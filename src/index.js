@@ -1,6 +1,7 @@
 // Components
-import { Header } from './components'
+import { Header, Dialog } from './components'
 
 export {
-  Header
+  Header,
+  Dialog
 }

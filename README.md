@@ -114,3 +114,99 @@ import { Header } from '@skyservice/vue-dev-kit'
   <button @click="create">Створити</button>
 </Header>
 ```
+
+---
+
+### Modal
+
+Модальне вікно в стилістиці проекту
+
+#### Імпорт
+
+```js
+import { Modal } from '@skyservice/vue-dev-kit'
+```
+
+#### Базове використання
+
+```vue
+<template>
+  <button @click="showModal = true">Відкрити</button>
+
+  <Modal v-model="showModal" title="Заголовок" subtitle="Підзаголовок">
+    <p>Контент модального вікна</p>
+
+    <template #footer>
+      <button @click="showModal = false">Закрити</button>
+    </template>
+  </Modal>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { Modal } from '@skyservice/vue-dev-kit'
+
+const showModal = ref(false)
+</script>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `modelValue` | `Boolean` | `false` | Стан відкриття (v-model) |
+| `title` | `String` | `''` | Заголовок модального вікна |
+| `subtitle` | `String` | `''` | Підзаголовок |
+| `closeTitle` | `String` | `'Закрити'` | Tooltip для кнопки закриття |
+| `closeOnOverlay` | `Boolean` | `true` | Закривати при кліку на overlay |
+| `closeOnEsc` | `Boolean` | `true` | Закривати при натисканні Esc |
+
+#### Events
+
+| Event | Опис |
+|-------|------|
+| `update:modelValue` | Зміна стану відкриття |
+| `close` | Закриття модального вікна |
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `default` | Основний контент модального вікна |
+| `footer` | Футер з кнопками (відображається тільки якщо заповнений) |
+
+#### CSS змінні
+
+```css
+:root {
+  --sky-modal-z-index: 9998;
+  --sky-modal-bg: white;
+  --sky-modal-radius: 0; /* на desktop 8px */
+  --sky-modal-border-color: #dee2e6;
+  --sky-modal-header-padding: 10px 14px;
+  --sky-modal-body-padding: 14px;
+  --sky-modal-footer-padding: 10px 14px;
+  --sky-modal-title-size: 18px;
+  --sky-modal-title-weight: 500;
+  --sky-modal-title-color: #252525;
+  --sky-modal-subtitle-size: 14px;
+  --sky-modal-subtitle-color: #6c757d;
+  --sky-modal-back-color: #374151;
+  --sky-modal-back-hover-bg: #f8f9fa;
+}
+```
+
+#### Приклади
+
+**Простий діалог**
+
+```vue
+<Modal v-model="isOpen" title="Підтвердження">
+  <p>Ви впевнені?</p>
+
+  <template #footer>
+    <button @click="isOpen = false">Скасувати</button>
+    <button @click="confirm">Підтвердити</button>
+  </template>
+</Modal>
+```
