@@ -6,20 +6,16 @@ export default defineConfig({
   plugins: [vue()],
   build: {
     lib: {
-      entry: {
-        'vue-dev-kit': resolve(__dirname, 'src/index.js'),
-        'components': resolve(__dirname, 'src/components/index.js'),
-        'api': resolve(__dirname, 'src/api/index.js')
-      },
+      entry: resolve(__dirname, 'src/index.js'),
       name: 'VueDevKit',
-      formats: ['es', 'cjs']
+      formats: ['es', 'cjs'],
+      fileName: 'vue-dev-kit'
     },
     rollupOptions: {
-      external: ['vue', 'axios'],
+      external: ['vue'],
       output: {
         globals: {
-          vue: 'Vue',
-          axios: 'axios'
+          vue: 'Vue'
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') {
