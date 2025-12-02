@@ -1,18 +1,18 @@
-# @skyservice/vue-dev-kit
+# @skyservice-developers/vue-dev-kit
 
 Vue 3 developer toolkit - компоненти для розробки.
 
 ## Встановлення
 
 ```bash
-npm install @skyservice/vue-dev-kit
+npm install @skyservice-developers/vue-dev-kit
 ```
 
 ## Підключення стилів
 
 ```js
 // main.js
-import '@skyservice/vue-dev-kit/style.css'
+import '@skyservice-developers/vue-dev-kit/style.css'
 ```
 
 ---
@@ -26,7 +26,7 @@ import '@skyservice/vue-dev-kit/style.css'
 #### Імпорт
 
 ```js
-import { Header } from '@skyservice/vue-dev-kit'
+import { Header } from '@skyservice-developers/vue-dev-kit'
 ```
 
 #### Базове використання
@@ -40,7 +40,7 @@ import { Header } from '@skyservice/vue-dev-kit'
 </template>
 
 <script setup>
-import { Header } from '@skyservice/vue-dev-kit'
+import { Header } from '@skyservice-developers/vue-dev-kit'
 </script>
 ```
 
@@ -124,7 +124,7 @@ import { Header } from '@skyservice/vue-dev-kit'
 #### Імпорт
 
 ```js
-import { Modal } from '@skyservice/vue-dev-kit'
+import { Modal } from '@skyservice-developers/vue-dev-kit'
 ```
 
 #### Базове використання
@@ -144,7 +144,7 @@ import { Modal } from '@skyservice/vue-dev-kit'
 
 <script setup>
 import { ref } from 'vue'
-import { Modal } from '@skyservice/vue-dev-kit'
+import { Modal } from '@skyservice-developers/vue-dev-kit'
 
 const showModal = ref(false)
 </script>
