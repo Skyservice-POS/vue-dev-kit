@@ -317,6 +317,13 @@ onUnmounted(() => {
     border-radius: 5px;
   }
 
+  /* Full height when no footer */
+  .sky-dialog-content:not(:has(.sky-dialog-footer)) .sky-dialog-paper {
+    height: calc(100% - 90px);
+    max-height: calc(100% - 90px);
+    margin-bottom: 10px;
+  }
+
   .sky-dialogbox,
   .sky-dialog-overlay {
     padding: 10px;
@@ -332,6 +339,12 @@ onUnmounted(() => {
     margin: 0 10px 10px 10px;
     border-radius: 5px;
     max-width: 100vw !important;
+  }
+
+  /* Full height when no footer */
+  .sky-dialog-content:not(:has(.sky-dialog-footer)) .sky-dialog-paper {
+    height: calc(100% - 80px);
+    max-height: calc(100% - 80px);
   }
 
   .sky-dialog-footer {
@@ -362,6 +375,11 @@ onUnmounted(() => {
 @supports (padding-top: env(safe-area-inset-top)) {
   .sky-dialog-paper {
     height: calc(100% - 150px - env(safe-area-inset-top));
+  }
+
+  /* Full height when no footer */
+  .sky-dialog-content:not(:has(.sky-dialog-footer)) .sky-dialog-paper {
+    height: calc(100% - 90px - env(safe-area-inset-top));
   }
 
   .sky-dialog-footer {
