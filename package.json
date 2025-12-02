@@ -23,7 +23,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
-    "publish": "npm publish --access public"
+    "release": "npm publish --access public"
   },
   "peerDependencies": {
     "vue": "^3.4.0"
