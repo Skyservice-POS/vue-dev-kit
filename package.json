@@ -1,0 +1,65 @@
+{
+  "name": "@skyservice/vue-dev-kit",
+  "version": "1.0.0",
+  "description": "Vue 3 developer toolkit - components, API utilities, and helpers",
+  "type": "module",
+  "main": "./dist/vue-dev-kit.umd.cjs",
+  "module": "./dist/vue-dev-kit.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-dev-kit.js",
+      "require": "./dist/vue-dev-kit.umd.cjs",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./components": {
+      "import": "./dist/components.js",
+      "types": "./dist/types/components/index.d.ts"
+    },
+    "./api": {
+      "import": "./dist/api.js",
+      "types": "./dist/types/api/index.d.ts"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.1.4",
+    "vue": "^3.4.21"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "components",
+    "api",
+    "toolkit",
+    "ui",
+    "developer-tools"
+  ],
+  "author": "Skyservice-POS",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Skyservice-POS/vue-dev-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Skyservice-POS/vue-dev-kit/issues"
+  },
+  "homepage": "https://github.com/Skyservice-POS/vue-dev-kit#readme"
+}
