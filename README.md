@@ -61,42 +61,6 @@ import { Header } from '@skyservice-developers/vue-dev-kit'
 | `title` | Кастомний заголовок (замість `title` prop) |
 | `subtitle` | Кастомний підзаголовок (замість `subtitle` prop) |
 
-#### Особливості
-
-**Автоматичне визначення iframe та кнопка "Назад"**
-
-Кнопка "Назад" автоматично:
-- Відображається тільки коли сторінка завантажена в iframe
-- При кліку відправляє `postMessage({ type: 'exit' }, '*')` батьківському вікну
-
-```vue
-<!-- Кнопка з'явиться тільки в iframe -->
-<Header title="Dashboard" />
-
-<!-- Примусово приховати кнопку -->
-<Header title="Dashboard" :show-back-button="false" />
-```
-
-#### CSS змінні
-
-```css
-:root {
-  --sky-header-bg: white;
-  --sky-header-border-color: #dee2e6;
-  --sky-header-z-index: 100;
-  --sky-header-padding: 10px 0;
-  --sky-header-content-padding: 4px 14px;
-  --sky-header-title-size: 18px;
-  --sky-header-title-weight: 500;
-  --sky-header-title-color: #252525;
-  --sky-header-subtitle-size: 14px;
-  --sky-header-subtitle-color: #6c757d;
-  --sky-header-back-btn-color: #374151;
-  --sky-header-back-btn-hover-bg: #f8f9fa;
-  --sky-header-back-btn-active-bg: #e9ecef;
-  --sky-header-actions-gap: 12px;
-}
-```
 
 #### Приклади
 
@@ -175,26 +139,6 @@ const showModal = ref(false)
 | `default` | Основний контент модального вікна |
 | `footer` | Футер з кнопками (відображається тільки якщо заповнений) |
 
-#### CSS змінні
-
-```css
-:root {
-  --sky-modal-z-index: 9998;
-  --sky-modal-bg: white;
-  --sky-modal-radius: 0; /* на desktop 8px */
-  --sky-modal-border-color: #dee2e6;
-  --sky-modal-header-padding: 10px 14px;
-  --sky-modal-body-padding: 14px;
-  --sky-modal-footer-padding: 10px 14px;
-  --sky-modal-title-size: 18px;
-  --sky-modal-title-weight: 500;
-  --sky-modal-title-color: #252525;
-  --sky-modal-subtitle-size: 14px;
-  --sky-modal-subtitle-color: #6c757d;
-  --sky-modal-back-color: #374151;
-  --sky-modal-back-hover-bg: #f8f9fa;
-}
-```
 
 #### Приклади
 
