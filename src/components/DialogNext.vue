@@ -26,6 +26,7 @@
             <div
               ref="dialogPaper"
               class="sky-dialog-paper"
+              :class="{ 'sky-dialog-paper-no-footer': !$slots.buttons }"
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
@@ -314,7 +315,7 @@ onUnmounted(() => {
   }
 
   /* Full height when no footer */
-  .sky-dialog-content:not(:has(.sky-dialog-footer)) .sky-dialog-paper {
+  .sky-dialog-paper-no-footer {
     height: calc(100% - 90px);
     max-height: calc(100% - 90px);
     margin-bottom: 10px;
@@ -332,7 +333,7 @@ onUnmounted(() => {
   }
 
   /* Full height when no footer */
-  .sky-dialog-content:not(:has(.sky-dialog-footer)) .sky-dialog-paper {
+  .sky-dialog-paper-no-footer {
     height: calc(100% - 80px);
     max-height: calc(100% - 80px);
   }
@@ -368,7 +369,7 @@ onUnmounted(() => {
   }
 
   /* Full height when no footer */
-  .sky-dialog-content:not(:has(.sky-dialog-footer)) .sky-dialog-paper {
+  .sky-dialog-paper-no-footer {
     height: calc(100% - 90px - env(safe-area-inset-top));
   }
 
