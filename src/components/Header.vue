@@ -6,7 +6,7 @@
           <button
             v-if="shouldShowBackButton"
             class="btn-back"
-            @click="$emit('back')"
+            @click="handleBack"
             :title="backButtonTitle"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -53,8 +53,6 @@ const props = defineProps({
   }
 })
 
-defineEmits(['back'])
-
 // Перевіряємо чи сторінка в iframe
 const isInIframe = computed(() => {
   try {
@@ -68,6 +66,11 @@ const isInIframe = computed(() => {
 const shouldShowBackButton = computed(() => {
   return props.showBackButton && isInIframe.value
 })
+
+// Обробник кнопки "Назад" - відправляє повідомлення батьківському вікну
+const handleBack = () => {
+  window.parent.postMessage({ type: 'exit' }, '*')
+}
 </script>
 
 <style scoped>

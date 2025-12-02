@@ -21,7 +21,7 @@ import '@skyservice/vue-dev-kit/style.css'
 
 ### Header
 
-Компонент фіксованої шапки сторінки з підтримкою кнопки "Назад" для iframe.
+Компонент фіксованої шапки сторінки з вбудованою підтримкою кнопки "Назад" для iframe.
 
 #### Імпорт
 
@@ -33,11 +33,7 @@ import { Header } from '@skyservice/vue-dev-kit'
 
 ```vue
 <template>
-  <Header
-    title="Назва сторінки"
-    subtitle="Опис сторінки"
-    @back="handleBack"
-  >
+  <Header title="Назва сторінки" subtitle="Опис сторінки">
     <button @click="handleRefresh">Оновити</button>
     <button @click="handleCreate">Створити</button>
   </Header>
@@ -45,10 +41,6 @@ import { Header } from '@skyservice/vue-dev-kit'
 
 <script setup>
 import { Header } from '@skyservice/vue-dev-kit'
-
-const handleBack = () => {
-  window.parent.postMessage({ type: 'exit' }, '*')
-}
 </script>
 ```
 
@@ -61,12 +53,6 @@ const handleBack = () => {
 | `showBackButton` | `Boolean` | `true` | Показувати кнопку "Назад" (відображається тільки в iframe) |
 | `backButtonTitle` | `String` | `'Назад'` | Tooltip для кнопки "Назад" |
 
-#### Events
-
-| Event | Опис |
-|-------|------|
-| `back` | Викликається при кліку на кнопку "Назад" |
-
 #### Slots
 
 | Slot | Опис |
@@ -77,13 +63,15 @@ const handleBack = () => {
 
 #### Особливості
 
-**Автоматичне визначення iframe**
+**Автоматичне визначення iframe та кнопка "Назад"**
 
-Кнопка "Назад" автоматично відображається тільки коли сторінка завантажена в iframe. Якщо сторінка відкрита напряму - кнопка прихована.
+Кнопка "Назад" автоматично:
+- Відображається тільки коли сторінка завантажена в iframe
+- При кліку відправляє `postMessage({ type: 'exit' }, '*')` батьківському вікну
 
 ```vue
 <!-- Кнопка з'явиться тільки в iframe -->
-<Header title="Dashboard" @back="handleBack" />
+<Header title="Dashboard" />
 
 <!-- Примусово приховати кнопку -->
 <Header title="Dashboard" :show-back-button="false" />
@@ -132,11 +120,7 @@ const handleBack = () => {
 **З кнопками дій**
 
 ```vue
-<Header
-  title="Контейнери"
-  subtitle="Керування Docker контейнерами"
-  @back="handleExit"
->
+<Header title="Контейнери" subtitle="Керування Docker контейнерами">
   <button class="btn-secondary" @click="refresh">Оновити</button>
   <button class="btn-primary" @click="create">Створити</button>
 </Header>
@@ -145,7 +129,7 @@ const handleBack = () => {
 **Повністю кастомний заголовок**
 
 ```vue
-<Header @back="goBack">
+<Header>
   <template #title>
     <div class="custom-title">
       <img src="/logo.svg" alt="Logo" />

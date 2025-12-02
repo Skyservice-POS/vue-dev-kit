@@ -10,27 +10,13 @@ export interface HeaderProps {
   backButtonTitle?: string
 }
 
-export interface HeaderEmits {
-  (e: 'back'): void
-}
-
 export interface HeaderSlots {
-  'back-icon'?: () => any
+  'default'?: () => any
   'title'?: () => any
   'subtitle'?: () => any
-  'actions'?: () => any
 }
 
-declare const Header: DefineComponent<
-  HeaderProps,
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  HeaderEmits
->
+declare const Header: DefineComponent<HeaderProps>
 
 // ============ API Utilities ============
 
