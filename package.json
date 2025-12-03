@@ -1,6 +1,6 @@
 {
   "name": "@skyservice-developers/vue-dev-kit",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Vue 3 developer toolkit - components and helpers",
   "type": "module",
   "main": "./dist/vue-dev-kit.cjs",
