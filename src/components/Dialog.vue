@@ -8,11 +8,12 @@
     :close-text="closeText"
     :enable-animation="enableAnimation"
     :close-on-esc="closeOnEsc"
+    :has-buttons="!!$slots.buttons"
     @close="$emit('close')"
     @save="$emit('save')"
   >
     <slot></slot>
-    <template #buttons>
+    <template v-if="$slots.buttons" #buttons>
       <slot name="buttons"></slot>
     </template>
   </component>

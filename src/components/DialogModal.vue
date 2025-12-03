@@ -27,7 +27,7 @@
             <div
               ref="dialogPaper"
               class="sky-dialog-paper"
-              :class="{ 'sky-dialog-paper-no-footer': !$slots.buttons }"
+              :class="{ 'sky-dialog-paper-no-footer': !showFooter }"
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
@@ -37,7 +37,7 @@
             </div>
 
             <!-- Footer -->
-            <div v-if="$slots.buttons" class="sky-dialog-footer" :class="{ 'sky-dialog-footer-animate': enableAnimation }">
+            <div v-if="showFooter" class="sky-dialog-footer" :class="{ 'sky-dialog-footer-animate': enableAnimation }">
               <slot name="buttons"></slot>
             </div>
           </div>
@@ -48,8 +48,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick, useSlots } from 'vue'
 import { isIosWebview, isAndroidWebview } from '../utils/webviewCheck'
+
+const slots = useSlots()
 
 const props = defineProps({
   modelValue: {
@@ -79,6 +81,10 @@ const props = defineProps({
   closeOnEsc: {
     type: Boolean,
     default: true
+  },
+  hasButtons: {
+    type: Boolean,
+    default: null
   }
 })
 
@@ -102,6 +108,16 @@ const isAndroid = computed(() => {
   } catch {
     return false
   }
+})
+
+// Determine if footer should be shown
+const showFooter = computed(() => {
+  // If hasButtons prop is explicitly set, use it
+  if (props.hasButtons !== null) {
+    return props.hasButtons
+  }
+  // Fallback to slot check (for direct usage without Dialog wrapper)
+  return !!slots.buttons
 })
 
 const close = () => {
@@ -320,8 +336,8 @@ onUnmounted(() => {
 
   /* Full height when no footer */
   .sky-dialog-paper-no-footer {
-    height: calc(100% - 90px);
-    max-height: calc(100% - 90px);
+    height: calc(100% - 70px);
+    max-height: calc(100% - 70px);
     margin-bottom: 10px;
   }
 
@@ -344,8 +360,8 @@ onUnmounted(() => {
 
   /* Full height when no footer */
   .sky-dialog-paper-no-footer {
-    height: calc(100% - 80px);
-    max-height: calc(100% - 80px);
+    height: calc(100% - 60px);
+    max-height: calc(100% - 60px);
   }
 
   .sky-dialog-footer {
@@ -380,7 +396,7 @@ onUnmounted(() => {
 
   /* Full height when no footer */
   .sky-dialog-paper-no-footer {
-    height: calc(100% - 90px - env(safe-area-inset-top));
+    height: calc(100% - 60px - env(safe-area-inset-top));
   }
 
   .sky-dialog-footer {
