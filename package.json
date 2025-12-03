@@ -1,6 +1,6 @@
 {
   "name": "@skyservice-developers/vue-dev-kit",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Vue 3 developer toolkit - components and helpers",
   "type": "module",
   "main": "./dist/vue-dev-kit.cjs",
@@ -12,7 +12,11 @@
       "require": "./dist/vue-dev-kit.cjs",
       "types": "./src/types/index.d.ts"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css",
+      "default": "./dist/style.css"
+    }
   },
   "files": [
     "dist",
