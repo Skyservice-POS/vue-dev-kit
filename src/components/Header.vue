@@ -157,14 +157,14 @@ const handleBack = () => {
 }
 
 @media (max-width: 768px) {
-  .header-content {
+  /* .header-content {
     padding: 12px 16px;
-  }
+  } */
 
   .header-top {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    /* gap: 12px; */
   }
 
   .header-actions {
