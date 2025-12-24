@@ -50,6 +50,10 @@ const props = defineProps({
   backButtonTitle: {
     type: String,
     default: 'Назад'
+  },
+  onBackCallback: {
+    type: Function,
+    default: null
   }
 })
 
@@ -67,9 +71,13 @@ const shouldShowBackButton = computed(() => {
   return props.showBackButton && isInIframe.value
 })
 
-// Обробник кнопки "Назад" - відправляє повідомлення батьківському вікну
+// Обробник кнопки "Назад" - викликає передану функцію або відправляє повідомлення батьківському вікну
 const handleBack = () => {
-  window.parent.postMessage({ type: 'exit' }, '*')
+  if (props.onBackCallback) {
+    props.onBackCallback()
+  } else {
+    window.parent.postMessage({ type: 'exit' }, '*')
+  }
 }
 </script>
 
