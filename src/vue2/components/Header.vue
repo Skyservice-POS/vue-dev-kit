@@ -15,7 +15,7 @@
           </button>
           <div class="header-title-content">
             <slot name="title">
-              <h4 class="header-title">{{ title }}</h4>
+              <h4 class="header-title">{{ title }} vue 2</h4>
             </slot>
             <slot name="subtitle">
               <div v-if="subtitle" class="header-subtitle">{{ subtitle }}</div>
@@ -31,45 +31,47 @@
   </header>
 </template>
 
-<script setup>
-import { computed } from 'vue'
-
-const props = defineProps({
-  title: {
-    type: String,
-    default: ''
+<script>
+export default {
+  name: 'Header',
+  props: {
+    title: {
+      type: String,
+      default: ''
+    },
+    subtitle: {
+      type: String,
+      default: ''
+    },
+    showBackButton: {
+      type: Boolean,
+      default: true
+    },
+    backButtonTitle: {
+      type: String,
+      default: 'Назад'
+    }
   },
-  subtitle: {
-    type: String,
-    default: ''
+  computed: {
+    // Перевіряємо чи сторінка в iframe
+    isInIframe() {
+      try {
+        return window.self !== window.top
+      } catch (e) {
+        return true
+      }
+    },
+    // Показуємо кнопку тільки якщо showBackButton=true І сторінка в iframe
+    shouldShowBackButton() {
+      return this.showBackButton && this.isInIframe
+    }
   },
-  showBackButton: {
-    type: Boolean,
-    default: true
-  },
-  backButtonTitle: {
-    type: String,
-    default: 'Назад'
+  methods: {
+    // Обробник кнопки "Назад" - відправляє повідомлення батьківському вікну
+    handleBack() {
+      window.parent.postMessage({ type: 'exit' }, '*')
+    }
   }
-})
-
-// Перевіряємо чи сторінка в iframe
-const isInIframe = computed(() => {
-  try {
-    return window.self !== window.top
-  } catch (e) {
-    return true
-  }
-})
-
-// Показуємо кнопку тільки якщо showBackButton=true І сторінка в iframe
-const shouldShowBackButton = computed(() => {
-  return props.showBackButton && isInIframe.value
-})
-
-// Обробник кнопки "Назад" - відправляє повідомлення батьківському вікну
-const handleBack = () => {
-  window.parent.postMessage({ type: 'exit' }, '*')
 }
 </script>
 

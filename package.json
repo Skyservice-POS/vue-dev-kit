@@ -1,22 +1,29 @@
 {
   "name": "@skyservice-developers/vue-dev-kit",
   "version": "1.0.7",
-  "description": "Vue 3 developer toolkit - components and helpers",
+  "description": "Vue 2 and Vue 3 developer toolkit - components and helpers",
   "type": "module",
-  "main": "./dist/vue-dev-kit.cjs",
-  "module": "./dist/vue-dev-kit.js",
-  "types": "./src/types/index.d.ts",
+  "main": "./dist/vue3/vue-dev-kit.cjs",
+  "module": "./dist/vue3/vue-dev-kit.js",
+  "types": "./src/shared/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/vue-dev-kit.js",
-      "require": "./dist/vue-dev-kit.cjs",
-      "types": "./src/types/index.d.ts"
+      "import": "./dist/vue3/vue-dev-kit.js",
+      "require": "./dist/vue3/vue-dev-kit.cjs",
+      "types": "./src/shared/types/index.d.ts"
     },
-    "./style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css",
-      "default": "./dist/style.css"
-    }
+    "./vue2": {
+      "import": "./dist/vue2/vue-dev-kit.js",
+      "require": "./dist/vue2/vue-dev-kit.cjs"
+    },
+    "./vue3": {
+      "import": "./dist/vue3/vue-dev-kit.js",
+      "require": "./dist/vue3/vue-dev-kit.cjs",
+      "types": "./src/shared/types/index.d.ts"
+    },
+    "./vue2/style.css": "./dist/vue2/style.css",
+    "./vue3/style.css": "./dist/vue3/style.css",
+    "./style.css": "./dist/vue3/style.css"
   },
   "files": [
     "dist",
@@ -24,24 +31,36 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build:vue2": "vite build --config vite.vue2.config.js",
+    "build:vue3": "vite build --config vite.vue3.config.js",
+    "build": "npm run build:vue2 && npm run build:vue3",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
     "release": "npm publish --access public"
   },
   "peerDependencies": {
-    "vue": "^3.4.0"
+    "vue": "^2.7.0 || ^3.4.0"
+  },
+  "peerDependenciesMeta": {
+    "portal-vue": {
+      "optional": true
+    }
   },
   "dependencies": {
+    "portal-vue": "^3.0.0",
     "ua-parser-js": "^1.0.37"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.1.4",
-    "vue": "^3.4.21"
+    "@vitejs/plugin-vue": "^4.5.2",
+    "vite": "^4.5.2",
+    "vite-plugin-vue2": "^2.0.3",
+    "vue": "^2.7.16",
+    "vue-template-compiler": "^2.7.16",
+    "vue3": "npm:vue@^3.4.21"
   },
   "keywords": [
     "vue",
+    "vue2",
     "vue3",
     "components",
     "toolkit",
@@ -56,5 +75,10 @@
   "bugs": {
     "url": "https://github.com/Skyservice-POS/vue-dev-kit/issues"
   },
-  "homepage": "https://github.com/Skyservice-POS/vue-dev-kit#readme"
+  "homepage": "https://github.com/Skyservice-POS/vue-dev-kit#readme",
+  "overrides": {
+    "@vitejs/plugin-vue": {
+      "vue": "3.4.21"
+    }
+  }
 }

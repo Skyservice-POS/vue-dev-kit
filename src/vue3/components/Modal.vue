@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="body">
+  <BaseTeleport to="body">
     <transition name="modal-fade">
       <div v-if="modelValue" class="sky-modal-overlay" @click.self="handleOverlayClick">
         <div class="sky-modal" :style="modalStyle">
@@ -25,11 +25,13 @@
         </div>
       </div>
     </transition>
-  </Teleport>
+  </BaseTeleport>
 </template>
 
 <script setup>
 import { computed, watch, onMounted, onUnmounted } from 'vue'
+import BaseTeleport from './BaseTeleport.vue';
+
 
 const props = defineProps({
   modelValue: {
