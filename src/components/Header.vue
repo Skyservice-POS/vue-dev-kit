@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
 
 const props = defineProps({
   title: {
@@ -50,12 +50,11 @@ const props = defineProps({
   backButtonTitle: {
     type: String,
     default: 'Назад'
-  },
-  onBackCallback: {
-    type: Function,
-    default: null
   }
 })
+
+const emit = defineEmits(['back'])
+const attrs = useAttrs()
 
 // Перевіряємо чи сторінка в iframe
 const isInIframe = computed(() => {
@@ -71,10 +70,9 @@ const shouldShowBackButton = computed(() => {
   return props.showBackButton && isInIframe.value
 })
 
-// Обробник кнопки "Назад" - викликає передану функцію або відправляє повідомлення батьківському вікну
 const handleBack = () => {
-  if (props.onBackCallback) {
-    props.onBackCallback()
+  if (attrs.onBack) {
+    emit('back')
   } else {
     window.parent.postMessage({ type: 'exit' }, '*')
   }
