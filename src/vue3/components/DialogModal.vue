@@ -49,7 +49,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick, useSlots } from 'vue'
-import { isIosWebview, isAndroidWebview } from '../utils/webviewCheck'
+import { isIosWebview, isAndroidWebview } from '../../shared/utils/webviewCheck'
 
 const slots = useSlots()
 
