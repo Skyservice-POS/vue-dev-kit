@@ -50,6 +50,10 @@ const props = defineProps({
   backButtonTitle: {
     type: String,
     default: 'Назад'
+  },
+  backEvent: {
+    type: Function,
+    default: null
   }
 })
 
@@ -62,14 +66,18 @@ const isInIframe = computed(() => {
   }
 })
 
-// Показуємо кнопку тільки якщо showBackButton=true І сторінка в iframe
+// Показуємо кнопку якщо є backEvent АБО (showBackButton=true І сторінка в iframe)
 const shouldShowBackButton = computed(() => {
-  return props.showBackButton && isInIframe.value
+  return props.backEvent || (props.showBackButton && isInIframe.value)
 })
 
-// Обробник кнопки "Назад" - відправляє повідомлення батьківському вікну
+// Обробник кнопки "Назад" - викликає backEvent або відправляє повідомлення батьківському вікну
 const handleBack = () => {
-  window.parent.postMessage({ type: 'exit' }, '*')
+  if (props.backEvent) {
+    props.backEvent()
+  } else {
+    window.parent.postMessage({ type: 'exit' }, '*')
+  }
 }
 </script>
 
