@@ -15,7 +15,7 @@
           </button>
           <div class="header-title-content">
             <slot name="title">
-              <h4 class="header-title">{{ title }} vue 3</h4>
+              <h4 class="header-title">{{ title }}</h4>
             </slot>
             <slot name="subtitle">
               <div v-if="subtitle" class="header-subtitle">{{ subtitle }}</div>
