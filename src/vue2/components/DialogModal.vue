@@ -5,18 +5,40 @@
       class="sky-dialogbox sky-dialogbox-classic"
       :style="[zIndex ? { 'z-index': zIndex } : null]"
     >
-      <div class="sky-dialog-overlay" :class="{ 'sky-dialog-animate': enableAnimation }">
+      <div
+        class="sky-dialog-overlay"
+        :class="{ 'sky-dialog-animate': enableAnimation }"
+      >
         <div ref="dialogContent" class="sky-dialog-content">
           <!-- Header -->
-          <div class="sky-dialog-title" :class="{ 'sky-dialog-title-with-subtitle': subtitle }">
+          <div
+            class="sky-dialog-title"
+            :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
+          >
             {{ title }}
-            <span v-if="subtitle" class="sky-dialog-subtitle">{{ subtitle }}</span>
+            <span v-if="subtitle" class="sky-dialog-subtitle">{{
+              subtitle
+            }}</span>
           </div>
 
           <button class="sky-dialog-close" :title="closeText" @click="close">
             <svg viewBox="0 0 16 16" width="16" height="16">
-              <line x1="1" y1="15" x2="15" y2="1" stroke="currentColor" stroke-width="2" />
-              <line x1="1" y1="1" x2="15" y2="15" stroke="currentColor" stroke-width="2" />
+              <line
+                x1="1"
+                y1="15"
+                x2="15"
+                y2="1"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <line
+                x1="1"
+                y1="1"
+                x2="15"
+                y2="15"
+                stroke="currentColor"
+                stroke-width="2"
+              />
             </svg>
           </button>
 
@@ -36,7 +58,11 @@
           </div>
 
           <!-- Footer -->
-          <div v-if="showFooter" class="sky-dialog-footer" :class="{ 'sky-dialog-footer-animate': enableAnimation }">
+          <div
+            v-if="showFooter"
+            class="sky-dialog-footer"
+            :class="{ 'sky-dialog-footer-animate': enableAnimation }"
+          >
             <slot name="buttons"></slot>
           </div>
         </div>
@@ -46,142 +72,145 @@
 </template>
 
 <script>
-import { isIosWebview, isAndroidWebview } from '../../shared/utils/webviewCheck'
+import {
+  isIosWebview,
+  isAndroidWebview,
+} from "../../shared/utils/webviewCheck";
 
 export default {
-  name: 'DialogModal',
+  name: "DialogModal",
   props: {
     modelValue: {
       type: Boolean,
-      default: false
+      default: false,
     },
     title: {
       type: String,
-      default: ''
+      default: "",
     },
     subtitle: {
       type: String,
-      default: ''
+      default: "",
     },
     zIndex: {
       type: [Number, String],
-      default: null
+      default: null,
     },
     closeText: {
       type: String,
-      default: 'Закрити'
+      default: "Закрити",
     },
     enableAnimation: {
       type: Boolean,
-      default: true
+      default: true,
     },
     closeOnEsc: {
       type: Boolean,
-      default: true
+      default: true,
     },
     hasButtons: {
       type: Boolean,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      touchStartX: 0
-    }
+      touchStartX: 0,
+    };
   },
   computed: {
     isIos() {
       try {
-        return isIosWebview()
+        return isIosWebview();
       } catch {
-        return false
+        return false;
       }
     },
     isAndroid() {
       try {
-        return isAndroidWebview()
+        return isAndroidWebview();
       } catch {
-        return false
+        return false;
       }
     },
     // Determine if footer should be shown
     showFooter() {
       // If hasButtons prop is explicitly set, use it
       if (this.hasButtons !== null) {
-        return this.hasButtons
+        return this.hasButtons;
       }
       // Fallback to slot check (for direct usage without Dialog wrapper)
-      return !!this.$slots.buttons
-    }
+      return !!this.$slots.buttons;
+    },
   },
   watch: {
     // Body scroll lock
     modelValue(value) {
       if (value) {
-        document.body.style.overflow = 'hidden'
+        document.body.style.overflow = "hidden";
         this.$nextTick(() => {
-          this.androidFix()
-        })
+          this.androidFix();
+        });
       } else {
-        document.body.style.overflow = ''
+        document.body.style.overflow = "";
       }
-    }
+    },
   },
   mounted() {
-    document.addEventListener('keydown', this.handleKeydown)
-    window.addEventListener('resize', this.androidFix)
+    document.addEventListener("keydown", this.handleKeydown);
+    window.addEventListener("resize", this.androidFix);
   },
   beforeDestroy() {
-    document.removeEventListener('keydown', this.handleKeydown)
-    window.removeEventListener('resize', this.androidFix)
-    document.body.style.overflow = ''
+    document.removeEventListener("keydown", this.handleKeydown);
+    window.removeEventListener("resize", this.androidFix);
+    document.body.style.overflow = "";
   },
   methods: {
     close() {
-      this.$emit('update:modelValue', false)
-      this.$emit('close')
+      this.$emit("update:modelValue", false);
+      this.$emit("close");
     },
     handleKeydown(e) {
-      if (e.key === 'Escape' && this.closeOnEsc && this.modelValue) {
-        this.close()
+      if (e.key === "Escape" && this.closeOnEsc && this.modelValue) {
+        this.close();
       }
-      if (e.key === 'Enter' && this.modelValue) {
-        this.$emit('save')
+      if (e.key === "Enter" && this.modelValue) {
+        this.$emit("save");
       }
     },
     // Touch handling for iOS swipe back
     handleTouchStart(e) {
       if (e.touches[0].clientX < 35) {
-        this.touchStartX = e.touches[0].clientX
+        this.touchStartX = e.touches[0].clientX;
       }
     },
     handleTouchEnd(e) {
       if (this.touchStartX > 0 && this.touchStartX < 35) {
-        const touchEndX = e.changedTouches[0].clientX
+        const touchEndX = e.changedTouches[0].clientX;
         if (touchEndX - this.touchStartX > 50) {
-          this.close()
+          this.close();
         }
       }
-      this.touchStartX = 0
+      this.touchStartX = 0;
     },
     // Android notch fix
     androidFix() {
-      if (!this.isAndroid || !this.$refs.dialogContent) return
+      if (!this.isAndroid || !this.$refs.dialogContent) return;
 
       try {
-        if (typeof Android !== 'undefined' && Android.getDisplayCutoutTop) {
-          const cutoutTop = Android.getDisplayCutoutTop()
+        if (typeof Android !== "undefined" && Android.getDisplayCutoutTop) {
+          const cutoutTop = Android.getDisplayCutoutTop();
           if (cutoutTop && window.devicePixelRatio > 1.0) {
-            const paddingTop = cutoutTop / window.devicePixelRatio
-            this.$refs.dialogContent.style.paddingTop = paddingTop + 'px'
+            const paddingTop = cutoutTop / window.devicePixelRatio;
+            this.$refs.dialogContent.style.paddingTop = paddingTop + "px";
           }
         }
       } catch (err) {
         // Android interface not available
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>
@@ -304,7 +333,10 @@ export default {
   max-width: 100%;
 }
 
-.sky-dialog-footer:has(> :deep(*:nth-child(2)):not(:has(> :deep(*:nth-child(3))))) > :deep(*) {
+.sky-dialog-footer:has(
+    > :deep(*:nth-child(2)):not(:has(> :deep(*:nth-child(3))))
+  )
+  > :deep(*) {
   flex: 1 1 50%;
 }
 

@@ -9,8 +9,16 @@
             @click="handleBack"
             :title="backButtonTitle"
           >
-            <svg width="15" height="15" viewBox="0 0 451.847 451.847" style="transform: rotate(90deg)">
-              <path fill="currentColor" d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"/>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 451.847 451.847"
+              style="transform: rotate(90deg)"
+            >
+              <path
+                fill="currentColor"
+                d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
+              />
             </svg>
           </button>
           <div class="header-title-content">
@@ -24,7 +32,10 @@
         </div>
 
         <div class="header-actions">
+          <!-- Порожні блоки ремонтують відображення на windows в додатку, не видаляти! -->
+          <div></div>
           <slot></slot>
+          <div></div>
         </div>
       </div>
     </div>
@@ -32,53 +43,53 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps({
   title: {
     type: String,
-    default: ''
+    default: "",
   },
   subtitle: {
     type: String,
-    default: ''
+    default: "",
   },
   showBackButton: {
     type: Boolean,
-    default: true
+    default: true,
   },
   backButtonTitle: {
     type: String,
-    default: 'Назад'
+    default: "Назад",
   },
   backEvent: {
     type: Function,
-    default: null
-  }
-})
+    default: null,
+  },
+});
 
 // Перевіряємо чи сторінка в iframe
 const isInIframe = computed(() => {
   try {
-    return window.self !== window.top
+    return window.self !== window.top;
   } catch (e) {
-    return true
+    return true;
   }
-})
+});
 
 // Показуємо кнопку якщо є backEvent АБО (showBackButton=true І сторінка в iframe)
 const shouldShowBackButton = computed(() => {
-  return props.backEvent || (props.showBackButton && isInIframe.value)
-})
+  return props.backEvent || (props.showBackButton && isInIframe.value);
+});
 
 // Обробник кнопки "Назад" - викликає backEvent або відправляє повідомлення батьківському вікну
 const handleBack = () => {
   if (props.backEvent) {
-    props.backEvent()
+    props.backEvent();
   } else {
-    window.parent.postMessage({ type: 'exit' }, '*')
+    window.parent.postMessage({ type: "exit" }, "*");
   }
-}
+};
 </script>
 
 <style scoped>

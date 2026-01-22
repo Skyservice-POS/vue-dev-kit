@@ -6,18 +6,34 @@
         class="sky-dialogbox sky-dialogbox-next"
         :style="[zIndex ? { 'z-index': zIndex } : null]"
       >
-        <div class="sky-dialog-overlay" :class="{ 'sky-dialog-animate': enableAnimation }">
+        <div
+          class="sky-dialog-overlay"
+          :class="{ 'sky-dialog-animate': enableAnimation }"
+        >
           <div ref="dialogContent" class="sky-dialog-content">
             <!-- Header -->
             <button class="sky-dialog-back" :title="closeText" @click="close">
-              <svg width="15" height="15" viewBox="0 0 451.847 451.847" style="transform: rotate(90deg)">
-                <path fill="currentColor" d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"/>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 451.847 451.847"
+                style="transform: rotate(90deg)"
+              >
+                <path
+                  fill="currentColor"
+                  d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
+                />
               </svg>
             </button>
 
-            <div class="sky-dialog-title" :class="{ 'sky-dialog-title-with-subtitle': subtitle }">
+            <div
+              class="sky-dialog-title"
+              :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
+            >
               {{ title }}
-              <span v-if="subtitle" class="sky-dialog-subtitle">{{ subtitle }}</span>
+              <span v-if="subtitle" class="sky-dialog-subtitle">{{
+                subtitle
+              }}</span>
             </div>
 
             <div class="sky-dialog-clearfix" />
@@ -36,8 +52,15 @@
             </div>
 
             <!-- Footer -->
-            <div v-if="showFooter" class="sky-dialog-footer" :class="{ 'sky-dialog-footer-animate': enableAnimation }">
+            <div
+              v-if="showFooter"
+              class="sky-dialog-footer"
+              :class="{ 'sky-dialog-footer-animate': enableAnimation }"
+            >
+              <!-- Порожні блоки ремонтують відображення на windows в додатку, не видаляти! -->
+              <div></div>
               <slot name="buttons"></slot>
+              <div></div>
             </div>
           </div>
         </div>
@@ -47,148 +70,162 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick, useSlots } from 'vue'
-import { isIosWebview, isAndroidWebview } from '../../shared/utils/webviewCheck'
+import {
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onUnmounted,
+  nextTick,
+  useSlots,
+} from "vue";
+import {
+  isIosWebview,
+  isAndroidWebview,
+} from "../../shared/utils/webviewCheck";
 
-const slots = useSlots()
+const slots = useSlots();
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   title: {
     type: String,
-    default: ''
+    default: "",
   },
   subtitle: {
     type: String,
-    default: ''
+    default: "",
   },
   zIndex: {
     type: [Number, String],
-    default: null
+    default: null,
   },
   closeText: {
     type: String,
-    default: 'Назад'
+    default: "Назад",
   },
   enableAnimation: {
     type: Boolean,
-    default: true
+    default: true,
   },
   closeOnEsc: {
     type: Boolean,
-    default: true
+    default: true,
   },
   hasButtons: {
     type: Boolean,
-    default: null
-  }
-})
+    default: null,
+  },
+});
 
-const emit = defineEmits(['update:modelValue', 'close', 'save'])
+const emit = defineEmits(["update:modelValue", "close", "save"]);
 
-const dialogContent = ref(null)
-const dialogPaper = ref(null)
-const touchStartX = ref(0)
+const dialogContent = ref(null);
+const dialogPaper = ref(null);
+const touchStartX = ref(0);
 
 const isIos = computed(() => {
   try {
-    return isIosWebview()
+    return isIosWebview();
   } catch {
-    return false
+    return false;
   }
-})
+});
 
 const isAndroid = computed(() => {
   try {
-    return isAndroidWebview()
+    return isAndroidWebview();
   } catch {
-    return false
+    return false;
   }
-})
+});
 
 // Determine if footer should be shown
 const showFooter = computed(() => {
   // If hasButtons prop is explicitly set, use it
   if (props.hasButtons !== null) {
-    return props.hasButtons
+    return props.hasButtons;
   }
   // Fallback to slot check (for direct usage without Dialog wrapper)
-  return !!slots.buttons
-})
+  return !!slots.buttons;
+});
 
 const close = () => {
-  emit('update:modelValue', false)
-  emit('close')
-}
+  emit("update:modelValue", false);
+  emit("close");
+};
 
 const handleKeydown = (e) => {
-  if (e.key === 'Escape' && props.closeOnEsc && props.modelValue) {
-    close()
+  if (e.key === "Escape" && props.closeOnEsc && props.modelValue) {
+    close();
   }
-  if (e.key === 'Enter' && props.modelValue) {
-    emit('save')
+  if (e.key === "Enter" && props.modelValue) {
+    emit("save");
   }
-}
+};
 
 // Touch handling for iOS swipe back
 const handleTouchStart = (e) => {
   if (e.touches[0].clientX < 35) {
-    touchStartX.value = e.touches[0].clientX
+    touchStartX.value = e.touches[0].clientX;
   }
-}
+};
 
 const handleTouchEnd = (e) => {
   if (touchStartX.value > 0 && touchStartX.value < 35) {
-    const touchEndX = e.changedTouches[0].clientX
+    const touchEndX = e.changedTouches[0].clientX;
     if (touchEndX - touchStartX.value > 50) {
-      close()
+      close();
     }
   }
-  touchStartX.value = 0
-}
+  touchStartX.value = 0;
+};
 
 // Android notch fix
 const androidFix = () => {
-  if (!isAndroid.value || !dialogContent.value) return
+  if (!isAndroid.value || !dialogContent.value) return;
 
   try {
-    if (typeof Android !== 'undefined' && Android.getDisplayCutoutTop) {
-      const cutoutTop = Android.getDisplayCutoutTop()
+    if (typeof Android !== "undefined" && Android.getDisplayCutoutTop) {
+      const cutoutTop = Android.getDisplayCutoutTop();
       if (cutoutTop && window.devicePixelRatio > 1.0) {
-        const paddingTop = cutoutTop / window.devicePixelRatio
-        dialogContent.value.style.paddingTop = paddingTop + 'px'
+        const paddingTop = cutoutTop / window.devicePixelRatio;
+        dialogContent.value.style.paddingTop = paddingTop + "px";
       }
     }
   } catch (err) {
     // Android interface not available
   }
-}
+};
 
 // Body scroll lock
-watch(() => props.modelValue, (value) => {
-  if (value) {
-    document.body.style.overflow = 'hidden'
-    nextTick(() => {
-      androidFix()
-    })
-  } else {
-    document.body.style.overflow = ''
-  }
-})
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value) {
+      document.body.style.overflow = "hidden";
+      nextTick(() => {
+        androidFix();
+      });
+    } else {
+      document.body.style.overflow = "";
+    }
+  },
+);
 
 onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-  window.addEventListener('resize', androidFix)
-})
+  document.addEventListener("keydown", handleKeydown);
+  window.addEventListener("resize", androidFix);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
-  window.removeEventListener('resize', androidFix)
-  document.body.style.overflow = ''
-})
+  document.removeEventListener("keydown", handleKeydown);
+  window.removeEventListener("resize", androidFix);
+  document.body.style.overflow = "";
+});
 </script>
 
 <style>
@@ -309,7 +346,10 @@ onUnmounted(() => {
   max-width: 100%;
 }
 
-.sky-dialog-footer:has(> :deep(*:nth-child(2)):not(:has(> :deep(*:nth-child(3))))) > :deep(*) {
+.sky-dialog-footer:has(
+    > :deep(*:nth-child(2)):not(:has(> :deep(*:nth-child(3))))
+  )
+  > :deep(*) {
   flex: 1 1 50%;
 }
 
@@ -336,6 +376,11 @@ onUnmounted(() => {
     max-height: calc(100% - 70px);
     margin-bottom: 10px;
   }
+
+  /* .sky-dialogbox,
+  .sky-dialog-overlay {
+    padding: 10px;
+  } */
 }
 
 /* Mobile */
