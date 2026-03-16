@@ -15,7 +15,7 @@
           </button>
           <div class="header-title-content">
             <slot name="title">
-              <h4 class="header-title">{{ title }} vue 2</h4>
+              <h4 class="header-title">{{ title }}</h4>
             </slot>
             <slot name="subtitle">
               <div v-if="subtitle" class="header-subtitle">{{ subtitle }}</div>
@@ -50,6 +50,10 @@ export default {
     backButtonTitle: {
       type: String,
       default: 'Назад'
+    },
+    backEvent: {
+      type: Function,
+      default: null
     }
   },
   computed: {
@@ -61,15 +65,19 @@ export default {
         return true
       }
     },
-    // Показуємо кнопку тільки якщо showBackButton=true І сторінка в iframe
+    // Показуємо кнопку якщо є backEvent АБО (showBackButton=true І сторінка в iframe)
     shouldShowBackButton() {
-      return this.showBackButton && this.isInIframe
+      return this.backEvent || (this.showBackButton && this.isInIframe)
     }
   },
   methods: {
-    // Обробник кнопки "Назад" - відправляє повідомлення батьківському вікну
+    // Обробник кнопки "Назад" - викликає backEvent або відправляє повідомлення батьківському вікну
     handleBack() {
-      window.parent.postMessage({ type: 'exit' }, '*')
+      if (this.backEvent) {
+        this.backEvent()
+      } else {
+        window.parent.postMessage({ type: 'exit' }, '*')
+      }
     }
   }
 }
