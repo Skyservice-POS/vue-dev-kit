@@ -333,7 +333,6 @@ const handleBack = () => {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sky-header-actions-gap, 12px);
 }
 
 .btn-back {
