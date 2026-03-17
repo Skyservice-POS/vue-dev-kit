@@ -1,6 +1,6 @@
 {
   "name": "@skyservice-developers/vue-dev-kit",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Vue 2 and Vue 3 developer toolkit - components and helpers",
   "type": "module",
   "main": "./dist/vue3/vue-dev-kit.cjs",
@@ -31,6 +31,7 @@
   ],
   "scripts": {
     "dev": "vite",
+    "playground": "vite --config playground/vite.config.js playground",
     "build:vue2": "vite build --config vite.vue2.config.js",
     "build:vue3": "vite build --config vite.vue3.config.js",
     "build": "npm run build:vue2 && npm run build:vue3",

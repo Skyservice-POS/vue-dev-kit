@@ -2,11 +2,26 @@ import { DefineComponent } from 'vue'
 
 // ============ Components ============
 
+export interface HeaderDropdownItem {
+  name: string
+  path: string
+  lastVisit: number
+}
+
 export interface HeaderProps {
   title?: string
   subtitle?: string
   showBackButton?: boolean
   backButtonTitle?: string
+  backEvent?: (() => void) | null
+  dropdownItems?: HeaderDropdownItem[]
+  dropdownTitle?: string
+  visitLabel?: string
+}
+
+export interface HeaderEmits {
+  'back': () => void
+  'navigate': (path: string) => void
 }
 
 export interface HeaderSlots {

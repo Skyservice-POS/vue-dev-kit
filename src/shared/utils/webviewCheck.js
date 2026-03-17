@@ -44,3 +44,11 @@ export function isWebview() {
   const check = webviewCheck()
   return check !== 'browser'
 }
+
+export function isInIframe() {
+  try {
+    return window.self !== window.top
+  } catch (e) {
+    return true
+  }
+}
