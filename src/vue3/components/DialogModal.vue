@@ -116,7 +116,7 @@ const props = defineProps({
   },
   enableAnimation: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   closeOnEsc: {
     type: Boolean,

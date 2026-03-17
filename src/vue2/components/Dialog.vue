@@ -52,7 +52,7 @@ export default {
     },
     enableAnimation: {
       type: Boolean,
-      default: true
+      default: false
     },
     closeOnEsc: {
       type: Boolean,

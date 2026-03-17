@@ -12,31 +12,30 @@
         >
           <div ref="dialogContent" class="sky-dialog-content">
             <!-- Header -->
-            <button class="sky-dialog-back" :title="closeText" @click="close">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 451.847 451.847"
-                style="transform: rotate(90deg)"
+            <div class="sky-dialog-header">
+              <button class="sky-dialog-back" :title="closeText" @click="close">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 451.847 451.847"
+                  style="transform: rotate(90deg)"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
+                  />
+                </svg>
+              </button>
+              <div
+                class="sky-dialog-title"
+                :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
               >
-                <path
-                  fill="currentColor"
-                  d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
-                />
-              </svg>
-            </button>
-
-            <div
-              class="sky-dialog-title"
-              :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
-            >
-              {{ title }}
-              <span v-if="subtitle" class="sky-dialog-subtitle">{{
-                subtitle
-              }}</span>
+                {{ title }}
+                <span v-if="subtitle" class="sky-dialog-subtitle">{{
+                  subtitle
+                }}</span>
+              </div>
             </div>
-
-            <div class="sky-dialog-clearfix" />
 
             <!-- Body -->
             <div
@@ -109,7 +108,7 @@ const props = defineProps({
   },
   enableAnimation: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   closeOnEsc: {
     type: Boolean,
@@ -265,37 +264,52 @@ onUnmounted(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
+.sky-dialog-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+}
+
 .sky-dialog-back {
-  cursor: pointer;
-  margin: 10px;
-  padding: 14px 12px 6px;
-  float: left;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   background: transparent;
   border: none;
+  cursor: pointer;
   border-radius: 6px;
   color: var(--sky-dialog-back-color, #374151);
   transition: background-color 0.2s;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.sky-dialog-back svg {
+  display: block;
 }
 
 .sky-dialog-back:hover {
   background-color: var(--sky-dialog-back-hover-bg, #f8f9fa);
 }
 
+.sky-dialog-back:active {
+  background-color: var(--sky-dialog-back-active-bg, #e9ecef);
+}
+
 .sky-dialog-title {
-  max-width: calc(100% - 80px);
   font-size: var(--sky-dialog-title-size, 13pt);
-  padding: 21px 0;
-  padding-right: 0;
-  float: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--sky-dialog-title-color, #252525);
+  min-width: 0;
 }
 
 .sky-dialog-title-with-subtitle {
-  padding: 13px 0;
+  line-height: 1.2;
 }
 
 .sky-dialog-subtitle {
@@ -308,9 +322,6 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 
-.sky-dialog-clearfix {
-  clear: both;
-}
 
 .sky-dialog-paper {
   height: 100%;
