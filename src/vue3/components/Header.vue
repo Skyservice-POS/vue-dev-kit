@@ -55,7 +55,7 @@
               class="title-dropdown-item"
               @click="selectItem(item)"
             >
-              <p class="pageName">{{ capitalize(item.name) }}</p>
+              <p class="pageName">{{ translateName(item.name) }}</p>
               <small class="pageVisit">
                 ({{ visitLabel }} {{ getTimeAgo(item.lastVisit) }})
               </small>
@@ -80,7 +80,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { isInIframe } from '../../shared/utils/webviewCheck'
-import { getParentLocalStorage } from '../../shared/utils/parentBridge'
+import { getParentLocalStorage, getParentWindowValue } from '../../shared/utils/parentBridge'
 
 const props = defineProps({
   title: {
@@ -123,6 +123,16 @@ const dropdownRef = ref(null)
 const isDropdownOpen = ref(false)
 
 const localStorageItems = ref([])
+const parentLang = ref({})
+
+// Load translations from parent
+if (isInIframe()) {
+  getParentWindowValue('lang').then((data) => {
+    if (data != null) {
+      parentLang.value = data
+    }
+  })
+}
 
 function loadComponentStats(raw) {
   try {
@@ -163,21 +173,17 @@ const closeDropdown = () => {
 }
 
 const selectItem = (item) => {
-  console.log('[Header] selectItem clicked, item:', item)
-  console.log('[Header] item.path:', item.path)
-  console.log('[Header] isInIframe:', isInIframe())
   emit('navigate', item.path)
   if (isInIframe()) {
-    console.log('[Header] sending postMessage navigate to parent, path:', item.path)
     window.parent.postMessage({ type: 'navigate', path: item.path }, '*')
-    console.log('[Header] postMessage sent')
   }
   closeDropdown()
 }
 
-const capitalize = (str) => {
-  if (!str) return ''
-  return str.charAt(0).toUpperCase() + str.slice(1)
+const translateName = (name) => {
+  if (!name) return ''
+  const translated = parentLang.value[name] || name
+  return translated.charAt(0).toUpperCase() + translated.slice(1)
 }
 
 const getTimeAgo = (lastVisit) => {

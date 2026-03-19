@@ -45,3 +45,7 @@ export function getParentLocalStorage(key) {
 export function getParentStoreValue(key) {
   return requestFromParent('store', key)
 }
+
+export function getParentWindowValue(key) {
+  return requestFromParent('window', key)
+}
