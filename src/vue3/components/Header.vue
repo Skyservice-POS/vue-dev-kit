@@ -134,15 +134,17 @@ const localStorageItems = ref([])
 const parentLang = ref({})
 
 // Track page visit in parent's componentStats
-console.log('[Header] trackPageName:', props.trackPageName, 'isInIframe:', isInIframe())
 if (isInIframe() && props.trackPageName) {
-  const msg = {
+  window.parent.postMessage({
     type: 'trackVisit',
     name: props.trackPageName,
     path: props.trackPagePath || `/${props.trackPageName}`,
-  }
-  console.log('[Header] sending trackVisit:', msg)
-  window.parent.postMessage(msg, '*')
+  }, '*')
+}
+
+// Set rocketMode in parent
+if (isInIframe()) {
+  window.parent.postMessage({ type: 'setRocketMode', value: true }, '*')
 }
 
 // Load translations from parent
