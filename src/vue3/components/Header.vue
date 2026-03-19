@@ -164,6 +164,9 @@ const closeDropdown = () => {
 
 const selectItem = (item) => {
   emit('navigate', item.path)
+  if (isInIframe()) {
+    window.parent.postMessage({ type: 'navigate', path: item.path }, '*')
+  }
   closeDropdown()
 }
 
