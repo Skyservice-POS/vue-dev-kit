@@ -134,12 +134,15 @@ const localStorageItems = ref([])
 const parentLang = ref({})
 
 // Track page visit in parent's componentStats
+console.log('[Header] trackPageName:', props.trackPageName, 'isInIframe:', isInIframe())
 if (isInIframe() && props.trackPageName) {
-  window.parent.postMessage({
+  const msg = {
     type: 'trackVisit',
     name: props.trackPageName,
     path: props.trackPagePath || `/${props.trackPageName}`,
-  }, '*')
+  }
+  console.log('[Header] sending trackVisit:', msg)
+  window.parent.postMessage(msg, '*')
 }
 
 // Load translations from parent
