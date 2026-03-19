@@ -163,9 +163,14 @@ const closeDropdown = () => {
 }
 
 const selectItem = (item) => {
+  console.log('[Header] selectItem clicked, item:', item)
+  console.log('[Header] item.path:', item.path)
+  console.log('[Header] isInIframe:', isInIframe())
   emit('navigate', item.path)
   if (isInIframe()) {
+    console.log('[Header] sending postMessage navigate to parent, path:', item.path)
     window.parent.postMessage({ type: 'navigate', path: item.path }, '*')
+    console.log('[Header] postMessage sent')
   }
   closeDropdown()
 }
