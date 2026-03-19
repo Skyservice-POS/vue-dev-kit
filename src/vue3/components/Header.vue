@@ -80,6 +80,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { isInIframe } from '../../shared/utils/webviewCheck'
+import { getParentLocalStorage } from '../../shared/utils/parentBridge'
 
 const props = defineProps({
   title: {
@@ -121,8 +122,34 @@ const emit = defineEmits(['back', 'navigate'])
 const dropdownRef = ref(null)
 const isDropdownOpen = ref(false)
 
+const localStorageItems = ref([])
+
+function loadComponentStats(raw) {
+  try {
+    if (!raw) return
+    const data = typeof raw === 'string' ? JSON.parse(raw) : raw
+    if (data?.pages) {
+      localStorageItems.value = Object.values(data.pages)
+    }
+  } catch {}
+}
+
+// Load from local localStorage first
+loadComponentStats(localStorage['componentStats'])
+
+// If in iframe, request from parent and update
+if (isInIframe()) {
+  getParentLocalStorage('componentStats').then((data) => {
+    if (data != null) {
+      localStorage.setItem('componentStats', JSON.stringify(data))
+      loadComponentStats(data)
+    }
+  })
+}
+
 const sortedItems = computed(() => {
-  return [...props.dropdownItems].sort((a, b) => b.lastVisit - a.lastVisit)
+  const items = props.dropdownItems.length ? props.dropdownItems : localStorageItems.value
+  return [...items].sort((a, b) => b.lastVisit - a.lastVisit)
 })
 
 const toggleDropdown = () => {
