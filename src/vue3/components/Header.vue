@@ -115,6 +115,14 @@ const props = defineProps({
     type: String,
     default: "Останнє відвідування",
   },
+  trackPageName: {
+    type: String,
+    default: "",
+  },
+  trackPagePath: {
+    type: String,
+    default: "",
+  },
 });
 
 const emit = defineEmits(['back', 'navigate'])
@@ -124,6 +132,15 @@ const isDropdownOpen = ref(false)
 
 const localStorageItems = ref([])
 const parentLang = ref({})
+
+// Track page visit in parent's componentStats
+if (isInIframe() && props.trackPageName) {
+  window.parent.postMessage({
+    type: 'trackVisit',
+    name: props.trackPageName,
+    path: props.trackPagePath || `/${props.trackPageName}`,
+  }, '*')
+}
 
 // Load translations from parent
 if (isInIframe()) {
