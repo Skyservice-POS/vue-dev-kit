@@ -149,10 +149,22 @@ if (isInIframe() && props.trackPageName) {
   })
 }
 
-// Set rocketMode in parent
+// Set rocketMode in parent, remember previous value to restore on unmount
+const previousRocketMode = ref(null)
+
 if (isInIframe()) {
-  sendToParent({ type: 'setRocketMode', value: true })
+  getParentLocalStorage('rocketMode').then((value) => {
+    previousRocketMode.value = value
+    sendToParent({ type: 'setRocketMode', value: true })
+  })
 }
+
+onUnmounted(() => {
+  if (isInIframe() && previousRocketMode.value !== null) {
+    const restore = previousRocketMode.value === 'true'
+    sendToParent({ type: 'setRocketMode', value: restore })
+  }
+})
 
 // Load translations from parent
 if (isInIframe()) {
