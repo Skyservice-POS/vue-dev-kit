@@ -24,12 +24,17 @@ export function getSenderId() {
 }
 
 export function sendToParent(message) {
-  if (!isInIframe()) return
-  window.parent.postMessage({
+  if (!isInIframe()) {
+    console.log('[parentBridge] not in iframe, skip sendToParent')
+    return
+  }
+  const msg = {
     ...message,
     sender: getSenderId(),
     target: message.target || 'DASHBOARD',
-  }, '*')
+  }
+  console.log('[parentBridge] sendToParent:', msg)
+  window.parent.postMessage(msg, '*')
 }
 
 function requestFromParent(source, key) {
@@ -45,6 +50,9 @@ function requestFromParent(source, key) {
 
     function handler(event) {
       const d = event.data
+      if (d?.type === 'DATA_RESPONSE') {
+        console.log('[parentBridge] DATA_RESPONSE received:', { requestId: d.requestId, expectedId: requestId, target: d.target, sender: d.sender, hasData: d.data != null })
+      }
       if (
         d?.type === 'DATA_RESPONSE' &&
         d?.requestId === requestId &&
