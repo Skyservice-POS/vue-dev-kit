@@ -2,9 +2,34 @@ import { isInIframe } from './webviewCheck'
 
 const TIMEOUT = 3000
 let counter = 0
+let _senderId = null
 
 function generateRequestId() {
   return `req_${++counter}_${Date.now()}`
+}
+
+function generateAppId() {
+  return 'APP_' + Math.random().toString(36).slice(2, 10)
+}
+
+export function setSenderId(id) {
+  _senderId = id
+}
+
+export function getSenderId() {
+  if (!_senderId) {
+    _senderId = generateAppId()
+  }
+  return _senderId
+}
+
+export function sendToParent(message) {
+  if (!isInIframe()) return
+  window.parent.postMessage({
+    ...message,
+    sender: getSenderId(),
+    target: message.target || 'DASHBOARD',
+  }, '*')
 }
 
 function requestFromParent(source, key) {
@@ -19,22 +44,26 @@ function requestFromParent(source, key) {
     }, TIMEOUT)
 
     function handler(event) {
+      const d = event.data
       if (
-        event.data?.type === 'DATA_RESPONSE' &&
-        event.data?.requestId === requestId
+        d?.type === 'DATA_RESPONSE' &&
+        d?.requestId === requestId &&
+        (!d.target || d.target === getSenderId())
       ) {
         clearTimeout(timeout)
         window.removeEventListener('message', handler)
-        resolve(event.data.data ?? null)
+        resolve(d.data ?? null)
       }
     }
 
     window.addEventListener('message', handler)
 
-    window.parent.postMessage(
-      { type: 'DATA_REQUEST', requestId, source, key },
-      '*',
-    )
+    sendToParent({
+      type: 'DATA_REQUEST',
+      requestId,
+      source,
+      key,
+    })
   })
 }
 

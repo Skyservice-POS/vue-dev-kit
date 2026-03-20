@@ -80,7 +80,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { isInIframe } from '../../shared/utils/webviewCheck'
-import { getParentLocalStorage, getParentWindowValue } from '../../shared/utils/parentBridge'
+import { getParentLocalStorage, getParentWindowValue, sendToParent, setSenderId, getSenderId } from '../../shared/utils/parentBridge'
 
 const props = defineProps({
   title: {
@@ -123,7 +123,14 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  appId: {
+    type: String,
+    default: "",
+  },
 });
+
+// Initialize sender ID from prop or generate
+setSenderId(props.appId || getSenderId())
 
 const emit = defineEmits(['back', 'navigate'])
 
@@ -135,16 +142,16 @@ const parentLang = ref({})
 
 // Track page visit in parent's componentStats
 if (isInIframe() && props.trackPageName) {
-  window.parent.postMessage({
+  sendToParent({
     type: 'trackVisit',
     name: props.trackPageName,
     path: props.trackPagePath || `/${props.trackPageName}`,
-  }, '*')
+  })
 }
 
 // Set rocketMode in parent
 if (isInIframe()) {
-  window.parent.postMessage({ type: 'setRocketMode', value: true }, '*')
+  sendToParent({ type: 'setRocketMode', value: true })
 }
 
 // Load translations from parent
@@ -197,7 +204,7 @@ const closeDropdown = () => {
 const selectItem = (item) => {
   emit('navigate', item.path)
   if (isInIframe()) {
-    window.parent.postMessage({ type: 'navigate', path: item.path }, '*')
+    sendToParent({ type: 'navigate', path: item.path })
   }
   closeDropdown()
 }
@@ -245,7 +252,7 @@ const shouldShowBackButton = computed(() => {
 const handleBack = () => {
   if (props.backEvent) return props.backEvent()
 
-  window.parent.postMessage({ type: 'exit' }, '*')
+  sendToParent({ type: 'exit' })
 }
 </script>
 
