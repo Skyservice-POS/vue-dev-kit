@@ -57,9 +57,7 @@
               :class="{ 'sky-dialog-footer-animate': enableAnimation }"
             >
               <!-- Порожні блоки ремонтують відображення на windows в додатку, не видаляти! -->
-              <div></div>
               <slot name="buttons"></slot>
-              <div></div>
             </div>
           </div>
         </div>
