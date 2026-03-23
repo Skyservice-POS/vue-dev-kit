@@ -160,10 +160,7 @@ if (isInIframe()) {
 }
 
 onUnmounted(() => {
-  if (isInIframe() && previousRocketMode.value !== null) {
-    const restore = previousRocketMode.value === 'true'
-    sendToParent({ type: 'setRocketMode', value: restore })
-  }
+  restoreRocketMode()
 })
 
 // Load translations from parent
@@ -261,9 +258,17 @@ const shouldShowBackButton = computed(() => {
   return props.backEvent || (props.showBackButton && isInIframe());
 });
 
+const restoreRocketMode = () => {
+  if (previousRocketMode.value !== null) {
+    const restore = previousRocketMode.value === 'true'
+    sendToParent({ type: 'setRocketMode', value: restore })
+  }
+}
+
 const handleBack = () => {
   if (props.backEvent) return props.backEvent()
 
+  restoreRocketMode()
   sendToParent({ type: 'exit' })
 }
 </script>

@@ -71,6 +71,7 @@
 
 <script>
 import { isInIframe } from '../../shared/utils/webviewCheck'
+import { getParentLocalStorage, sendToParent, setSenderId, getSenderId } from '../../shared/utils/parentBridge'
 
 export default {
   name: 'Header',
@@ -106,11 +107,16 @@ export default {
     visitLabel: {
       type: String,
       default: 'Останнє відвідування'
+    },
+    appId: {
+      type: String,
+      default: ''
     }
   },
   data() {
     return {
-      isDropdownOpen: false
+      isDropdownOpen: false,
+      previousRocketMode: null
     }
   },
   computed: {
@@ -121,17 +127,34 @@ export default {
       return this.backEvent || (this.showBackButton && isInIframe())
     }
   },
+  created() {
+    setSenderId(this.appId || getSenderId())
+    if (isInIframe()) {
+      getParentLocalStorage('rocketMode').then((value) => {
+        this.previousRocketMode = value
+        sendToParent({ type: 'setRocketMode', value: true })
+      })
+    }
+  },
   mounted() {
     document.addEventListener('click', this.handleClickOutside, true)
   },
   beforeDestroy() {
     document.removeEventListener('click', this.handleClickOutside, true)
+    this.restoreRocketMode()
   },
   methods: {
+    restoreRocketMode() {
+      if (isInIframe() && this.previousRocketMode !== null) {
+        const restore = this.previousRocketMode === 'true'
+        sendToParent({ type: 'setRocketMode', value: restore })
+      }
+    },
     handleBack() {
       if (this.backEvent) return this.backEvent()
 
-      window.parent.postMessage({ type: 'exit' }, '*')
+      this.restoreRocketMode()
+      sendToParent({ type: 'exit' })
     },
     toggleDropdown() {
       if (this.sortedItems.length) {
