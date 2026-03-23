@@ -174,20 +174,26 @@ if (isInIframe()) {
 
 function loadComponentStats(raw) {
   try {
-    if (!raw) return
+    if (!raw) { console.log('[Header] loadComponentStats: raw is empty'); return }
     const data = typeof raw === 'string' ? JSON.parse(raw) : raw
     if (data?.pages) {
       localStorageItems.value = Object.values(data.pages)
+      console.log('[Header] loadComponentStats: loaded', localStorageItems.value.length, 'items', localStorageItems.value.map(i => i.name))
+    } else {
+      console.log('[Header] loadComponentStats: no pages in data', data)
     }
-  } catch {}
+  } catch (e) { console.error('[Header] loadComponentStats error:', e) }
 }
 
 // Load from local localStorage first
+console.log('[Header] localStorage componentStats:', localStorage['componentStats'] ? 'exists' : 'empty')
 loadComponentStats(localStorage['componentStats'])
 
 // If in iframe, request from parent and update
 if (isInIframe()) {
+  console.log('[Header] requesting componentStats from parent...')
   getParentLocalStorage('componentStats').then((data) => {
+    console.log('[Header] componentStats from parent:', data != null ? 'received' : 'null', data)
     if (data != null) {
       localStorage.setItem('componentStats', JSON.stringify(data))
       loadComponentStats(data)
@@ -270,26 +276,37 @@ const findPreviousPage = () => {
 }
 
 const handleBack = async () => {
+  console.log('[Header] handleBack called')
+  console.log('[Header] backEvent:', !!props.backEvent)
   if (props.backEvent) return props.backEvent()
+
+  console.log('[Header] trackPageName:', props.trackPageName)
+  console.log('[Header] sortedItems:', sortedItems.value.length, 'items', sortedItems.value.map(i => ({ name: i.name, path: i.path?.substring(0, 50) })))
 
   // Navigate to the last visited page that isn't the current one
   let previousPage = findPreviousPage()
+  console.log('[Header] findPreviousPage (cached):', previousPage ? previousPage.name + ' → ' + previousPage.path?.substring(0, 50) : 'NOT FOUND')
 
   // If history not loaded yet, try fetching from parent
   if (!previousPage && isInIframe()) {
+    console.log('[Header] no cached history, fetching from parent...')
     const data = await getParentLocalStorage('componentStats')
+    console.log('[Header] fresh componentStats:', data)
     if (data) {
       loadComponentStats(data)
       previousPage = findPreviousPage()
+      console.log('[Header] findPreviousPage (fresh):', previousPage ? previousPage.name : 'NOT FOUND')
     }
   }
 
   if (previousPage) {
+    console.log('[Header] → NAVIGATE to', previousPage.path)
     restoreRocketMode()
     sendToParent({ type: 'navigate', path: previousPage.path })
     return
   }
 
+  console.log('[Header] → EXIT (no previous page found)')
   restoreRocketMode()
   sendToParent({ type: 'exit' })
 }
