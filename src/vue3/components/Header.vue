@@ -265,11 +265,25 @@ const restoreRocketMode = () => {
   }
 }
 
-const handleBack = () => {
+const findPreviousPage = () => {
+  return sortedItems.value.find(item => item.name !== props.trackPageName)
+}
+
+const handleBack = async () => {
   if (props.backEvent) return props.backEvent()
 
   // Navigate to the last visited page that isn't the current one
-  const previousPage = sortedItems.value.find(item => item.name !== props.trackPageName)
+  let previousPage = findPreviousPage()
+
+  // If history not loaded yet, try fetching from parent
+  if (!previousPage && isInIframe()) {
+    const data = await getParentLocalStorage('componentStats')
+    if (data) {
+      loadComponentStats(data)
+      previousPage = findPreviousPage()
+    }
+  }
+
   if (previousPage) {
     restoreRocketMode()
     sendToParent({ type: 'navigate', path: previousPage.path })

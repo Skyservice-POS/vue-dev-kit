@@ -158,12 +158,7 @@ export default {
       // Load componentStats from parent
       getParentLocalStorage('componentStats').then((data) => {
         if (data != null) {
-          try {
-            const parsed = typeof data === 'string' ? JSON.parse(data) : data
-            if (parsed?.pages) {
-              this.localStorageItems = Object.values(parsed.pages)
-            }
-          } catch {}
+          this.loadParentComponentStats(data)
         }
       })
     }
@@ -182,11 +177,32 @@ export default {
         sendToParent({ type: 'setRocketMode', value: restore })
       }
     },
-    handleBack() {
+    findPreviousPage() {
+      return this.sortedItems.find(item => item.name !== this.trackPageName)
+    },
+    loadParentComponentStats(data) {
+      try {
+        const parsed = typeof data === 'string' ? JSON.parse(data) : data
+        if (parsed?.pages) {
+          this.localStorageItems = Object.values(parsed.pages)
+        }
+      } catch {}
+    },
+    async handleBack() {
       if (this.backEvent) return this.backEvent()
 
       // Navigate to the last visited page that isn't the current one
-      const previousPage = this.sortedItems.find(item => item.name !== this.$props.trackPageName)
+      let previousPage = this.findPreviousPage()
+
+      // If history not loaded yet, try fetching from parent
+      if (!previousPage && isInIframe()) {
+        const data = await getParentLocalStorage('componentStats')
+        if (data) {
+          this.loadParentComponentStats(data)
+          previousPage = this.findPreviousPage()
+        }
+      }
+
       if (previousPage) {
         this.restoreRocketMode()
         sendToParent({ type: 'navigate', path: previousPage.path })
