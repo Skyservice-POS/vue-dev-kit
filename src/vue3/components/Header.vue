@@ -293,7 +293,10 @@ const handleBack = () => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+}
+
+.header-left > * + * {
+  margin-left: 12px;
 }
 
 .titleAndDesc {

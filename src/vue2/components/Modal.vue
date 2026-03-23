@@ -225,8 +225,11 @@ export default {
   border-top: 1px solid var(--sky-modal-border-color, #dee2e6);
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
   flex-shrink: 0;
+}
+
+.sky-modal-footer > * + * {
+  margin-left: 10px;
 }
 
 /* Animations */

@@ -344,7 +344,10 @@ onUnmounted(() => {
   justify-content: center;
   width: 100%;
   transform: translateY(-52px);
-  gap: 10px;
+}
+
+.sky-dialog-footer > * + * {
+  margin-left: 10px;
 }
 
 /* Кнопки в футері: 1 = 100%, 2 = по 50% */
