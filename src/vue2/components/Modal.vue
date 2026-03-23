@@ -151,6 +151,10 @@ export default {
   flex-direction: column;
   max-width: 100%;
   max-height: 100%;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 .sky-modal-header {
