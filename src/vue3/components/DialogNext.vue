@@ -492,4 +492,14 @@ onUnmounted(() => {
 .dialog-slide-leave-active {
   animation: sky-dialog-slide-in 0.4s reverse;
 }
+
+/* iOS safe area */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .sky-dialog-header {
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+  .sky-dialog-paper {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
 </style>

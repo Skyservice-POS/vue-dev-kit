@@ -263,4 +263,17 @@ onUnmounted(() => {
     border-radius: var(--sky-modal-radius, 8px);
   }
 }
+
+/* iOS safe area */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .sky-modal-header {
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+  .sky-modal-footer {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  .sky-modal-body:last-child {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+}
 </style>
