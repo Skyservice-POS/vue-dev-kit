@@ -268,6 +268,14 @@ const restoreRocketMode = () => {
 const handleBack = () => {
   if (props.backEvent) return props.backEvent()
 
+  // Navigate to the last visited page that isn't the current one
+  const previousPage = sortedItems.value.find(item => item.name !== props.trackPageName)
+  if (previousPage) {
+    restoreRocketMode()
+    sendToParent({ type: 'navigate', path: previousPage.path })
+    return
+  }
+
   restoreRocketMode()
   sendToParent({ type: 'exit' })
 }

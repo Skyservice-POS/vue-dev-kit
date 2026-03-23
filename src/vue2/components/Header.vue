@@ -108,6 +108,14 @@ export default {
       type: String,
       default: 'Останнє відвідування'
     },
+    trackPageName: {
+      type: String,
+      default: ''
+    },
+    trackPagePath: {
+      type: String,
+      default: ''
+    },
     appId: {
       type: String,
       default: ''
@@ -116,12 +124,14 @@ export default {
   data() {
     return {
       isDropdownOpen: false,
-      previousRocketMode: null
+      previousRocketMode: null,
+      localStorageItems: []
     }
   },
   computed: {
     sortedItems() {
-      return [...this.dropdownItems].sort((a, b) => b.lastVisit - a.lastVisit)
+      const items = this.dropdownItems.length ? this.dropdownItems : this.localStorageItems
+      return [...items].sort((a, b) => b.lastVisit - a.lastVisit)
     },
     shouldShowBackButton() {
       return this.backEvent || (this.showBackButton && isInIframe())
@@ -130,9 +140,31 @@ export default {
   created() {
     setSenderId(this.appId || getSenderId())
     if (isInIframe()) {
+      // Track page visit
+      if (this.trackPageName) {
+        sendToParent({
+          type: 'trackVisit',
+          name: this.trackPageName,
+          path: this.trackPagePath || `/${this.trackPageName}`,
+        })
+      }
+
+      // Set rocketMode
       getParentLocalStorage('rocketMode').then((value) => {
         this.previousRocketMode = value
         sendToParent({ type: 'setRocketMode', value: true })
+      })
+
+      // Load componentStats from parent
+      getParentLocalStorage('componentStats').then((data) => {
+        if (data != null) {
+          try {
+            const parsed = typeof data === 'string' ? JSON.parse(data) : data
+            if (parsed?.pages) {
+              this.localStorageItems = Object.values(parsed.pages)
+            }
+          } catch {}
+        }
       })
     }
   },
@@ -153,6 +185,14 @@ export default {
     handleBack() {
       if (this.backEvent) return this.backEvent()
 
+      // Navigate to the last visited page that isn't the current one
+      const previousPage = this.sortedItems.find(item => item.name !== this.$props.trackPageName)
+      if (previousPage) {
+        this.restoreRocketMode()
+        sendToParent({ type: 'navigate', path: previousPage.path })
+        return
+      }
+
       this.restoreRocketMode()
       sendToParent({ type: 'exit' })
     },
@@ -166,6 +206,9 @@ export default {
     },
     selectItem(item) {
       this.$emit('navigate', item.path)
+      if (isInIframe()) {
+        sendToParent({ type: 'navigate', path: item.path })
+      }
       this.closeDropdown()
     },
     capitalize(str) {
