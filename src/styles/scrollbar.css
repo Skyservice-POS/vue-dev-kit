@@ -1,0 +1,47 @@
+/* Custom scrollbar — visible, thin (6px) */
+.sky-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.sky-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sky-scroll::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.sky-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Custom scrollbar — hidden (overflow works, bar not visible) */
+.sky-scroll-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sky-scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dark background variant */
+.sky-scroll-dark::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.sky-scroll-dark::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sky-scroll-dark::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.sky-scroll-dark::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
