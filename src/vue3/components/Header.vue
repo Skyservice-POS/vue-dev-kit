@@ -299,18 +299,19 @@ const handleBack = async () => {
     }
   }
 
-  if (previousPage) {
-    console.log('[Header] → NAVIGATE to', previousPage.path)
-    restoreRocketMode()
-    sendToParent({ type: 'navigate', path: previousPage.path })
-    return
+  restoreRocketMode()
+
+  // exit без target — закриває модалку в проміжному iframe (iframeModal)
+  // або dashboard handleExit якщо напряму
+  if (isInIframe()) {
+    console.log('[Header] → EXIT (no target)')
+    window.parent.postMessage({ type: 'exit', sender: getSenderId() }, '*')
   }
 
-  console.log('[Header] → EXIT (no previous page found)')
-  restoreRocketMode()
-  // exit без target — щоб прямий parent обробив (не relay)
-  if (isInIframe()) {
-    window.parent.postMessage({ type: 'exit', sender: getSenderId() }, '*')
+  // Якщо є попередня сторінка — навігуємо dashboard туди
+  if (previousPage) {
+    console.log('[Header] → NAVIGATE to', previousPage.path)
+    sendToParent({ type: 'navigate', path: previousPage.path })
   }
 }
 </script>

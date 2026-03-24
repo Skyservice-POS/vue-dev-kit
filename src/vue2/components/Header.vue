@@ -203,16 +203,14 @@ export default {
         }
       }
 
-      if (previousPage) {
-        this.restoreRocketMode()
-        sendToParent({ type: 'navigate', path: previousPage.path })
-        return
-      }
-
       this.restoreRocketMode()
-      // exit без target — щоб прямий parent обробив (не relay)
+
       if (isInIframe()) {
         window.parent.postMessage({ type: 'exit', sender: getSenderId() }, '*')
+      }
+
+      if (previousPage) {
+        sendToParent({ type: 'navigate', path: previousPage.path })
       }
     },
     toggleDropdown() {
