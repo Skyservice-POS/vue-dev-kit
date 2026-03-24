@@ -260,7 +260,7 @@ const shouldShowBackButton = computed(() => {
 
 const restoreRocketMode = () => {
   if (previousRocketMode.value !== null) {
-    const restore = previousRocketMode.value === 'true'
+    const restore = previousRocketMode.value === true || previousRocketMode.value === 'true'
     sendToParent({ type: 'setRocketMode', value: restore })
   }
 }

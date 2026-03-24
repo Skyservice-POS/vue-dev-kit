@@ -173,7 +173,7 @@ export default {
   methods: {
     restoreRocketMode() {
       if (isInIframe() && this.previousRocketMode !== null) {
-        const restore = this.previousRocketMode === 'true'
+        const restore = this.previousRocketMode === true || this.previousRocketMode === 'true'
         sendToParent({ type: 'setRocketMode', value: restore })
       }
     },
