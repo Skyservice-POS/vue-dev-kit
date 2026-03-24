@@ -19,7 +19,7 @@
             @click="toggleDropdown"
           >
             <slot name="title">
-              <h4 class="notPadding" style="margin-bottom: 4px">
+              <h4 class="notPadding">
                 <span class="topmenu-title">{{ title }}</span>
                 <svg
                   v-if="sortedItems.length"
