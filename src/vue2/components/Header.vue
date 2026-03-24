@@ -210,7 +210,10 @@ export default {
       }
 
       this.restoreRocketMode()
-      sendToParent({ type: 'exit' })
+      // exit без target — щоб прямий parent обробив (не relay)
+      if (isInIframe()) {
+        window.parent.postMessage({ type: 'exit', sender: getSenderId() }, '*')
+      }
     },
     toggleDropdown() {
       if (this.sortedItems.length) {
