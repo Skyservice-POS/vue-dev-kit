@@ -217,6 +217,8 @@ export default {
   width: 100%;
   height: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24);
+  display: flex;
+  flex-direction: column;
 }
 
 .sky-dialog-header {
@@ -279,7 +281,7 @@ export default {
 
 
 .sky-dialog-paper {
-  height: 100%;
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -298,7 +300,7 @@ export default {
   display: flex;
   justify-content: center;
   width: 100%;
-  transform: translateY(-52px);
+  flex-shrink: 0;
 }
 
 .sky-dialog-footer > * + * {
@@ -330,38 +332,17 @@ export default {
 /* Tablet and Desktop */
 @media screen and (min-width: 710px) {
   .sky-dialog-paper {
-    height: calc(100% - 150px);
-    max-height: calc(100% - 150px);
     background-color: #fff;
-    margin: 0 10px 60px 10px;
-  }
-
-  /* Full height when no footer */
-  .sky-dialog-paper-no-footer {
-    height: calc(100% - 70px);
-    max-height: calc(100% - 70px);
-    margin-bottom: 10px;
+    margin: 0 10px 10px 10px;
   }
 }
 
 /* Mobile */
 @media screen and (max-width: 709px) {
   .sky-dialog-paper {
-    height: calc(100% - 142px);
-    max-height: calc(100% - 142px);
     background-color: #fff;
     margin: 0 10px 10px 10px;
     max-width: 100vw !important;
-  }
-
-  /* Full height when no footer */
-  .sky-dialog-paper-no-footer {
-    height: calc(100% - 60px);
-    max-height: calc(100% - 60px);
-  }
-
-  .sky-dialog-footer {
-    transform: translateY(-6px);
   }
 }
 
@@ -386,17 +367,8 @@ export default {
 
 /* iPhone safe area support */
 @supports (padding-top: env(safe-area-inset-top)) {
-  .sky-dialog-paper {
-    height: calc(100% - 150px - env(safe-area-inset-top));
-  }
-
-  /* Full height when no footer */
-  .sky-dialog-paper-no-footer {
-    height: calc(100% - 60px - env(safe-area-inset-top));
-  }
-
   .sky-dialog-footer {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 5px);
   }
 }
 
