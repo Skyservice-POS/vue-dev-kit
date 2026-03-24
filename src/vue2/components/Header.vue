@@ -178,7 +178,7 @@ export default {
       }
     },
     findPreviousPage() {
-      return this.sortedItems.find(item => item.name !== this.trackPageName)
+      return this.sortedItems.find(item => item.name !== this.trackPageName && item.path)
     },
     loadParentComponentStats(data) {
       try {

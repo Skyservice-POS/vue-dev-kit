@@ -266,7 +266,7 @@ const restoreRocketMode = () => {
 }
 
 const findPreviousPage = () => {
-  return sortedItems.value.find(item => item.name !== props.trackPageName)
+  return sortedItems.value.find(item => item.name !== props.trackPageName && item.path)
 }
 
 const handleBack = async () => {
