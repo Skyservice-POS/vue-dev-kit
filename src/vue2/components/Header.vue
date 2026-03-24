@@ -205,12 +205,10 @@ export default {
 
       this.restoreRocketMode()
 
-      if (isInIframe()) {
-        window.parent.postMessage({ type: 'exit', sender: getSenderId() }, '*')
-      }
-
       if (previousPage) {
         sendToParent({ type: 'navigate', path: previousPage.path })
+      } else {
+        sendToParent({ type: 'exit' })
       }
     },
     toggleDropdown() {
