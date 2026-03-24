@@ -270,7 +270,10 @@ const findPreviousPage = () => {
 }
 
 const handleBack = async () => {
-  if (props.backEvent) return props.backEvent()
+  if (props.backEvent) {
+    restoreRocketMode()
+    return props.backEvent()
+  }
 
   let previousPage = findPreviousPage()
 

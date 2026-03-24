@@ -189,7 +189,10 @@ export default {
       } catch {}
     },
     async handleBack() {
-      if (this.backEvent) return this.backEvent()
+      if (this.backEvent) {
+        this.restoreRocketMode()
+        return this.backEvent()
+      }
 
       // Navigate to the last visited page that isn't the current one
       let previousPage = this.findPreviousPage()
