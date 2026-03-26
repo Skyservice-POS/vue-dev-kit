@@ -55,3 +55,17 @@ export interface DialogEmits {
 }
 
 export declare const Dialog: DefineComponent<DialogProps>
+
+// Button component
+export interface ButtonProps {
+  variant?: 'primary' | 'danger' | 'secondary' | 'outline'
+  loading?: boolean
+  disabled?: boolean
+  block?: boolean
+}
+
+export interface ButtonSlots {
+  'default'?: () => any
+}
+
+export declare const Button: DefineComponent<ButtonProps>
