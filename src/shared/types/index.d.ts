@@ -39,7 +39,6 @@ export interface DialogProps {
   subtitle?: string
   zIndex?: number | string
   closeText?: string
-  enableAnimation?: boolean
   closeOnEsc?: boolean
   mode?: 'next' | 'classic' | null
 }

@@ -6,7 +6,6 @@
     :subtitle="subtitle"
     :z-index="zIndex"
     :close-text="closeText"
-    :enable-animation="enableAnimation"
     :close-on-esc="closeOnEsc"
     :has-buttons="!!$slots.buttons"
     @close="$emit('close')"
@@ -49,10 +48,6 @@ export default {
     closeText: {
       type: String,
       default: ''
-    },
-    enableAnimation: {
-      type: Boolean,
-      default: false
     },
     closeOnEsc: {
       type: Boolean,

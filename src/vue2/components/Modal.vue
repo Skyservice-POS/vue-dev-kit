@@ -1,7 +1,6 @@
 <template>
-  <base-teleport to="body"> 
-    <transition>
-      <div v-if="isOpen" class="sky-modal-overlay" @click.self="handleOverlayClick">
+  <base-teleport to="body">
+    <div v-if="isOpen" class="sky-modal-overlay" @click.self="handleOverlayClick">
         <div class="sky-modal" :style="modalStyle">
           <div class="sky-modal-header">
             <button class="sky-modal-back" @click="close" :title="closeTitle">
@@ -24,7 +23,6 @@
           </div>
         </div>
       </div>
-    </transition>
   </base-teleport>
 </template>
 
@@ -230,30 +228,6 @@ export default {
 
 .sky-modal-footer > * + * {
   margin-left: 10px;
-}
-
-/* Animations */
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-fade-enter-active .sky-modal,
-.modal-fade-leave-active .sky-modal {
-  transition: transform 0.3s ease;
-}
-
-.modal-fade-enter,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-
-.modal-fade-enter .sky-modal {
-  transform: translateY(-20px);
-}
-
-.modal-fade-leave-to .sky-modal {
-  transform: translateY(20px);
 }
 
 /* Responsive */

@@ -6,7 +6,6 @@
     :subtitle="subtitle"
     :z-index="zIndex"
     :close-text="closeText"
-    :enable-animation="enableAnimation"
     :close-on-esc="closeOnEsc"
     :has-buttons="!!$slots.buttons"
     @close="$emit('close')"
@@ -44,10 +43,6 @@ const props = defineProps({
   closeText: {
     type: String,
     default: ''
-  },
-  enableAnimation: {
-    type: Boolean,
-    default: false
   },
   closeOnEsc: {
     type: Boolean,

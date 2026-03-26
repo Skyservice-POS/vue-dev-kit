@@ -1,14 +1,12 @@
 <template>
-  <transition :name="enableAnimation ? 'dialog-slide' : ''">
+  <div
+    v-if="modelValue"
+    class="sky-dialogbox sky-dialogbox-classic"
+    :style="[zIndex ? { 'z-index': zIndex } : null]"
+  >
     <div
-      v-if="modelValue"
-      class="sky-dialogbox sky-dialogbox-classic"
-      :style="[zIndex ? { 'z-index': zIndex } : null]"
+      class="sky-dialog-overlay"
     >
-      <div
-        class="sky-dialog-overlay"
-        :class="{ 'sky-dialog-animate': enableAnimation }"
-      >
         <div ref="dialogContent" class="sky-dialog-content">
           <!-- Header -->
           <div
@@ -61,14 +59,13 @@
           <div
             v-if="showFooter"
             class="sky-dialog-footer"
-            :class="{ 'sky-dialog-footer-animate': enableAnimation }"
           >
             <slot name="buttons"></slot>
           </div>
         </div>
       </div>
     </div>
-  </transition>
+  </div>
 </template>
 
 <script>
@@ -99,10 +96,6 @@ export default {
     closeText: {
       type: String,
       default: "Закрити",
-    },
-    enableAnimation: {
-      type: Boolean,
-      default: false,
     },
     closeOnEsc: {
       type: Boolean,
@@ -429,46 +422,6 @@ export default {
   .sky-dialog-footer {
     padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
   }
-}
-
-/* Animations */
-.sky-dialog-animate {
-  animation: sky-dialog-slide-in 0.4s ease-in-out;
-}
-
-.sky-dialog-footer-animate {
-  animation: sky-dialog-footer-in 0.4s ease-in-out;
-}
-
-@keyframes sky-dialog-slide-in {
-  0% {
-    opacity: 0;
-    margin-top: -1600px;
-  }
-  100% {
-    opacity: 1;
-    margin-top: 0;
-  }
-}
-
-@keyframes sky-dialog-footer-in {
-  0% {
-    opacity: 0;
-    bottom: -100px;
-  }
-  50% {
-    opacity: 0.25;
-    bottom: -50px;
-  }
-  100% {
-    opacity: 1;
-    bottom: 15px;
-  }
-}
-
-/* Transition */
-.dialog-slide-leave-active {
-  animation: sky-dialog-slide-in 0.4s reverse;
 }
 
 /* iOS safe area */
