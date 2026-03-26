@@ -1,7 +1,14 @@
 <template>
   <button
     class="sky-btn"
-    :class="[`sky-btn-${variant}`, { 'sky-btn-block': block, 'sky-btn-loading': loading }]"
+    :class="[
+      `sky-btn-${variant}`,
+      {
+        'sky-btn-block': block,
+        'sky-btn-loading': loading,
+        'sky-btn-icon': icon,
+      }
+    ]"
     :disabled="disabled || loading"
     v-bind="$attrs"
   >
@@ -12,7 +19,7 @@
 
 <script>
 export default {
-  name: 'Button',
+  name: 'SkyButton',
   inheritAttrs: false,
   props: {
     variant: {
@@ -29,6 +36,10 @@ export default {
       default: false
     },
     block: {
+      type: Boolean,
+      default: false
+    },
+    icon: {
       type: Boolean,
       default: false
     }
@@ -51,6 +62,11 @@ export default {
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
+}
+
+.sky-btn-icon {
+  padding: var(--sky-btn-icon-padding, 10px);
+  border-radius: var(--sky-btn-icon-radius, 6px);
 }
 
 .sky-btn-block {

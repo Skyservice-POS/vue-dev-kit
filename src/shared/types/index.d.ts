@@ -56,16 +56,17 @@ export interface DialogEmits {
 
 export declare const Dialog: DefineComponent<DialogProps>
 
-// Button component
-export interface ButtonProps {
+// SkyButton component
+export interface SkyButtonProps {
   variant?: 'primary' | 'danger' | 'secondary' | 'outline'
   loading?: boolean
   disabled?: boolean
   block?: boolean
+  icon?: boolean
 }
 
-export interface ButtonSlots {
+export interface SkyButtonSlots {
   'default'?: () => any
 }
 
-export declare const Button: DefineComponent<ButtonProps>
+export declare const SkyButton: DefineComponent<SkyButtonProps>

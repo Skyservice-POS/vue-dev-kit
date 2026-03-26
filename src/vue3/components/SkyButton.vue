@@ -1,7 +1,14 @@
 <template>
   <button
     class="sky-btn"
-    :class="[`sky-btn-${variant}`, { 'sky-btn-block': block, 'sky-btn-loading': loading }]"
+    :class="[
+      `sky-btn-${variant}`,
+      {
+        'sky-btn-block': block,
+        'sky-btn-loading': loading,
+        'sky-btn-icon': icon,
+      }
+    ]"
     :disabled="disabled || loading"
     v-bind="$attrs"
   >
@@ -28,6 +35,10 @@ defineProps({
   block: {
     type: Boolean,
     default: false
+  },
+  icon: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
@@ -47,6 +58,11 @@ defineProps({
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
+}
+
+.sky-btn-icon {
+  padding: var(--sky-btn-icon-padding, 10px);
+  border-radius: var(--sky-btn-icon-radius, 6px);
 }
 
 .sky-btn-block {
