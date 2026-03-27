@@ -1,54 +1,33 @@
 # @skyservice-developers/vue-dev-kit
 
-Vue developer toolkit - компоненти для розробки. Підтримує Vue 2 та Vue 3.
+Vue developer toolkit — компоненти для розробки мінідодатків. Підтримує Vue 2.7+ та Vue 3.4+.
 
 ## Встановлення
 
 ```bash
-npm install @skyservice-developers/vue-dev-kit
+npm install @skyservice-developers/vue-dev-kit --legacy-peer-deps
 ```
 
-## Використання з Vue 3 (за замовчуванням)
+## Підключення
+
+### Vue 3
 
 ```js
-// main.js
-import { createApp } from 'vue'
 import '@skyservice-developers/vue-dev-kit/vue3/style.css'
-import { Header, Modal, Dialog } from '@skyservice-developers/vue-dev-kit'
-// або явно:
-// import { Header, Modal, Dialog } from '@skyservice-developers/vue-dev-kit/vue3'
-
-const app = createApp(App)
-app.mount('#app')
+import { Header, Modal, Dialog, SkyButton, SkySelect } from '@skyservice-developers/vue-dev-kit'
 ```
 
-## Використання з Vue 2
+### Vue 2
 
 ```js
-// main.js
-import Vue from 'vue'
 import '@skyservice-developers/vue-dev-kit/vue2/style.css'
-import { Header, Modal, Dialog } from '@skyservice-developers/vue-dev-kit/vue2'
-
-new Vue({
-  render: h => h(App)
-}).$mount('#app')
+import { Header, Modal, Dialog, SkyButton, SkySelect } from '@skyservice-developers/vue-dev-kit/vue2'
 ```
 
-**Важливо для Vue 2:** Бібліотека використовує `portal-vue` для телепортації компонентів. Якщо у вас проблеми з модалками, додатково встановіть:
-
-```bash
-npm install portal-vue
-```
-
-## Швидкий старт
-
-| Версія | Імпорт компонентів | Стилі |
-|--------|-------------------|-------|
-| **Vue 3** | `from '@skyservice-developers/vue-dev-kit'` або `from '@skyservice-developers/vue-dev-kit/vue3'` | `@skyservice-developers/vue-dev-kit/vue3/style.css` |
-| **Vue 2** | `from '@skyservice-developers/vue-dev-kit/vue2'` | `@skyservice-developers/vue-dev-kit/vue2/style.css` |
-
-**Доступні компоненти:** `Header`, `Modal`, `Dialog`, `BaseTeleport`
+> **Vue 2:** якщо модалки не відображаються, встановіть `portal-vue`:
+> ```bash
+> npm install portal-vue
+> ```
 
 ---
 
@@ -56,61 +35,17 @@ npm install portal-vue
 
 ### Header
 
-Компонент фіксованої шапки сторінки з вбудованою підтримкою кнопки "Назад" для iframe.
+Шапка сторінки з кнопкою "Назад", дропдауном нещодавніх розділів та слотом для кнопок. Автоматично відправляє батьківському iframe сигнал `setRocketMode` при монтуванні та відновлює попередній стан при розмонтуванні.
 
-#### Імпорт
-
-```js
-// Vue 3
-import { Header } from '@skyservice-developers/vue-dev-kit'
-
-// Vue 2
-import { Header } from '@skyservice-developers/vue-dev-kit/vue2'
-```
-
-#### Базове використання
-
-**Vue 3 (Composition API)**
 ```vue
-<template>
-  <Header title="Назва сторінки" subtitle="Опис сторінки">
-    <button @click="handleRefresh">Оновити</button>
-    <button @click="handleCreate">Створити</button>
-  </Header>
-</template>
-
-<script setup>
-import { Header } from '@skyservice-developers/vue-dev-kit'
-
-const handleRefresh = () => console.log('Refresh')
-const handleCreate = () => console.log('Create')
-</script>
-```
-
-**Vue 2 (Options API)**
-```vue
-<template>
-  <Header title="Назва сторінки" subtitle="Опис сторінки">
-    <button @click="handleRefresh">Оновити</button>
-    <button @click="handleCreate">Створити</button>
-  </Header>
-</template>
-
-<script>
-import { Header } from '@skyservice-developers/vue-dev-kit/vue2'
-
-export default {
-  components: { Header },
-  methods: {
-    handleRefresh() {
-      console.log('Refresh')
-    },
-    handleCreate() {
-      console.log('Create')
-    }
-  }
-}
-</script>
+<Header
+  title="Товари"
+  subtitle="Управління каталогом"
+  :dropdown-items="recentPages"
+  @navigate="goTo"
+>
+  <SkyButton @click="openDialog">+ Додати</SkyButton>
+</Header>
 ```
 
 #### Props
@@ -118,104 +53,47 @@ export default {
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
 | `title` | `String` | `''` | Заголовок сторінки |
-| `subtitle` | `String` | `''` | Підзаголовок сторінки |
-| `showBackButton` | `Boolean` | `true` | Показувати кнопку "Назад" (відображається тільки в iframe) |
-| `backButtonTitle` | `String` | `'Назад'` | Tooltip для кнопки "Назад" |
+| `subtitle` | `String` | `''` | Підзаголовок |
+| `showBackButton` | `Boolean` | `true` | Показувати кнопку "Назад" (тільки в iframe) |
+| `backButtonTitle` | `String` | `'Назад'` | Tooltip кнопки "Назад" |
+| `backEvent` | `Function` | `null` | Кастомна функція для кнопки "Назад" (замість iframe exit) |
+| `dropdownItems` | `Array` | `[]` | Список нещодавніх розділів `[{ name, path, lastVisit }]` |
+| `dropdownTitle` | `String` | `'Останні відвідані розділи'` | Заголовок дропдауну |
+| `visitLabel` | `String` | `'Останнє відвідування'` | Підпис часу в дропдауні |
+| `trackPageName` | `String` | `''` | Назва сторінки для трекінгу відвідувань |
+| `trackPagePath` | `String` | `''` | Шлях сторінки для трекінгу |
+| `appId` | `String` | `''` | Ідентифікатор додатку для iframe bridge |
 
 #### Slots
 
 | Slot | Опис |
 |------|------|
-| `default` | Контент справа (кнопки, меню тощо) |
-| `title` | Кастомний заголовок (замість `title` prop) |
-| `subtitle` | Кастомний підзаголовок (замість `subtitle` prop) |
+| `default` | Кнопки та елементи справа |
+| `title` | Кастомний заголовок |
+| `subtitle` | Кастомний підзаголовок |
 
+#### Events
 
-#### Приклади
-
-**Мінімальний**
-
-```vue
-<Header title="Користувачі" />
-```
-
-**З кнопками**
-
-```vue
-<Header title="Контейнери" subtitle="Керування Docker контейнерами">
-  <button @click="refresh">Оновити</button>
-  <button @click="create">Створити</button>
-</Header>
-```
+| Event | Опис |
+|-------|------|
+| `back` | Клік на кнопку "Назад" |
+| `navigate` | Вибір розділу з дропдауну |
 
 ---
 
 ### Modal
 
-Модальне вікно в стилістиці проекту
+Модальне вікно з оверлеєм, шапкою, скролом у тілі та опціональним футером. Монтується в `<body>`.
 
-#### Імпорт
-
-```js
-// Vue 3
-import { Modal } from '@skyservice-developers/vue-dev-kit'
-
-// Vue 2
-import { Modal } from '@skyservice-developers/vue-dev-kit/vue2'
-```
-
-#### Базове використання
-
-**Vue 3 (Composition API)**
 ```vue
-<template>
-  <button @click="showModal = true">Відкрити</button>
+<button @click="show = true">Відкрити</button>
 
-  <Modal v-model="showModal" title="Заголовок" subtitle="Підзаголовок">
-    <p>Контент модального вікна</p>
-
-    <template #footer>
-      <button @click="showModal = false">Закрити</button>
-    </template>
-  </Modal>
-</template>
-
-<script setup>
-import { ref } from 'vue'
-import { Modal } from '@skyservice-developers/vue-dev-kit'
-
-const showModal = ref(false)
-</script>
-```
-
-**Vue 2 (Options API)**
-```vue
-<template>
-  <div>
-    <button @click="showModal = true">Відкрити</button>
-
-    <Modal v-model="showModal" title="Заголовок" subtitle="Підзаголовок">
-      <p>Контент модального вікна</p>
-
-      <template #footer>
-        <button @click="showModal = false">Закрити</button>
-      </template>
-    </Modal>
-  </div>
-</template>
-
-<script>
-import { Modal } from '@skyservice-developers/vue-dev-kit/vue2'
-
-export default {
-  components: { Modal },
-  data() {
-    return {
-      showModal: false
-    }
-  }
-}
-</script>
+<Modal v-model="show" title="Заголовок" subtitle="Підзаголовок">
+  <p>Контент модального вікна</p>
+  <template #footer>
+    <button @click="show = false">Закрити</button>
+  </template>
+</Modal>
 ```
 
 #### Props
@@ -223,83 +101,193 @@ export default {
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
 | `modelValue` | `Boolean` | `false` | Стан відкриття (v-model) |
-| `title` | `String` | `''` | Заголовок модального вікна |
+| `title` | `String` | `''` | Заголовок |
 | `subtitle` | `String` | `''` | Підзаголовок |
-| `closeTitle` | `String` | `'Закрити'` | Tooltip для кнопки закриття |
-| `closeOnOverlay` | `Boolean` | `true` | Закривати при кліку на overlay |
+| `closeTitle` | `String` | `'Закрити'` | Tooltip кнопки закриття |
+| `closeOnOverlay` | `Boolean` | `true` | Закривати при кліку на оверлей |
 | `closeOnEsc` | `Boolean` | `true` | Закривати при натисканні Esc |
-
-#### Events
-
-| Event | Опис |
-|-------|------|
-| `update:modelValue` | Зміна стану відкриття |
-| `close` | Закриття модального вікна |
+| `width` | `String` | `'100%'` | Ширина модалки |
+| `height` | `String` | `'100%'` | Висота модалки |
 
 #### Slots
 
 | Slot | Опис |
 |------|------|
-| `default` | Основний контент модального вікна |
-| `footer` | Футер з кнопками (відображається тільки якщо заповнений) |
+| `default` | Основний контент |
+| `footer` | Футер з кнопками |
 
+#### Events
 
-#### Приклади
+| Event | Опис |
+|-------|------|
+| `update:modelValue` | Зміна стану |
+| `close` | Закриття модалки |
 
-**Простий діалог**
+---
+
+### Dialog
+
+Повноекранний діалог. Є два стилі: `next` (кнопка "Назад") та `classic` (кнопка ×). Якщо `mode` не вказано — визначається автоматично за URL-параметром `?rocketMode=`.
 
 ```vue
-<Modal v-model="isOpen" title="Підтвердження">
-  <p>Ви впевнені?</p>
-
-  <template #footer>
-    <button @click="isOpen = false">Скасувати</button>
-    <button @click="confirm">Підтвердити</button>
+<Dialog v-model="show" mode="next" title="Новий товар" subtitle="Заповніть дані">
+  <div style="padding: 20px">
+    <input placeholder="Назва" />
+  </div>
+  <template #buttons>
+    <button @click="show = false">Скасувати</button>
+    <button @click="save">Зберегти</button>
   </template>
-</Modal>
+</Dialog>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `modelValue` | `Boolean` | `false` | Стан відкриття (v-model) |
+| `title` | `String` | `''` | Заголовок |
+| `subtitle` | `String` | `''` | Підзаголовок |
+| `mode` | `String` | `null` | `'next'` \| `'classic'` \| `null` (авто) |
+| `closeText` | `String` | `''` | Текст кнопки закриття |
+| `closeOnEsc` | `Boolean` | `true` | Закривати при Esc |
+| `zIndex` | `Number\|String` | `null` | Кастомний z-index |
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `default` | Основний контент |
+| `buttons` | Кнопки у футері |
+
+#### Events
+
+| Event | Опис |
+|-------|------|
+| `update:modelValue` | Зміна стану |
+| `close` | Закриття |
+| `save` | Підтвердження |
+
+---
+
+### SkyButton
+
+Кнопка з чотирма варіантами, станами loading/disabled, режимами block та icon.
+
+```vue
+<SkyButton variant="primary" @click="save">Зберегти</SkyButton>
+<SkyButton variant="danger" :loading="deleting" @click="del">Видалити</SkyButton>
+<SkyButton variant="outline" disabled>Недоступно</SkyButton>
+<SkyButton variant="secondary" block>На всю ширину</SkyButton>
+
+<!-- Іконка -->
+<SkyButton variant="primary" icon title="Додати">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</SkyButton>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` |
+| `loading` | `Boolean` | `false` | Показує спінер, блокує клік |
+| `disabled` | `Boolean` | `false` | Вимкнена кнопка |
+| `block` | `Boolean` | `false` | Повна ширина |
+| `icon` | `Boolean` | `false` | Квадратна кнопка для іконки |
+
+#### CSS змінні
+
+```css
+--sky-btn-padding: 16px 20px
+--sky-btn-radius: 6px
+--sky-btn-font-size: 14px
+--sky-btn-font-weight: 500
+
+--sky-btn-primary-bg: #24973f
+--sky-btn-danger-bg: #dc2626
+--sky-btn-secondary-bg: #f3f4f6
+--sky-btn-outline-bg: transparent
 ```
 
 ---
 
-## TypeScript
+### SkySelect
 
-Бібліотека включає TypeScript типи. Типи автоматично підключаються при імпорті компонентів.
+Кастомний select з дропдауном, клавіатурною навігацією та підтримкою рядків і об'єктів як опцій.
 
-```typescript
-import type { Component } from 'vue'
-import { Header, Modal } from '@skyservice-developers/vue-dev-kit'
+```vue
+<!-- Об'єкти -->
+<SkySelect
+  v-model="selected"
+  :options="[
+    { label: 'Готівка', value: 'cash' },
+    { label: 'Картка', value: 'card' },
+  ]"
+  placeholder="Оберіть спосіб оплати"
+/>
+
+<!-- Рядки -->
+<SkySelect v-model="selected" :options="['Кг', 'Шт', 'Л']" />
+
+<!-- На всю ширину -->
+<SkySelect v-model="selected" :options="options" block />
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `modelValue` / `value` | `any` | `null` | Поточне значення (v-model) |
+| `options` | `Array` | `[]` | `Array<{ label, value } \| string>` |
+| `placeholder` | `String` | `''` | Текст-заглушка |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+| `block` | `Boolean` | `false` | Повна ширина |
+
+#### Клавіатура
+
+| Клавіша | Дія |
+|---------|-----|
+| `Enter` / `Space` | Відкрити дропдаун |
+| `↑` / `↓` | Навігація по опціях |
+| `Enter` | Вибрати поточну опцію |
+| `Esc` | Закрити дропдаун |
+
+#### CSS змінні
+
+```css
+--sky-select-padding: 10px 14px
+--sky-select-radius: 6px
+--sky-select-font-size: 14px
+--sky-select-border: 1px solid #d1d5db
+--sky-select-dropdown-shadow: 0 4px 12px rgba(0,0,0,0.1)
+--sky-select-dropdown-max-height: 220px
+--sky-select-option-hover-bg: #f3f4f6
+--sky-select-option-selected-color: #24973f
 ```
 
 ---
 
-## Troubleshooting
+## Теміzація
 
-### Vue 2: Модальні вікна не відображаються
+Всі компоненти підтримують кастомізацію через CSS змінні. Перевизначайте їх глобально або локально:
 
-Переконайтеся що у вас встановлена залежність `portal-vue`:
-
-```bash
-npm install portal-vue
-```
-
-### TypeScript помилки
-
-Якщо TypeScript не знаходить типи, додайте в `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "types": ["@skyservice-developers/vue-dev-kit"]
-  }
+```css
+/* Глобально */
+:root {
+  --sky-btn-primary-bg: #6366f1;
+  --sky-btn-radius: 8px;
+  --sky-select-radius: 8px;
+  --sky-modal-z-index: 1000;
 }
-```
 
-### Конфлікт залежностей при встановленні
-
-Використовуйте прапорець `--legacy-peer-deps`:
-
-```bash
-npm install @skyservice-developers/vue-dev-kit --legacy-peer-deps
+/* Локально для конкретного блоку */
+.my-form {
+  --sky-btn-padding: 12px 16px;
+  --sky-select-padding: 8px 12px;
+}
 ```
 
 ---
@@ -307,16 +295,12 @@ npm install @skyservice-developers/vue-dev-kit --legacy-peer-deps
 ## Розробка
 
 ```bash
-# Встановлення залежностей
 npm install --legacy-peer-deps
 
-# Білд для Vue 2
-npm run build:vue2
+# Playground (live preview компонентів)
+npm run playground
 
-# Білд для Vue 3
-npm run build:vue3
-
-# Білд обох версій
+# Білд
 npm run build
 ```
 
