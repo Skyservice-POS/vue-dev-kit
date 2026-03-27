@@ -245,6 +245,7 @@ import { Header, Modal, Dialog, SkyButton, SkySelect } from '@skyservice-develop
 | `placeholder` | `String` | `''` | Текст-заглушка |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
 | `block` | `Boolean` | `false` | Повна ширина |
+| `teleport` | `Boolean` | `false` | Рендерить дропдаун в `<body>` (для модалок/overflow:hidden контейнерів) |
 
 #### Клавіатура
 

@@ -26,24 +26,49 @@
       </svg>
     </button>
 
-    <div v-if="open" class="sky-select-dropdown">
-      <div
-        v-for="(option, idx) in normalizedOptions"
-        :key="option.value"
-        class="sky-select-option"
-        :class="{
-          'sky-select-option-selected': option.value === value,
-          'sky-select-option-focused': idx === focusedIdx,
-        }"
-        @click="select(option)"
-        @mouseenter="focusedIdx = idx"
-      >
-        <span>{{ option.label }}</span>
-        <svg v-if="option.value === value" class="sky-select-check" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+    <template v-if="open">
+      <portal v-if="teleport" to="sky-select-portal">
+        <div
+          class="sky-select-dropdown sky-select-dropdown-teleported"
+          :style="dropdownStyle"
+        >
+          <div
+            v-for="(option, idx) in normalizedOptions"
+            :key="option.value"
+            class="sky-select-option"
+            :class="{
+              'sky-select-option-selected': option.value === value,
+              'sky-select-option-focused': idx === focusedIdx,
+            }"
+            @click="select(option)"
+            @mouseenter="focusedIdx = idx"
+          >
+            <span>{{ option.label }}</span>
+            <svg v-if="option.value === value" class="sky-select-check" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </portal>
+      <div v-else class="sky-select-dropdown">
+        <div
+          v-for="(option, idx) in normalizedOptions"
+          :key="option.value"
+          class="sky-select-option"
+          :class="{
+            'sky-select-option-selected': option.value === value,
+            'sky-select-option-focused': idx === focusedIdx,
+          }"
+          @click="select(option)"
+          @mouseenter="focusedIdx = idx"
+        >
+          <span>{{ option.label }}</span>
+          <svg v-if="option.value === value" class="sky-select-check" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -71,11 +96,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    teleport: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       open: false,
       focusedIdx: -1,
+      dropdownStyle: {},
     };
   },
   computed: {
@@ -89,6 +119,17 @@ export default {
     },
   },
   methods: {
+    calcDropdownStyle() {
+      if (!this.teleport || !this.$refs.root) return;
+      const rect = this.$refs.root.getBoundingClientRect();
+      this.dropdownStyle = {
+        position: 'fixed',
+        top: `${rect.bottom + 4}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        zIndex: 'var(--sky-select-dropdown-z-index, 9999)',
+      };
+    },
     toggle() {
       if (this.disabled) return;
       this.open ? this.close() : this.openDropdown();
@@ -96,11 +137,18 @@ export default {
     openDropdown() {
       this.open = true;
       this.focusedIdx = this.normalizedOptions.findIndex((o) => o.value === this.value);
+      this.calcDropdownStyle();
       this.$nextTick(() => document.addEventListener('mousedown', this.onOutsideClick));
+      if (this.teleport) {
+        window.addEventListener('scroll', this.onScrollOrResize, true);
+        window.addEventListener('resize', this.onScrollOrResize);
+      }
     },
     close() {
       this.open = false;
       document.removeEventListener('mousedown', this.onOutsideClick);
+      window.removeEventListener('scroll', this.onScrollOrResize, true);
+      window.removeEventListener('resize', this.onScrollOrResize);
     },
     select(option) {
       this.$emit('input', option.value);
@@ -108,6 +156,9 @@ export default {
     },
     onOutsideClick(e) {
       if (!this.$refs.root.contains(e.target)) this.close();
+    },
+    onScrollOrResize() {
+      this.calcDropdownStyle();
     },
     onKeydown(e) {
       if (!this.open) {
@@ -133,6 +184,8 @@ export default {
   },
   beforeDestroy() {
     document.removeEventListener('mousedown', this.onOutsideClick);
+    window.removeEventListener('scroll', this.onScrollOrResize, true);
+    window.removeEventListener('resize', this.onScrollOrResize);
   },
 };
 </script>
@@ -224,6 +277,17 @@ export default {
   left: 0;
   right: 0;
   z-index: var(--sky-select-dropdown-z-index, 100);
+  background: var(--sky-select-dropdown-bg, #fff);
+  border: var(--sky-select-dropdown-border, 1px solid #d1d5db);
+  border-radius: var(--sky-select-dropdown-radius, 6px);
+  box-shadow: var(--sky-select-dropdown-shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
+  max-height: var(--sky-select-dropdown-max-height, 220px);
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.sky-select-dropdown-teleported {
+  position: fixed;
   background: var(--sky-select-dropdown-bg, #fff);
   border: var(--sky-select-dropdown-border, 1px solid #d1d5db);
   border-radius: var(--sky-select-dropdown-radius, 6px);
