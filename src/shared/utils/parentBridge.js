@@ -78,3 +78,7 @@ export function getParentStoreValue(key) {
 export function getParentWindowValue(key) {
   return requestFromParent('window', key)
 }
+
+export function setParentLocalStorage(key, value) {
+  sendToParent({ type: 'setLocalStorage', key, value })
+}

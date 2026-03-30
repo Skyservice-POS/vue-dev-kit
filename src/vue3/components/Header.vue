@@ -80,7 +80,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { isInIframe } from '../../shared/utils/webviewCheck'
-import { getParentLocalStorage, getParentWindowValue, sendToParent, setSenderId, getSenderId } from '../../shared/utils/parentBridge'
+import { getParentLocalStorage, getParentWindowValue, setParentLocalStorage, sendToParent, setSenderId, getSenderId } from '../../shared/utils/parentBridge'
 
 const props = defineProps({
   title: {
@@ -153,8 +153,12 @@ if (isInIframe() && props.trackPageName) {
 const previousRocketMode = ref(null)
 
 if (isInIframe()) {
-  getParentLocalStorage('rocketMode').then((value) => {
+  getParentLocalStorage('rocketMode').then(async (value) => {
     previousRocketMode.value = value
+    const existingFallback = await getParentLocalStorage('fallbackRocketMode')
+    if (existingFallback === null) {
+      setParentLocalStorage('fallbackRocketMode', value === true || value === 'true' ? 'true' : 'false')
+    }
     sendToParent({ type: 'setRocketMode', value: true })
   })
 }

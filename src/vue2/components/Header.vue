@@ -71,7 +71,7 @@
 
 <script>
 import { isInIframe } from '../../shared/utils/webviewCheck'
-import { getParentLocalStorage, sendToParent, setSenderId, getSenderId } from '../../shared/utils/parentBridge'
+import { getParentLocalStorage, setParentLocalStorage, sendToParent, setSenderId, getSenderId } from '../../shared/utils/parentBridge'
 
 export default {
   name: 'Header',
@@ -150,8 +150,12 @@ export default {
       }
 
       // Set rocketMode
-      getParentLocalStorage('rocketMode').then((value) => {
+      getParentLocalStorage('rocketMode').then(async (value) => {
         this.previousRocketMode = value
+        const existingFallback = await getParentLocalStorage('fallbackRocketMode')
+        if (existingFallback === null) {
+          setParentLocalStorage('fallbackRocketMode', value === true || value === 'true' ? 'true' : 'false')
+        }
         sendToParent({ type: 'setRocketMode', value: true })
       })
 
