@@ -3,7 +3,7 @@
     <div
       v-if="modelValue"
       class="sky-modal-overlay"
-      @click.self="handleOverlayClick"
+      @mousedown.self="handleOverlayClick"
     >
         <div class="sky-modal" :style="modalStyle">
           <div class="sky-modal-header">
