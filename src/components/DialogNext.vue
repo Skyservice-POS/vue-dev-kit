@@ -72,10 +72,7 @@ import {
   nextTick,
   useSlots,
 } from "vue";
-import {
-  isIosWebview,
-  isAndroidWebview,
-} from "../../shared/utils/webviewCheck";
+import { isIosWebview, isAndroidWebview } from "../sdk";
 
 const slots = useSlots();
 

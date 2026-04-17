@@ -79,8 +79,18 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { isInIframe } from '../../shared/utils/webviewCheck'
-import { getParentLocalStorage, getParentWindowValue, setParentLocalStorage, sendToParent, setSenderId, getSenderId } from '../../shared/utils/parentBridge'
+import {
+  isInsideIframe,
+  getLocalStorageData,
+  getWindowData,
+  setLocalStorage,
+  setRocketMode,
+  trackVisit,
+  navigate as navigateParent,
+  exit as exitParent,
+  setSenderId,
+  getSenderId,
+} from '../sdk'
 
 const props = defineProps({
   title: {
@@ -141,25 +151,24 @@ const localStorageItems = ref([])
 const parentLang = ref({})
 
 // Track page visit in parent's componentStats
-if (isInIframe() && props.trackPageName) {
-  sendToParent({
-    type: 'trackVisit',
-    name: props.trackPageName,
-    path: props.trackPagePath || `/${props.trackPageName}`,
-  })
+if (isInsideIframe() && props.trackPageName) {
+  trackVisit(
+    props.trackPageName,
+    props.trackPagePath || `/${props.trackPageName}`,
+  )
 }
 
 // Set rocketMode in parent, remember previous value to restore on unmount
 const previousRocketMode = ref(null)
 
-if (isInIframe()) {
-  getParentLocalStorage('rocketMode').then(async (value) => {
+if (isInsideIframe()) {
+  getLocalStorageData('rocketMode').then(async (value) => {
     previousRocketMode.value = value
-    const existingFallback = await getParentLocalStorage('fallbackRocketMode')
+    const existingFallback = await getLocalStorageData('fallbackRocketMode')
     if (existingFallback === null) {
-      setParentLocalStorage('fallbackRocketMode', value === true || value === 'true' ? 'true' : 'false')
+      setLocalStorage('fallbackRocketMode', value === true || value === 'true' ? 'true' : 'false')
     }
-    sendToParent({ type: 'setRocketMode', value: true })
+    setRocketMode(true)
   })
 }
 
@@ -168,8 +177,8 @@ onUnmounted(() => {
 })
 
 // Load translations from parent
-if (isInIframe()) {
-  getParentWindowValue('lang').then((data) => {
+if (isInsideIframe()) {
+  getWindowData('lang').then((data) => {
     if (data != null) {
       parentLang.value = data
     }
@@ -190,8 +199,8 @@ function loadComponentStats(raw) {
 loadComponentStats(localStorage['componentStats'])
 
 // If in iframe, request from parent and update
-if (isInIframe()) {
-  getParentLocalStorage('componentStats').then((data) => {
+if (isInsideIframe()) {
+  getLocalStorageData('componentStats').then((data) => {
     if (data != null) {
       localStorage.setItem('componentStats', JSON.stringify(data))
       loadComponentStats(data)
@@ -216,8 +225,8 @@ const closeDropdown = () => {
 
 const selectItem = (item) => {
   emit('navigate', item.path)
-  if (isInIframe()) {
-    sendToParent({ type: 'navigate', path: item.path })
+  if (isInsideIframe()) {
+    navigateParent(item.path)
   }
   closeDropdown()
 }
@@ -259,13 +268,13 @@ onUnmounted(() => {
 
 // Показуємо кнопку якщо є backEvent АБО (showBackButton=true І сторінка в iframe)
 const shouldShowBackButton = computed(() => {
-  return props.backEvent || (props.showBackButton && isInIframe());
+  return props.backEvent || (props.showBackButton && isInsideIframe());
 });
 
 const restoreRocketMode = () => {
   if (previousRocketMode.value !== null) {
     const restore = previousRocketMode.value === true || previousRocketMode.value === 'true'
-    sendToParent({ type: 'setRocketMode', value: restore })
+    setRocketMode(restore)
   }
 }
 
@@ -281,8 +290,8 @@ const handleBack = async () => {
 
   let previousPage = findPreviousPage()
 
-  if (!previousPage && isInIframe()) {
-    const data = await getParentLocalStorage('componentStats')
+  if (!previousPage && isInsideIframe()) {
+    const data = await getLocalStorageData('componentStats')
     if (data) {
       loadComponentStats(data)
       previousPage = findPreviousPage()
@@ -292,9 +301,9 @@ const handleBack = async () => {
   restoreRocketMode()
 
   if (previousPage) {
-    sendToParent({ type: 'navigate', path: previousPage.path })
+    navigateParent(previousPage.path)
   } else {
-    sendToParent({ type: 'exit' })
+    exitParent()
   }
 }
 </script>

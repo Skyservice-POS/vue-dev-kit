@@ -1,33 +1,99 @@
 # @skyservice-developers/vue-dev-kit
 
-Vue developer toolkit — компоненти для розробки мінідодатків. Підтримує Vue 2.7+ та Vue 3.4+.
+Vue 3 developer toolkit для Skyservice mini-apps: UI компоненти + TypeScript SDK (iframe bridge + HTTP API клієнт).
+
+> **v2.0.0 breaking changes:**
+> - Vue 2 більше не підтримується (тільки Vue 3.4+).
+> - Додано повноцінний SDK (`bridge` + `SkyserviceAPI`), раніше опублікований як окремий пакет `skyservice-sdk` (задепрекейтнутий).
+> - Старі utils `shared/utils/parentBridge` та `shared/utils/webviewCheck` замінені типізованим SDK. Якщо ви імпортували їх напряму — переходьте на `@skyservice-developers/vue-dev-kit/sdk`.
 
 ## Встановлення
 
 ```bash
-npm install @skyservice-developers/vue-dev-kit --legacy-peer-deps
+npm install @skyservice-developers/vue-dev-kit
 ```
 
 ## Підключення
 
-### Vue 3
+### Компоненти + SDK (разом)
 
 ```js
-import '@skyservice-developers/vue-dev-kit/vue3/style.css'
-import { Header, Modal, Dialog, SkyButton, SkySelect } from '@skyservice-developers/vue-dev-kit'
+import '@skyservice-developers/vue-dev-kit/style.css'
+import {
+  Header, Modal, Dialog, SkyButton, SkySelect,
+  navigate, SkyserviceAPI, isInsideIframe,
+} from '@skyservice-developers/vue-dev-kit'
 ```
 
-### Vue 2
+### Тільки SDK (без Vue залежностей)
 
-```js
-import '@skyservice-developers/vue-dev-kit/vue2/style.css'
-import { Header, Modal, Dialog, SkyButton, SkySelect } from '@skyservice-developers/vue-dev-kit/vue2'
+```ts
+import {
+  navigate, exit, getToken, getCompany,
+  setRocketMode, notify, SkyserviceAPI,
+  isInsideIframe, webviewCheck,
+} from '@skyservice-developers/vue-dev-kit/sdk'
 ```
 
-> **Vue 2:** якщо модалки не відображаються, встановіть `portal-vue`:
-> ```bash
-> npm install portal-vue
-> ```
+> Шлях `/vue3` залишено як alias на корінь для зворотної сумісності з v1.
+
+---
+
+## SDK
+
+### Bridge — комунікація з Dashboard через iframe
+
+Mini-app працює в iframe всередині Dashboard. Bridge обгортає `window.postMessage` типізованими функціями.
+
+```ts
+import {
+  navigate, exit, getBack,
+  getStoreData, getLocalStorageData, getWindowData,
+  getCompany, getUser, getToken, getLang, getProductCategories,
+  setLocalStorage, setRocketMode,
+  trackVisit, openExternalLink, openCrispChat,
+  notify, notifyError, notifyWarn,
+  isInsideIframe, onMessage,
+  setSenderId, getSenderId,
+} from '@skyservice-developers/vue-dev-kit/sdk'
+
+const token = await getToken()            // → string | null
+const company = await getCompany()        // → об'єкт з Vuex store
+setLocalStorage('userPref', { theme: 'dark' })
+notify('Збережено')
+navigate('/products/42')
+```
+
+Всі гетери повертають `Promise<T | null>` — `null` при таймауті або якщо додаток відкритий поза iframe. `null` не ламає `await` — просто треба перевірити результат.
+
+### SkyserviceAPI — HTTP клієнт
+
+Прямі запити до Skyservice API. Працює всюди (браузер, Node, edge), не потребує iframe.
+
+```ts
+import { SkyserviceAPI, getToken } from '@skyservice-developers/vue-dev-kit/sdk'
+
+const token = await getToken()
+const api = new SkyserviceAPI({
+  token,
+  domain: 'api.skyservice.online',
+  // companyId: 'optional',
+})
+
+const tradepoints = await api.getTradepoints()
+const categories = await api.getCategoryTree(tradepointId)
+const products = await api.getProducts({ tradepointId })
+```
+
+### Webview detection
+
+```ts
+import {
+  isInsideIframe, isWebview,
+  isIosWebview, isAndroidWebview, isCefWebview,
+  webviewCheck,
+} from '@skyservice-developers/vue-dev-kit/sdk'
+```
 
 ---
 
@@ -296,13 +362,28 @@ import { Header, Modal, Dialog, SkyButton, SkySelect } from '@skyservice-develop
 ## Розробка
 
 ```bash
-npm install --legacy-peer-deps
+npm install
 
 # Playground (live preview компонентів)
 npm run playground
 
-# Білд
+# Білд (компоненти + SDK → dist/)
 npm run build
+```
+
+## Структура проекту
+
+```
+src/
+├── index.ts           # публічний API (компоненти + SDK)
+├── components/        # Vue 3 компоненти (.vue + index.ts)
+├── sdk/               # TypeScript SDK
+│   ├── bridge.ts      # iframe postMessage API
+│   ├── api.ts         # SkyserviceAPI HTTP клієнт
+│   ├── webview.ts     # детекція webview/iframe
+│   ├── types.ts       # DTO типи (Tradepoint, Category, Product)
+│   └── index.ts
+└── styles/
 ```
 
 ## Ліцензія
