@@ -74,16 +74,25 @@ navigate('/products/42')
 import { SkyserviceAPI, getToken } from '@skyservice-developers/vue-dev-kit/sdk'
 
 const token = await getToken()
-const api = new SkyserviceAPI({
+const api = SkyserviceAPI.create({
   token,
   domain: 'api.skyservice.online',
-  // companyId: 'optional',
+  companyId,
+  appId,
+  // developerId: 'optional',
 })
 
 const tradepoints = await api.getTradepoints()
 const categories = await api.getCategoryTree(tradepointId)
 const products = await api.getProducts({ tradepointId })
+
+// Активація/деактивація міні-додатку
+await api.setAppActive({ isActive: true, settings: { foo: 'bar' } })
+await api.setAppActive({ isActive: false })
 ```
+
+> `SkyserviceAPI.create()` — factory; прямий виклик `new SkyserviceAPI(...)` недоступний.
+> `setAppActive` завжди ходить на `api.cabinet.developer.skyservice.online` (хардкод).
 
 ### Webview detection
 

@@ -10,8 +10,12 @@ import type {
 export interface SkyserviceAPIConfig {
   token: string;
   domain: string;
-  companyId?: string;
+  companyId: string;
+  appId: string;
+  developerId?: string;
 }
+
+const INTEGRATIONS_BASE_URL = 'https://api.cabinet.developer.skyservice.online';
 
 /**
  * HTTP client for Skyservice API.
@@ -20,30 +24,42 @@ export interface SkyserviceAPIConfig {
  *
  * @example
  * ```ts
- * const api = new SkyserviceAPI({ token, domain: 'api.skyservice.online' });
+ * const api = SkyserviceAPI.create({
+ *   token,
+ *   domain: 'api.skyservice.online',
+ *   companyId,
+ *   appId,
+ * });
  * const tradepoints = await api.getTradepoints();
- * const categories = await api.getCategoryTree(tradepointId);
  * ```
  */
 export class SkyserviceAPI {
   private baseUrl: string;
   private token: string;
-  private companyId: string | undefined;
+  private companyId: string;
+  private appId: string;
+  private developerId: string | undefined;
 
-  constructor(config: SkyserviceAPIConfig) {
+  private constructor(config: SkyserviceAPIConfig) {
     this.token = config.token;
     this.companyId = config.companyId;
-    // Ensure domain is api, not dashboard
+    this.appId = config.appId;
+    this.developerId = config.developerId;
     const domain = config.domain.replace('dashboard', 'api');
     this.baseUrl = domain.startsWith('http') ? domain : `https://${domain}`;
   }
 
+  /** Factory — create a new SkyserviceAPI instance. */
+  static create(config: SkyserviceAPIConfig): SkyserviceAPI {
+    return new SkyserviceAPI(config);
+  }
+
   // --- Low-level ---
 
-  private async request<T>(params: Record<string, string>): Promise<T> {
+  private async get<T>(params: Record<string, string>): Promise<T> {
     const searchParams = new URLSearchParams({
       token: this.token,
-      ...(this.companyId ? { companyId: this.companyId } : {}),
+      companyId: this.companyId,
       ...params,
     });
 
@@ -62,6 +78,29 @@ export class SkyserviceAPI {
     return json.data;
   }
 
+  private async post<T>(
+    baseUrl: string,
+    params: Record<string, string>,
+    body: Record<string, unknown>,
+  ): Promise<T> {
+    const searchParams = new URLSearchParams({
+      token: this.token,
+      ...params,
+    });
+
+    const response = await fetch(`${baseUrl}/?${searchParams}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Skyservice API error: ${response.status}`);
+    }
+
+    return response.json() as Promise<T>;
+  }
+
   // --- Tradepoints ---
 
   /**
@@ -71,7 +110,7 @@ export class SkyserviceAPI {
   async getTradepoints(options?: {
     includeDeleted?: boolean;
   }): Promise<Tradepoint[]> {
-    const data = await this.request<{ items: Tradepoint[]; total: number }>({
+    const data = await this.get<{ items: Tradepoint[]; total: number }>({
       section: 'tradepoints',
       action: 'getTradepoints',
     });
@@ -91,7 +130,7 @@ export class SkyserviceAPI {
    * If `tradepointId` is provided, filters to categories visible for that tradepoint.
    */
   async getCategoryTree(tradepointId?: number): Promise<Category[]> {
-    const raw = await this.request<RawCategory[]>({
+    const raw = await this.get<RawCategory[]>({
       section: 'productCategory',
       action: 'getCategories',
       ...(tradepointId ? { tradepointId: String(tradepointId) } : {}),
@@ -114,7 +153,7 @@ export class SkyserviceAPI {
     tradepointId?: number;
     includeInactive?: boolean;
   }): Promise<Product[]> {
-    const raw = await this.request<{
+    const raw = await this.get<{
       items: RawProduct[];
       total: number;
     }>({
@@ -129,6 +168,38 @@ export class SkyserviceAPI {
     });
 
     return stripProducts(raw.items, options?.includeInactive);
+  }
+
+  // --- Integrations ---
+
+  /**
+   * Activate or deactivate the mini-app for the current company.
+   *
+   * Sends POST to `api.cabinet.developer.skyservice.online`:
+   * - `isActive: true`  → `section=integrations&action=activateApp`
+   * - `isActive: false` → `section=integrations&action=deactivateApp`
+   *
+   * `settings` are sent only when activating.
+   */
+  async setAppActive({
+    isActive,
+    settings,
+  }: {
+    isActive: boolean;
+    settings?: Record<string, unknown>;
+  }): Promise<unknown> {
+    const action = isActive ? 'activateApp' : 'deactivateApp';
+    const body: Record<string, unknown> = {
+      company_id: this.companyId,
+      app_id: this.appId,
+      ...(this.developerId !== undefined && { developer_id: this.developerId }),
+      ...(isActive && settings !== undefined && { settings }),
+    };
+
+    return this.post(INTEGRATIONS_BASE_URL, {
+      section: 'integrations',
+      action,
+    }, body);
   }
 }
 
