@@ -48,4 +48,5 @@ export type {
   RawCategory,
   Product,
   RawProduct,
+  AppIntegration,
 } from './types';

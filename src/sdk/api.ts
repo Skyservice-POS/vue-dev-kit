@@ -5,6 +5,7 @@ import type {
   RawCategory,
   Product,
   RawProduct,
+  AppIntegration,
 } from './types';
 
 export interface SkyserviceAPIConfig {
@@ -104,7 +105,13 @@ export class SkyserviceAPI {
       throw new Error(`Skyservice API error: ${response.status}`);
     }
 
-    return response.json() as Promise<T>;
+    const json: SkyserviceResponse<T> = await response.json();
+
+    if (json.status !== 'done') {
+      throw new Error(`Skyservice API returned status: ${json.status}`);
+    }
+
+    return json.data;
   }
 
   // --- Tradepoints ---
@@ -198,7 +205,7 @@ export class SkyserviceAPI {
     isActive: boolean;
     title?: string;
     settings?: Record<string, unknown>;
-  }): Promise<unknown> {
+  }): Promise<AppIntegration> {
     const action = isActive ? 'activateApp' : 'deactivateApp';
     const body: Record<string, unknown> = {
       company_id: this.companyId,
@@ -207,7 +214,7 @@ export class SkyserviceAPI {
       ...(isActive && settings !== undefined && { settings }),
     };
 
-    const response = await this.post<{ data?: { appId?: string | number } }>(
+    const data = await this.post<AppIntegration>(
       INTEGRATIONS_URL,
       { section: 'integrations', action },
       body,
@@ -222,7 +229,7 @@ export class SkyserviceAPI {
       window.parent.postMessage(
         {
           type: 'sendActiveApp',
-          id: response?.data?.appId ?? this.appId,
+          id: data.id,
           is_active: isActive,
           deploymentId: this.deploymentId,
           appName: this.appName,
@@ -232,7 +239,7 @@ export class SkyserviceAPI {
       );
     }
 
-    return response;
+    return data;
   }
 }
 
