@@ -1,26 +1,22 @@
 <template>
   <BaseTeleport to="body">
-    <transition name="modal-fade">
-      <div
-        v-if="modelValue"
-        class="sky-modal-overlay"
-        @click.self="handleOverlayClick"
-      >
+    <div
+      v-if="modelValue"
+      class="sky-modal-overlay"
+      @mousedown.self="handleOverlayClick"
+    >
         <div class="sky-modal" :style="modalStyle">
           <div class="sky-modal-header">
             <button class="sky-modal-back" @click="close" :title="closeTitle">
               <svg
                 width="15"
                 height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
+                viewBox="0 0 451.847 451.847"
+                style="transform: rotate(90deg)"
               >
                 <path
-                  d="M19 12H5M12 19l-7-7 7-7"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  fill="currentColor"
+                  d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
                 />
               </svg>
             </button>
@@ -44,7 +40,6 @@
           </div>
         </div>
       </div>
-    </transition>
   </BaseTeleport>
 </template>
 
@@ -169,8 +164,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   background: transparent;
   border: none;
@@ -181,8 +176,16 @@ onUnmounted(() => {
   margin-right: 12px;
 }
 
+.sky-modal-back svg {
+  display: block;
+}
+
 .sky-modal-back:hover {
   background-color: var(--sky-modal-back-hover-bg, #f8f9fa);
+}
+
+.sky-modal-back:active {
+  background-color: var(--sky-modal-back-active-bg, #e9ecef);
 }
 
 .sky-modal-title-wrapper {
@@ -221,38 +224,30 @@ onUnmounted(() => {
   border-top: 1px solid var(--sky-modal-border-color, #dee2e6);
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
   flex-shrink: 0;
 }
 
-/* Animations */
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-fade-enter-active .sky-modal,
-.modal-fade-leave-active .sky-modal {
-  transition: transform 0.3s ease;
-}
-
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
-
-.modal-fade-enter-from .sky-modal {
-  transform: translateY(-20px);
-}
-
-.modal-fade-leave-to .sky-modal {
-  transform: translateY(20px);
+.sky-modal-footer > * + * {
+  margin-left: 10px;
 }
 
 /* Responsive */
 @media (min-width: 768px) {
   .sky-modal {
     border-radius: var(--sky-modal-radius, 8px);
+  }
+}
+
+/* iOS safe area */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .sky-modal-header {
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+  .sky-modal-footer {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  .sky-modal-body:last-child {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
   }
 }
 </style>

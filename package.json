@@ -1,70 +1,65 @@
 {
   "name": "@skyservice-developers/vue-dev-kit",
-  "version": "1.1.1",
-  "description": "Vue 2 and Vue 3 developer toolkit - components and helpers",
+  "version": "2.0.0",
+  "description": "Vue 3 component library + TypeScript SDK (iframe bridge + HTTP API) for Skyservice mini-apps",
   "type": "module",
-  "main": "./dist/vue3/vue-dev-kit.cjs",
-  "module": "./dist/vue3/vue-dev-kit.js",
-  "types": "./src/shared/types/index.d.ts",
+  "main": "./dist/vue-dev-kit.cjs",
+  "module": "./dist/vue-dev-kit.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/vue3/vue-dev-kit.js",
-      "require": "./dist/vue3/vue-dev-kit.cjs",
-      "types": "./src/shared/types/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-dev-kit.js",
+      "require": "./dist/vue-dev-kit.cjs"
     },
-    "./vue2": {
-      "import": "./dist/vue2/vue-dev-kit.js",
-      "require": "./dist/vue2/vue-dev-kit.cjs"
+    "./sdk": {
+      "types": "./dist/sdk/index.d.ts",
+      "import": "./dist/sdk.js",
+      "require": "./dist/sdk.cjs"
     },
     "./vue3": {
-      "import": "./dist/vue3/vue-dev-kit.js",
-      "require": "./dist/vue3/vue-dev-kit.cjs",
-      "types": "./src/shared/types/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/vue-dev-kit.js",
+      "require": "./dist/vue-dev-kit.cjs"
     },
-    "./vue2/style.css": "./dist/vue2/style.css",
-    "./vue3/style.css": "./dist/vue3/style.css",
-    "./style.css": "./dist/vue3/style.css"
+    "./style.css": "./dist/style.css",
+    "./vue3/style.css": "./dist/style.css"
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "dev": "vite",
-    "build:vue2": "vite build --config vite.vue2.config.js",
-    "build:vue3": "vite build --config vite.vue3.config.js",
-    "build": "npm run build:vue2 && npm run build:vue3",
+    "playground": "vite --config playground/vite.config.js playground",
+    "build": "vite build",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
     "release": "npm publish --access public"
   },
   "peerDependencies": {
-    "vue": "^2.7.0 || ^3.4.0"
-  },
-  "peerDependenciesMeta": {
-    "portal-vue": {
-      "optional": true
-    }
+    "vue": "^3.4.0"
   },
   "dependencies": {
-    "portal-vue": "^3.0.0",
     "ua-parser-js": "^1.0.37"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.5.2",
-    "vite": "^4.5.2",
-    "vite-plugin-vue2": "^2.0.3",
-    "vue": "^2.7.16",
-    "vue-template-compiler": "^2.7.16",
-    "vue3": "npm:vue@^3.4.21"
+    "@types/ua-parser-js": "^0.7.39",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0",
+    "vite-plugin-dts": "^3.9.1",
+    "vue": "^3.4.21"
   },
   "keywords": [
     "vue",
-    "vue2",
     "vue3",
     "components",
     "toolkit",
-    "ui"
+    "ui",
+    "skyservice",
+    "sdk",
+    "iframe",
+    "bridge"
   ],
   "author": "Skyservice-POS",
   "license": "MIT",
@@ -75,10 +70,5 @@
   "bugs": {
     "url": "https://github.com/Skyservice-POS/vue-dev-kit/issues"
   },
-  "homepage": "https://github.com/Skyservice-POS/vue-dev-kit#readme",
-  "overrides": {
-    "@vitejs/plugin-vue": {
-      "vue": "3.4.21"
-    }
-  }
+  "homepage": "https://github.com/Skyservice-POS/vue-dev-kit#readme"
 }
