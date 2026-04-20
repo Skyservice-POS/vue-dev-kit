@@ -15,7 +15,7 @@ export interface SkyserviceAPIConfig {
   developerId?: string;
 }
 
-const INTEGRATIONS_BASE_URL = 'https://api.cabinet.developer.skyservice.online';
+const INTEGRATIONS_URL = 'https://api.cabinet.developer.skyservice.online/index.php';
 
 /**
  * HTTP client for Skyservice API.
@@ -79,7 +79,7 @@ export class SkyserviceAPI {
   }
 
   private async post<T>(
-    baseUrl: string,
+    url: string,
     params: Record<string, string>,
     body: Record<string, unknown>,
   ): Promise<T> {
@@ -88,7 +88,7 @@ export class SkyserviceAPI {
       ...params,
     });
 
-    const response = await fetch(`${baseUrl}/?${searchParams}`, {
+    const response = await fetch(`${url}?${searchParams}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -196,7 +196,7 @@ export class SkyserviceAPI {
       ...(isActive && settings !== undefined && { settings }),
     };
 
-    return this.post(INTEGRATIONS_BASE_URL, {
+    return this.post(INTEGRATIONS_URL, {
       section: 'integrations',
       action,
     }, body);
