@@ -80,6 +80,9 @@ const api = SkyserviceAPI.create({
   companyId,
   appId,
   // developerId: 'optional',
+  // deploymentId + appName — тільки якщо користуєтесь setAppActive
+  deploymentId: '4c3c7d32-2408-503b-c439-bff7332a238e',
+  appName: 'glovo',
 })
 
 const tradepoints = await api.getTradepoints()
@@ -87,12 +90,14 @@ const categories = await api.getCategoryTree(tradepointId)
 const products = await api.getProducts({ tradepointId })
 
 // Активація/деактивація міні-додатку
-await api.setAppActive({ isActive: true, settings: { foo: 'bar' } })
-await api.setAppActive({ isActive: false })
+await api.setAppActive({ isActive: true, title: 'Glovo', settings: { foo: 'bar' } })
+await api.setAppActive({ isActive: false, title: 'Glovo' })
 ```
 
 > `SkyserviceAPI.create()` — factory; прямий виклик `new SkyserviceAPI(...)` недоступний.
-> `setAppActive` завжди ходить на `api.cabinet.developer.skyservice.online` (хардкод).
+> `setAppActive` POST на `api.cabinet.developer.skyservice.online/index.php`. Якщо
+> `deploymentId` + `appName` задані в конфізі — додатково шле `sendActiveApp`
+> postMessage в parent (Dashboard) з відповіддю сервера та новим станом.
 
 ### Webview detection
 

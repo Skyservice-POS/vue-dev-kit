@@ -13,6 +13,8 @@ export interface SkyserviceAPIConfig {
   companyId: string;
   appId: string;
   developerId?: string;
+  deploymentId?: string;
+  appName?: string;
 }
 
 const INTEGRATIONS_URL = 'https://api.cabinet.developer.skyservice.online/index.php';
@@ -39,12 +41,16 @@ export class SkyserviceAPI {
   private companyId: string;
   private appId: string;
   private developerId: string | undefined;
+  private deploymentId: string | undefined;
+  private appName: string | undefined;
 
   private constructor(config: SkyserviceAPIConfig) {
     this.token = config.token;
     this.companyId = config.companyId;
     this.appId = config.appId;
     this.developerId = config.developerId;
+    this.deploymentId = config.deploymentId;
+    this.appName = config.appName;
     const domain = config.domain.replace('dashboard', 'api');
     this.baseUrl = domain.startsWith('http') ? domain : `https://${domain}`;
   }
@@ -175,17 +181,22 @@ export class SkyserviceAPI {
   /**
    * Activate or deactivate the mini-app for the current company.
    *
-   * Sends POST to `api.cabinet.developer.skyservice.online`:
+   * Sends POST to `api.cabinet.developer.skyservice.online/index.php`:
    * - `isActive: true`  → `section=integrations&action=activateApp`
    * - `isActive: false` → `section=integrations&action=deactivateApp`
    *
    * `settings` are sent only when activating.
+   *
+   * If `deploymentId` and `appName` were provided in config, also sends a
+   * `sendActiveApp` postMessage to Dashboard (parent window) with the new state.
    */
   async setAppActive({
     isActive,
+    title,
     settings,
   }: {
     isActive: boolean;
+    title?: string;
     settings?: Record<string, unknown>;
   }): Promise<unknown> {
     const action = isActive ? 'activateApp' : 'deactivateApp';
@@ -196,10 +207,32 @@ export class SkyserviceAPI {
       ...(isActive && settings !== undefined && { settings }),
     };
 
-    return this.post(INTEGRATIONS_URL, {
-      section: 'integrations',
-      action,
-    }, body);
+    const response = await this.post<{ data?: { appId?: string | number } }>(
+      INTEGRATIONS_URL,
+      { section: 'integrations', action },
+      body,
+    );
+
+    if (
+      this.deploymentId &&
+      this.appName &&
+      typeof window !== 'undefined' &&
+      window.self !== window.top
+    ) {
+      window.parent.postMessage(
+        {
+          type: 'sendActiveApp',
+          id: response?.data?.appId ?? this.appId,
+          is_active: isActive,
+          deploymentId: this.deploymentId,
+          appName: this.appName,
+          title,
+        },
+        '*',
+      );
+    }
+
+    return response;
   }
 }
 
