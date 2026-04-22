@@ -1,13 +1,18 @@
 <template>
   <div class="sky-tile-card">
-    <div v-if="$slots.icon || imageUrl" class="sky-tile-card-icon">
-      <slot name="icon">
-        <img v-if="imageUrl" :src="imageUrl" :alt="title" />
-      </slot>
+    <div class="sky-tile-card-head">
+      <div v-if="$slots.icon || imageUrl" class="sky-tile-card-icon">
+        <slot name="icon">
+          <img v-if="imageUrl" :src="imageUrl" :alt="title" />
+        </slot>
+      </div>
+      <div class="sky-tile-card-titles">
+        <h3 class="sky-tile-card-title">{{ title }}</h3>
+        <p v-if="subtitle" class="sky-tile-card-subtitle">{{ subtitle }}</p>
+      </div>
     </div>
-    <div class="sky-tile-card-body">
-      <h3 class="sky-tile-card-title">{{ title }}</h3>
-      <p v-if="subtitle" class="sky-tile-card-subtitle">{{ subtitle }}</p>
+    <div v-if="$slots.default" class="sky-tile-card-body">
+      <slot />
     </div>
   </div>
 </template>
@@ -23,12 +28,19 @@ defineProps({
 <style scoped>
 .sky-tile-card {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
   padding: 16px;
   background: var(--sky-tile-bg, #fff);
   border-radius: var(--sky-tile-radius, 12px);
   box-shadow: var(--sky-tile-shadow, 0 1px 12px rgba(0, 0, 0, 0.08));
+}
+
+.sky-tile-card-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
 }
 
 .sky-tile-card-icon {
@@ -50,7 +62,7 @@ defineProps({
   object-fit: contain;
 }
 
-.sky-tile-card-body {
+.sky-tile-card-titles {
   flex: 1;
   min-width: 0;
 }
@@ -75,9 +87,16 @@ defineProps({
   white-space: nowrap;
 }
 
+.sky-tile-card-body {
+  min-width: 0;
+}
+
 @media (max-width: 500px) {
   .sky-tile-card {
     padding: 12px;
+    gap: 10px;
+  }
+  .sky-tile-card-head {
     gap: 12px;
   }
   .sky-tile-card-icon {
