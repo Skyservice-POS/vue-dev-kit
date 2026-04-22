@@ -45,7 +45,7 @@
 
 <script setup>
 import { computed, watch, onMounted, onUnmounted } from "vue";
-import BaseTeleport from "./BaseTeleport.vue";
+import BaseTeleport from "../BaseTeleport/BaseTeleport.vue";
 
 const props = defineProps({
   modelValue: {

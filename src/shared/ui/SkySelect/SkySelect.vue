@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
 }
 
 .sky-select-trigger:focus-visible {
-  outline: 2px solid var(--sky-select-focus-ring, #24973f);
+  outline: 2px solid var(--sky-select-focus-ring, #00c279);
   outline-offset: 2px;
 }
 
@@ -253,7 +253,7 @@ onBeforeUnmount(() => {
 }
 
 .sky-select-option-selected {
-  color: var(--sky-select-option-selected-color, #24973f);
+  color: var(--sky-select-option-selected-color, #00c279);
   font-weight: 500;
 }
 
@@ -261,6 +261,6 @@ onBeforeUnmount(() => {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  color: var(--sky-select-check-color, #24973f);
+  color: var(--sky-select-check-color, #00c279);
 }
 </style>

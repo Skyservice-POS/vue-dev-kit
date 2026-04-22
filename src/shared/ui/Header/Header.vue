@@ -90,7 +90,7 @@ import {
   exit as exitParent,
   setSenderId,
   getSenderId,
-} from '../sdk'
+} from '../../../sdk'
 
 const props = defineProps({
   title: {
