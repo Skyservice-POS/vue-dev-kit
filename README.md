@@ -20,7 +20,14 @@ npm install @skyservice-developers/vue-dev-kit
 ```js
 import '@skyservice-developers/vue-dev-kit/style.css'
 import {
-  Header, Modal, Dialog, SkyButton, SkySelect,
+  // shared/ui
+  Header, Modal, Dialog,
+  SkyButton, SkySelect,
+  SkyAlert, SkyBadge,
+  SkyCard, SkyCardHeader, SkyCardRow,
+  // widgets
+  SkyTileCard,
+  // sdk
   navigate, SkyserviceAPI, isInsideIframe,
 } from '@skyservice-developers/vue-dev-kit'
 ```
@@ -351,6 +358,227 @@ import {
 
 ---
 
+### SkyAlert
+
+Інформаційне повідомлення з 4 тональностями та опціональною іконкою.
+
+```vue
+<SkyAlert tone="success">Все збережено</SkyAlert>
+<SkyAlert tone="error" :show-icon="false">Щось пішло не так</SkyAlert>
+<SkyAlert tone="warning">Увага: дія незворотня</SkyAlert>
+<SkyAlert tone="info">Підказка для користувача</SkyAlert>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `tone` | `String` | `'info'` | `'success'` \| `'error'` \| `'warning'` \| `'info'` |
+| `showIcon` | `Boolean` | `true` | Показувати іконку ліворуч |
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `default` | Вміст повідомлення |
+
+---
+
+### SkyBadge
+
+Компактний статус-лейбл з крапкою.
+
+```vue
+<SkyBadge tone="success" label="Під'єднано" />
+<SkyBadge tone="error">Помилка</SkyBadge>
+<SkyBadge tone="pending" :dot="false" label="Очікування" />
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `tone` | `String` | `'default'` | `'success'` \| `'error'` \| `'warning'` \| `'pending'` \| `'info'` \| `'default'` |
+| `label` | `String` | `''` | Текст (якщо не передаєте slot) |
+| `dot` | `Boolean` | `true` | Показувати крапку-індикатор |
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `default` | Альтернатива до `label` |
+
+---
+
+### SkyCard
+
+Shell-контейнер для карток: ribbon / header / body / footer — всі через slots. Використовуйте у зв'язці з `SkyCardHeader`, `SkyCardRow`, `SkyBadge`, `SkyAlert`.
+
+```vue
+<SkyCard>
+  <template #ribbon>Тимчасово закрито</template>
+  <template #header>
+    <SkyCardHeader
+      title="Торгова точка"
+      subtitle="вул. Хрещатик, 1"
+      icon-src="/svg/home.svg"
+    />
+  </template>
+
+  <SkyCardRow label="Статус">
+    <SkyBadge tone="success" label="Активна" />
+  </SkyCardRow>
+  <SkyCardRow label="ID" value="12345" />
+
+  <SkyAlert tone="error">Помилка синхронізації</SkyAlert>
+
+  <template #footer>
+    <SkyButton variant="primary" block>Налаштувати</SkyButton>
+  </template>
+</SkyCard>
+```
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `ribbon` | Стрічка зверху (наприклад "Тимчасово закрито") |
+| `header` | Шапка картки (часто `SkyCardHeader`) |
+| `default` | Тіло картки (часто `SkyCardRow`, `SkyAlert`) |
+| `footer` | Футер з кнопками |
+
+#### CSS змінні
+
+```css
+--sky-card-bg: #fff
+--sky-card-radius: 12px
+--sky-card-shadow: 0 1px 12px rgba(0,0,0,0.1)
+--sky-card-ribbon-bg: #e65100
+--sky-card-ribbon-color: #fff
+--sky-card-padding-header: 24px 24px 0
+--sky-card-padding-body: 10px 24px 15px
+--sky-card-padding-footer: 0 24px 24px
+```
+
+---
+
+### SkyCardHeader
+
+Готова шапка картки: іконка + заголовок + підзаголовок.
+
+```vue
+<SkyCardHeader title="Glovo" subtitle="Інтеграція доставки" icon-src="/svg/glovo.svg" />
+
+<!-- або свій slot замість img -->
+<SkyCardHeader title="Меню">
+  <template #icon>
+    <MyCustomIcon />
+  </template>
+</SkyCardHeader>
+```
+
+#### Props
+
+| Prop | Тип | Обов'язково | Опис |
+|------|-----|-------------|------|
+| `title` | `String` | так | Заголовок |
+| `subtitle` | `String` | ні | Підзаголовок |
+| `iconSrc` | `String` | ні | Шлях до зображення іконки |
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `icon` | Override іконки (якщо не хочете використовувати `iconSrc`) |
+
+#### CSS змінні
+
+```css
+--sky-card-icon-size: 64px
+--sky-card-icon-radius: 12px
+--sky-card-icon-bg: #00c279
+--sky-card-icon-color: #fff
+```
+
+---
+
+### SkyCardRow
+
+Рядок "label + value" (або довільний контент через slot).
+
+```vue
+<SkyCardRow label="Store ID" value="12345" />
+
+<!-- зі своїм вмістом праворуч -->
+<SkyCardRow label="Статус">
+  <SkyBadge tone="success" label="Під'єднано" />
+</SkyCardRow>
+```
+
+#### Props
+
+| Prop | Тип | Обов'язково | Опис |
+|------|-----|-------------|------|
+| `label` | `String` | так | Підпис зліва |
+| `value` | `String \| Number` | ні | Значення справа (ігнорується якщо є slot) |
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `default` | Override правої колонки |
+
+---
+
+### SkyTileCard
+
+Горизонтальна тайл-картка (іконка + заголовок + підзаголовок). Підходить для списків інтеграцій / додатків / швидкого доступу.
+
+```vue
+<SkyTileCard
+  title="Glovo"
+  subtitle="Інтеграція з сервісом доставки"
+  image-url="/image/glovo_logo.png"
+/>
+
+<!-- зі своєю іконкою -->
+<SkyTileCard title="Налаштування">
+  <template #icon>
+    <SettingsIcon />
+  </template>
+</SkyTileCard>
+```
+
+#### Props
+
+| Prop | Тип | Обов'язково | Опис |
+|------|-----|-------------|------|
+| `title` | `String` | так | Заголовок |
+| `subtitle` | `String` | ні | Підзаголовок |
+| `imageUrl` | `String` | ні | URL зображення |
+
+#### Slots
+
+| Slot | Опис |
+|------|------|
+| `icon` | Override іконки |
+
+#### CSS змінні
+
+```css
+--sky-tile-bg: #fff
+--sky-tile-radius: 12px
+--sky-tile-shadow: 0 1px 12px rgba(0,0,0,0.08)
+--sky-tile-icon-size: 56px
+--sky-tile-icon-radius: 12px
+--sky-tile-icon-bg: #00c279
+--sky-tile-icon-color: #fff
+--sky-tile-title-color: #1a1a1a
+--sky-tile-subtitle-color: #666
+```
+
+---
+
 ## Теміzація
 
 Всі компоненти підтримують кастомізацію через CSS змінні. Перевизначайте їх глобально або локально:
@@ -387,15 +615,34 @@ npm run build
 
 ## Структура проекту
 
+Організовано за Feature-Sliced Design:
+
 ```
 src/
-├── index.ts           # публічний API (компоненти + SDK)
-├── components/        # Vue 3 компоненти (.vue + index.ts)
-├── sdk/               # TypeScript SDK
+├── index.ts           # публічний API (shared/ui + widgets + sdk)
+├── shared/
+│   └── ui/            # базові UI-компоненти
+│       ├── index.ts
+│       ├── Header/
+│       ├── Modal/
+│       ├── Dialog/ DialogModal/ DialogNext/
+│       ├── BaseTeleport/
+│       ├── SkyButton/
+│       ├── SkySelect/
+│       ├── SkyAlert/
+│       ├── SkyBadge/
+│       ├── SkyCard/ SkyCardHeader/ SkyCardRow/
+│       └── <Component>/
+│           ├── <Component>.vue
+│           └── index.ts
+├── widgets/           # композитні віджети
+│   ├── index.ts
+│   └── SkyTileCard/
+├── sdk/               # TypeScript SDK (без Vue залежностей)
 │   ├── bridge.ts      # iframe postMessage API
 │   ├── api.ts         # SkyserviceAPI HTTP клієнт
 │   ├── webview.ts     # детекція webview/iframe
-│   ├── types.ts       # DTO типи (Tradepoint, Category, Product)
+│   ├── types.ts       # DTO типи (Tradepoint, Category, Product, AppIntegration)
 │   └── index.ts
 └── styles/
 ```
