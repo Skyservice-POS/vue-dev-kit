@@ -33,10 +33,7 @@
           </div>
 
           <div v-if="$slots.footer" class="sky-modal-footer">
-            <!-- Порожні блоки ремонтують відображення на windows в додатку, не видаляти! -->
-            <div></div>
             <slot name="footer"></slot>
-            <div></div>
           </div>
         </div>
       </div>
@@ -144,7 +141,7 @@ onUnmounted(() => {
 
 .sky-modal {
   background: var(--sky-modal-bg, white);
-  border-radius: var(--sky-modal-radius, 0);
+  border-radius: var(--sky-modal-radius, 8);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24);
   display: flex;
   flex-direction: column;
@@ -224,18 +221,8 @@ onUnmounted(() => {
   border-top: 1px solid var(--sky-modal-border-color, #dee2e6);
   display: flex;
   justify-content: flex-end;
+  gap: var(--sky-modal-footer-gap, 14px);
   flex-shrink: 0;
-}
-
-.sky-modal-footer > * + * {
-  margin-left: 10px;
-}
-
-/* Responsive */
-@media (min-width: 768px) {
-  .sky-modal {
-    border-radius: var(--sky-modal-radius, 8px);
-  }
 }
 
 /* iOS safe area */
