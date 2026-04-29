@@ -55,8 +55,8 @@
               <div v-if="isIos" class="sky-dialog-swipe-area" />
               <slot></slot>
             </div>
-
             <!-- Footer -->
+            <div></div>
             <div
               v-if="showFooter"
               class="sky-dialog-footer"

@@ -1,91 +1,86 @@
 <script setup lang="ts">
 defineProps<{
   modelValue?: string | number;
-  options: { value: string | number; text: string }[];
+  type?: string;
+  placeholder?: string;
   id?: string;
   disabled?: boolean;
   state?: "success" | "error" | "default";
-  placeholder?: string;
   hint?: string;
 }>();
 
 defineEmits<{
-  "update:modelValue": [value: string | number];
+  "update:modelValue": [value: string];
 }>();
 </script>
 
 <template>
-  <select
+  <input
     :id="id"
-    class="sky-select"
+    class="sky-input"
     :class="state"
+    :type="type ?? 'text'"
     :value="modelValue"
+    :placeholder="placeholder"
     :disabled="disabled"
-    @change="
-      $emit('update:modelValue', ($event.target as HTMLSelectElement).value)
+    @input="
+      $emit('update:modelValue', ($event.target as HTMLInputElement).value)
     "
-  >
-    <option v-if="placeholder" value="" disabled hidden>
-      {{ placeholder }}
-    </option>
-    <option v-for="option in options" :key="option.value" :value="option.value">
-      {{ option.text }}
-    </option>
-  </select>
+  />
   <small v-if="hint" class="setting-hint" :class="state">
     {{ hint }}
   </small>
 </template>
 
 <style scoped>
-.sky-select {
+.sky-input {
   display: block;
   width: 100%;
-  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
   color: #212529;
   background-color: #fff;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 16px 12px;
+  background-clip: padding-box;
   border: 1px solid #ced4da;
   border-radius: 0.375rem;
   outline: none;
-  appearance: none;
-  cursor: pointer;
   transition:
     border-color 0.15s ease-in-out,
     box-shadow 0.15s ease-in-out;
 }
 
-.sky-select:focus {
+.sky-input::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.sky-input:focus {
   border-color: #28a745;
   box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
 }
 
-.sky-select:disabled {
+.sky-input:disabled {
   background-color: #e9ecef;
   opacity: 1;
   cursor: not-allowed;
 }
 
-.sky-select.success {
+.sky-input.success {
   border-color: #28a745;
 }
 
-.sky-select.success:focus {
+.sky-input.success:focus {
   border-color: #28a745;
   box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
 }
 
-.sky-select.error {
+.sky-input.error {
   border-color: #dc3545;
 }
 
-.sky-select.error:focus {
+.sky-input.error:focus {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
 }
