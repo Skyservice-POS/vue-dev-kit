@@ -1,4 +1,5 @@
 import './styles/scrollbar.css';
 
-export * from './components';
+export * from './shared/ui';
+export * from './widgets';
 export * from './sdk';

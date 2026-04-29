@@ -20,8 +20,8 @@
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import DialogModal from './DialogModal.vue'
-import DialogNext from './DialogNext.vue'
+import DialogModal from '../DialogModal/DialogModal.vue'
+import DialogNext from '../DialogNext/DialogNext.vue'
 
 const props = defineProps({
   modelValue: {

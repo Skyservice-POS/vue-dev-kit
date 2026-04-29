@@ -76,14 +76,14 @@ defineProps({
 
 /* Primary */
 .sky-btn-primary {
-  background: var(--sky-btn-primary-bg, #24973f);
+  background: var(--sky-btn-primary-bg, #00c279);
   color: var(--sky-btn-primary-color, #fff);
 }
 .sky-btn-primary:hover:not(:disabled) {
-  background: var(--sky-btn-primary-hover-bg, #1e7a33);
+  background: var(--sky-btn-primary-hover-bg, #00a868);
 }
 .sky-btn-primary:active:not(:disabled) {
-  background: var(--sky-btn-primary-active-bg, #196b2c);
+  background: var(--sky-btn-primary-active-bg, #008f5a);
 }
 
 /* Danger */

@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div
       v-if="modelValue"
-      class="sky-dialogbox sky-dialogbox-next"
+      class="sky-dialogbox sky-dialogbox-classic"
       :style="[zIndex ? { 'z-index': zIndex } : null]"
     >
       <div
@@ -10,30 +10,38 @@
       >
           <div ref="dialogContent" class="sky-dialog-content">
             <!-- Header -->
-            <div class="sky-dialog-header">
-              <button class="sky-dialog-back" :title="closeText" @click="close">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 451.847 451.847"
-                  style="transform: rotate(90deg)"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
-                  />
-                </svg>
-              </button>
-              <div
-                class="sky-dialog-title"
-                :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
-              >
-                {{ title }}
-                <span v-if="subtitle" class="sky-dialog-subtitle">{{
-                  subtitle
-                }}</span>
-              </div>
+            <div
+              class="sky-dialog-title"
+              :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
+            >
+              {{ title }}
+              <span v-if="subtitle" class="sky-dialog-subtitle">{{
+                subtitle
+              }}</span>
             </div>
+
+            <button class="sky-dialog-close" :title="closeText" @click="close">
+              <svg viewBox="0 0 16 16" width="16" height="16">
+                <line
+                  x1="1"
+                  y1="15"
+                  x2="15"
+                  y2="1"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <line
+                  x1="1"
+                  y1="1"
+                  x2="15"
+                  y2="15"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+              </svg>
+            </button>
+
+            <div class="sky-dialog-clearfix" />
 
             <!-- Body -->
             <div
@@ -47,8 +55,8 @@
               <div v-if="isIos" class="sky-dialog-swipe-area" />
               <slot></slot>
             </div>
-
             <!-- Footer -->
+            <div></div>
             <div
               v-if="showFooter"
               class="sky-dialog-footer"
@@ -57,8 +65,8 @@
               <slot name="buttons"></slot>
             </div>
           </div>
+        </div>
       </div>
-    </div>
   </Teleport>
 </template>
 
@@ -72,7 +80,7 @@ import {
   nextTick,
   useSlots,
 } from "vue";
-import { isIosWebview, isAndroidWebview } from "../sdk";
+import { isIosWebview, isAndroidWebview } from "../../../sdk";
 
 const slots = useSlots();
 
@@ -95,7 +103,7 @@ const props = defineProps({
   },
   closeText: {
     type: String,
-    default: "Назад",
+    default: "Закрити",
   },
   closeOnEsc: {
     type: Boolean,
@@ -216,7 +224,7 @@ onUnmounted(() => {
 
 <style>
 /* Global styles (не scoped через баг з Teleport) */
-.sky-dialogbox-next {
+.sky-dialogbox-classic {
   display: block;
   position: fixed;
   padding: 0;
@@ -248,57 +256,20 @@ onUnmounted(() => {
   background: var(--sky-dialog-bg, white);
   width: 100%;
   height: 100%;
+  border-radius: var(--sky-dialog-radius, 5px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24);
-  display: flex;
-  flex-direction: column;
-}
-
-.sky-dialog-header {
-  display: flex;
-  align-items: center;
-  padding: 10px 14px;
-}
-
-.sky-dialog-back {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
-  color: var(--sky-dialog-back-color, #374151);
-  transition: background-color 0.2s;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-
-.sky-dialog-back svg {
-  display: block;
-}
-
-.sky-dialog-back:hover {
-  background-color: var(--sky-dialog-back-hover-bg, #f8f9fa);
-}
-
-.sky-dialog-back:active {
-  background-color: var(--sky-dialog-back-active-bg, #e9ecef);
 }
 
 .sky-dialog-title {
+  max-width: calc(100% - 80px);
   font-size: var(--sky-dialog-title-size, 13pt);
+  padding: 24px;
+  padding-right: 0;
+  float: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--sky-dialog-title-color, #252525);
-  min-width: 0;
-}
-
-.sky-dialog-title-with-subtitle {
-  line-height: 1.2;
 }
 
 .sky-dialog-subtitle {
@@ -311,9 +282,34 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 
+.sky-dialog-close {
+  cursor: pointer;
+  font-size: 16pt;
+  margin: 15px;
+  padding: 17px;
+  float: right;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sky-dialog-close-color, #333);
+  transition: background-color 0.2s;
+}
+
+.sky-dialog-close:hover {
+  background-color: var(--sky-dialog-close-hover-bg, #f0f0f0);
+}
+
+.sky-dialog-clearfix {
+  clear: both;
+}
 
 .sky-dialog-paper {
-  flex: 1;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -332,7 +328,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   width: 100%;
-  flex-shrink: 0;
+  transform: translateY(-52px);
 }
 
 .sky-dialog-footer > * + * {
@@ -359,7 +355,7 @@ onUnmounted(() => {
 /* Desktop */
 @media only screen and (min-width: 1400px) {
   .sky-dialog-content {
-    width: 100%;
+    width: 75%;
     margin: 0 auto;
   }
 }
@@ -367,22 +363,45 @@ onUnmounted(() => {
 /* Tablet and Desktop */
 @media screen and (min-width: 710px) {
   .sky-dialog-paper {
+    height: calc(100% - 150px);
+    max-height: calc(100% - 150px);
     background-color: #fff;
-    margin: 0 10px 10px 10px;
+    margin: 0 10px 60px 10px;
+    border-radius: 5px;
   }
 
-  /* .sky-dialogbox,
+  /* Full height when no footer */
+  .sky-dialog-paper-no-footer {
+    height: calc(100% - 70px);
+    max-height: calc(100% - 70px);
+    margin-bottom: 10px;
+  }
+
+  .sky-dialogbox,
   .sky-dialog-overlay {
     padding: 10px;
-  } */
+  }
 }
 
 /* Mobile */
 @media screen and (max-width: 709px) {
   .sky-dialog-paper {
+    height: calc(100% - 142px);
+    max-height: calc(100% - 142px);
     background-color: #fff;
     margin: 0 10px 10px 10px;
+    border-radius: 5px;
     max-width: 100vw !important;
+  }
+
+  /* Full height when no footer */
+  .sky-dialog-paper-no-footer {
+    height: calc(100% - 60px);
+    max-height: calc(100% - 60px);
+  }
+
+  .sky-dialog-footer {
+    transform: translateY(-6px);
   }
 }
 
@@ -407,6 +426,15 @@ onUnmounted(() => {
 
 /* iPhone safe area support */
 @supports (padding-top: env(safe-area-inset-top)) {
+  .sky-dialog-paper {
+    height: calc(100% - 150px - env(safe-area-inset-top));
+  }
+
+  /* Full height when no footer */
+  .sky-dialog-paper-no-footer {
+    height: calc(100% - 60px - env(safe-area-inset-top));
+  }
+
   .sky-dialog-footer {
     padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
   }
@@ -414,8 +442,11 @@ onUnmounted(() => {
 
 /* iOS safe area */
 @supports (padding-top: env(safe-area-inset-top)) {
-  .sky-dialog-header {
-    padding-top: calc(10px + env(safe-area-inset-top));
+  .sky-dialog-title {
+    padding-top: calc(24px + env(safe-area-inset-top));
+  }
+  .sky-dialog-close {
+    margin-top: calc(15px + env(safe-area-inset-top));
   }
   .sky-dialog-paper {
     padding-bottom: env(safe-area-inset-bottom);

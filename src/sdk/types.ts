@@ -5,6 +5,19 @@ export interface SkyserviceResponse<T> {
   data: T;
 }
 
+// --- Integrations ---
+
+export interface AppIntegration {
+  id: string;
+  company_id: string;
+  developer_id: string | null;
+  app_id: string;
+  is_active: 0 | 1;
+  settings: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // --- Tradepoints ---
 
 export interface Tradepoint {
