@@ -1,6 +1,6 @@
 {
   "name": "@skyservice-developers/vue-dev-kit",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Vue 3 component library + TypeScript SDK (iframe bridge + HTTP API) for Skyservice mini-apps",
   "type": "module",
   "main": "./dist/vue-dev-kit.cjs",
