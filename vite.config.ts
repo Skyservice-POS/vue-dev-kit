@@ -15,6 +15,11 @@ export default defineConfig({
       rollupTypes: false,
     }),
   ],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
+  },
   build: {
     outDir: 'dist',
     lib: {

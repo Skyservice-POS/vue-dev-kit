@@ -1,9 +1,9 @@
 <template>
   <div class="sky-tile-card">
     <div class="sky-tile-card-head">
-      <div v-if="$slots.icon || imageUrl" class="sky-tile-card-icon">
+      <div class="sky-tile-card-icon">
         <slot name="icon">
-          <img v-if="imageUrl" :src="imageUrl" :alt="title" />
+          <img :src="imageUrl || homeIcon" :alt="title" />
         </slot>
       </div>
       <div class="sky-tile-card-titles">
@@ -18,6 +18,8 @@
 </template>
 
 <script setup>
+import homeIcon from '@/shared/assets/icons/home.svg';
+
 defineProps({
   title: { type: String, required: true },
   subtitle: { type: String, default: '' },
@@ -44,8 +46,8 @@ defineProps({
 }
 
 .sky-tile-card-icon {
-  width: var(--sky-tile-icon-size, 56px);
-  height: var(--sky-tile-icon-size, 56px);
+  width: var(--sky-tile-icon-size, 64px);
+  height: var(--sky-tile-icon-size, 64px);
   border-radius: var(--sky-tile-icon-radius, 12px);
   background: var(--sky-tile-icon-bg, #00c279);
   color: var(--sky-tile-icon-color, #fff);
