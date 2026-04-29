@@ -10,5 +10,7 @@ export { default as SkyButton } from './SkyButton';
 export { default as SkyCard } from './SkyCard';
 export { default as SkyCardHeader } from './SkyCardHeader';
 export { default as SkyCardRow } from './SkyCardRow';
+export { default as SkyCheckbox } from './SkyCheckbox';
+export { default as SkyInput } from './SkyInput';
 export { default as SkyLoader } from './SkyLoader';
 export { default as SkySelect } from './SkySelect';
