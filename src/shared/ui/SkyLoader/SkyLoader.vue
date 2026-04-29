@@ -25,7 +25,6 @@
     </svg>
     <div class="sky-loader-double-ring">
       <div />
-      <div />
     </div>
   </div>
 </template>
