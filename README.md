@@ -761,7 +761,7 @@ npm run build
 
 ```
 src/
-├── index.ts           # публічний API (shared/ui + widgets + sdk)
+├── index.ts           # публічний API (shared/ui + features + sdk)
 ├── shared/
 │   ├── assets/
 │   │   └── icons/     # SVG-іконки (vite-svg-loader)
@@ -777,12 +777,10 @@ src/
 │       ├── SkyBadge/
 │       ├── SkyCard/ SkyCardHeader/ SkyCardRow/
 │       ├── SkyLoader/
+│       ├── SkyTileCard/
 │       └── <Component>/
 │           ├── <Component>.vue
 │           └── index.ts
-├── widgets/           # композитні віджети
-│   ├── index.ts
-│   └── SkyTileCard/
 ├── features/          # фічові блоки (orchestration shared/ui)
 │   ├── index.ts
 │   └── SkyCheckboxFilter/

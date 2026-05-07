@@ -193,7 +193,7 @@
           </div>
         </div>
 
-        <h3 class="section-title">SkyTileCard (widget)</h3>
+        <h3 class="section-title">SkyTileCard</h3>
         <p class="section-desc">
           Проста картка: обовʼязковий <code>title</code>, опціональний <code>subtitle</code>,
           опціональний <code>imageUrl</code> або слот <code>#icon</code> (фон іконки = primary).

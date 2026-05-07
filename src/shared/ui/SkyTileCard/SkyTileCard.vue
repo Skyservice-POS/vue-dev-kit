@@ -1,7 +1,7 @@
 <template>
   <div class="sky-tile-card">
     <div class="sky-tile-card-head">
-      <div class="sky-tile-card-icon">
+      <div class="sky-tile-card-icon" :class="{ 'is-default': !imageUrl && !$slots.icon }">
         <slot name="icon">
           <img :src="imageUrl || homeIcon" :alt="title" />
         </slot>
@@ -62,6 +62,11 @@ defineProps({
   width: 60%;
   height: 60%;
   object-fit: contain;
+}
+
+.sky-tile-card-icon.is-default img {
+  width: 100%;
+  height: 100%;
 }
 
 .sky-tile-card-titles {

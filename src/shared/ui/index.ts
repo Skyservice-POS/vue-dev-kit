@@ -14,3 +14,4 @@ export { default as SkyCheckbox } from './SkyCheckbox';
 export { default as SkyInput } from './SkyInput';
 export { default as SkyLoader } from './SkyLoader';
 export { default as SkySelect } from './SkySelect';
+export { default as SkyTileCard } from './SkyTileCard';
