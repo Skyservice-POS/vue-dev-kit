@@ -1,13 +1,13 @@
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue: boolean | string[] | number[];
+  modelValue: boolean | (string | number)[];
   value?: string | number;
   switch?: boolean;
   disabled?: boolean;
 }>();
 
 const emit = defineEmits<{
-  "update:modelValue": [value: boolean | string[] | number[]];
+  "update:modelValue": [value: boolean | (string | number)[]];
 }>();
 
 const switchMode = props.switch;
