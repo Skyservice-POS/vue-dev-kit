@@ -5,7 +5,7 @@
       class="sky-modal-overlay"
       @mousedown.self="handleOverlayClick"
     >
-        <div class="sky-modal" :style="modalStyle">
+        <div class="sky-modal" :class="{ 'sky-modal--fullscreen': isFullscreen }" :style="modalStyle">
           <div class="sky-modal-header">
             <button class="sky-modal-back" @click="close" :title="closeTitle">
               <svg
@@ -85,6 +85,10 @@ const modalStyle = computed(() => ({
   width: props.width,
   height: props.height,
 }));
+
+const isFullscreen = computed(
+  () => props.width === "100%" && props.height === "100%"
+);
 
 const close = () => {
   emit("update:modelValue", false);
@@ -225,15 +229,15 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-/* iOS safe area */
+/* iOS safe area — only when modal occupies the full viewport */
 @supports (padding-top: env(safe-area-inset-top)) {
-  .sky-modal-header {
+  .sky-modal--fullscreen .sky-modal-header {
     padding-top: calc(10px + env(safe-area-inset-top));
   }
-  .sky-modal-footer {
+  .sky-modal--fullscreen .sky-modal-footer {
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
-  .sky-modal-body:last-child {
+  .sky-modal--fullscreen .sky-modal-body:last-child {
     padding-bottom: calc(14px + env(safe-area-inset-bottom));
   }
 }
