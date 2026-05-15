@@ -153,6 +153,10 @@ onUnmounted(() => {
   max-height: 100%;
 }
 
+.sky-modal--fullscreen {
+  border-radius: 0;
+}
+
 .sky-modal-header {
   display: flex;
   align-items: center;
