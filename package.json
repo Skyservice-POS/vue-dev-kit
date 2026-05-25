@@ -40,6 +40,7 @@
     "vue": "^3.4.0"
   },
   "dependencies": {
+    "sky-service-ui-components": "^0.1.3",
     "ua-parser-js": "^1.0.37"
   },
   "devDependencies": {
