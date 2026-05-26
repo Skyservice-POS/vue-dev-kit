@@ -332,8 +332,26 @@
             <p>No <code>#footer</code> slot passed — footer block is not rendered at all.</p>
           </div>
         </Modal>
+
+        <h3 class="section-title">NotificationElement (sky-service-ui-components)</h3>
+        <p class="section-desc">
+          Toast-сповіщення через <code>notify</code>. Підтримує success, error, warning, info, loading, default.
+          Loading не закривається автоматично — потрібен <code>notify.dismiss(id)</code>.
+        </p>
+        <div class="button-demo-grid">
+          <button class="demo-btn" @click="showNotify('success')">Success</button>
+          <button class="demo-btn" @click="showNotify('error')">Error</button>
+          <button class="demo-btn" @click="showNotify('warning')">Warning</button>
+          <button class="demo-btn" @click="showNotify('info')">Info</button>
+          <button class="demo-btn" @click="showNotify('default')">Default</button>
+          <button class="demo-btn" @click="showNotifyLoading">Loading → dismiss</button>
+          <button class="demo-btn" @click="showNotifyWithButtons">З кнопками</button>
+          <button class="demo-btn" @click="showNotifyTopCenter">Top-center</button>
+        </div>
       </div>
     </template>
+
+    <sky-toast-notification />
 
     <!-- Page: Products -->
     <template v-if="page === 'products'">
@@ -600,7 +618,45 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Header, Dialog, Modal, SkyButton, SkySelect, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyLoader, SkyTileCard, SkyCheckboxFilter } from '../src'
+import { Header, Dialog, Modal, SkyButton, SkySelect, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyLoader, SkyTileCard, SkyCheckboxFilter, notificationModule } from '../src'
+
+const { notify } = notificationModule
+
+function showNotify(type) {
+  const titles = {
+    success: 'Успішно збережено!',
+    error: 'Помилка завантаження',
+    warning: 'Увага! Перевірте дані',
+    info: 'Нове повідомлення',
+    default: 'Звичайне сповіщення',
+  }
+  notify[type]({ toastData: { title: titles[type], description: type === 'error' ? 'Перевірте з\'єднання з інтернетом' : undefined } })
+}
+
+async function showNotifyLoading() {
+  const id = await notify.loading({ toastData: { title: 'Зберігається...', useCloseButton: false } })
+  setTimeout(() => {
+    if (id !== null) notify.dismiss(id)
+    notify.success({ toastData: { title: 'Готово!' } })
+  }, 2000)
+}
+
+function showNotifyWithButtons() {
+  notify.warning({
+    toastData: { title: 'Видалити запис?', useCloseButton: false },
+    toastAdditionalInfo: {
+      leftBtn: { buttonText: 'Скасувати', buttonAction: ({ close }) => close() },
+      rightBtn: { buttonText: 'Видалити', buttonAction: ({ close }) => { close(); notify.success({ toastData: { title: 'Видалено' } }) } },
+    },
+  })
+}
+
+function showNotifyTopCenter() {
+  notify.info({
+    toastData: { title: 'Top-center позиція', description: 'duration: 6000, pauseOnHover' },
+    toastOptions: { position: 'top-center', duration: 6000, pauseOnHover: true },
+  })
+}
 
 const page = ref('home')
 
