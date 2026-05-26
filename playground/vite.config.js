@@ -4,7 +4,16 @@ import svgLoader from 'vite-svg-loader'
 import { resolve } from 'node:path'
 
 export default defineConfig({
-  plugins: [vue(), svgLoader({ defaultImport: 'url' })],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: tag => tag.includes('-'),
+        },
+      },
+    }),
+    svgLoader({ defaultImport: 'url' }),
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, '..', 'src'),
