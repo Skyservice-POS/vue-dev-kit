@@ -6,7 +6,9 @@ import type {
   Product,
   RawProduct,
   AppIntegration,
+  PermsMap,
 } from './types';
+import { getStoreData } from './bridge';
 
 export interface SkyserviceAPIConfig {
   token: string;
@@ -44,6 +46,7 @@ export class SkyserviceAPI {
   private developerId: string | undefined;
   private deploymentId: string | undefined;
   private appName: string | undefined;
+  private permsCache: PermsMap | null = null;
 
   private constructor(config: SkyserviceAPIConfig) {
     this.token = config.token;
@@ -241,9 +244,86 @@ export class SkyserviceAPI {
 
     return data;
   }
+
+  // --- Permissions ---
+
+  /**
+   * Get access permissions for the current user.
+   *
+   * Source priority:
+   * 1. Dashboard's Vuex store via iframe bridge (`getStoreData('perms')`) —
+   *    instant, no token needed, includes Dashboard's computed perms. Used when
+   *    running inside the Dashboard iframe.
+   * 2. HTTP fallback `section=adminPanel&action=getStart` → `data.settings.perms`
+   *    — used outside the iframe (standalone page, Node) or while the store is
+   *    still empty.
+   *
+   * The resolved map is cached on the instance — repeated calls don't re-request.
+   * Call {@link clearPermsCache} to force a refetch.
+   *
+   * @example
+   * ```ts
+   * await api.getPerms('9006') // → boolean — is permission 9006 granted?
+   * await api.getPerms()       // → { '9006': true, '100': false, ... }
+   * ```
+   */
+  async getPerms(): Promise<PermsMap>;
+  async getPerms(code: string | number): Promise<boolean>;
+  async getPerms(code?: string | number): Promise<PermsMap | boolean> {
+    const perms = await this.loadPerms();
+    if (code === undefined) return perms;
+    return Boolean(perms[String(code)]);
+  }
+
+  /** Drop the cached permissions so the next {@link getPerms} call refetches. */
+  clearPermsCache(): void {
+    this.permsCache = null;
+  }
+
+  private async loadPerms(): Promise<PermsMap> {
+    if (this.permsCache) return this.permsCache;
+
+    // 1. Dashboard store via iframe bridge — instant, no token needed.
+    //    `store.perms` always carries Dashboard's synthetic perms once loaded,
+    //    so an empty object means "not loaded yet" → fall through to HTTP.
+    if (typeof window !== 'undefined') {
+      try {
+        const fromStore = await getStoreData<Record<string, unknown>>('perms');
+        if (fromStore && Object.keys(fromStore).length > 0) {
+          this.permsCache = normalizePerms(fromStore);
+          return this.permsCache;
+        }
+      } catch {
+        // bridge unavailable / not in iframe — fall through to HTTP
+      }
+    }
+
+    // 2. HTTP fallback — section=adminPanel&action=getStart.
+    const data = await this.get<{
+      settings?: { perms?: Record<string, unknown> };
+    }>({
+      section: 'adminPanel',
+      action: 'getStart',
+    });
+
+    this.permsCache = normalizePerms(data?.settings?.perms);
+    return this.permsCache;
+  }
 }
 
 // --- Helpers ---
+
+/** Coerce a raw perms object (boolean or 0/1 values) into a clean boolean map. */
+function normalizePerms(raw: Record<string, unknown> | null | undefined): PermsMap {
+  const result: PermsMap = {};
+  if (!raw || typeof raw !== 'object') return result;
+
+  for (const [code, value] of Object.entries(raw)) {
+    result[code] = Boolean(value);
+  }
+
+  return result;
+}
 
 function stripCategories(
   categories: RawCategory[],

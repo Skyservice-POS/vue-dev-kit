@@ -18,6 +18,16 @@ export interface AppIntegration {
   updated_at: string;
 }
 
+// --- Permissions ---
+
+/**
+ * Access permissions map — access-code → granted.
+ *
+ * Mirrors Dashboard's `store.perms` (e.g. `{ '9006': true, '100': false }`).
+ * A missing code means "not granted". Returned by `SkyserviceAPI.getPerms()`.
+ */
+export type PermsMap = Record<string, boolean>;
+
 // --- Tradepoints ---
 
 export interface Tradepoint {

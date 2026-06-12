@@ -101,6 +101,10 @@ const tradepoints = await api.getTradepoints()
 const categories = await api.getCategoryTree(tradepointId)
 const products = await api.getProducts({ tradepointId })
 
+// Права доступу
+const canInventory = await api.getPerms('204')  // → boolean
+const allPerms = await api.getPerms()            // → PermsMap { '204': true, ... }
+
 // Активація/деактивація міні-додатку
 await api.setAppActive({ isActive: true, title: 'Glovo', settings: { foo: 'bar' } })
 await api.setAppActive({ isActive: false, title: 'Glovo' })
@@ -110,6 +114,22 @@ await api.setAppActive({ isActive: false, title: 'Glovo' })
 > `setAppActive` POST на `api.cabinet.developer.skyservice.online/index.php`. Якщо
 > `deploymentId` + `appName` задані в конфізі — додатково шле `sendActiveApp`
 > postMessage в parent (Dashboard) з відповіддю сервера та новим станом.
+
+#### Права доступу — `getPerms`
+
+Повертає права поточного користувача. Джерело за пріоритетом:
+
+1. **Стор Dashboard** через iframe bridge (`store.perms`) — миттєво, без токена, працює всередині iframe;
+2. **HTTP fallback** `section=adminPanel&action=getStart` → `data.settings.perms` — поза iframe (standalone-сторінка, Node) або поки стор ще порожній.
+
+```ts
+await api.getPerms('9006')  // → boolean — чи надано право 9006
+await api.getPerms()        // → PermsMap: { '9006': true, '100': false, ... }
+api.clearPermsCache()       // скинути кеш (наступний getPerms перезапросить джерело)
+```
+
+> Результат кешується на інстансі — повторні виклики не роблять зайвих запитів/postMessage.
+> Значення нормалізуються в `boolean` (бек може віддавати `0/1`); відсутній код → `false`.
 
 ### Webview detection
 
@@ -841,7 +861,7 @@ src/
 │   ├── bridge.ts      # iframe postMessage API
 │   ├── api.ts         # SkyserviceAPI HTTP клієнт
 │   ├── webview.ts     # детекція webview/iframe
-│   ├── types.ts       # DTO типи (Tradepoint, Category, Product, AppIntegration)
+│   ├── types.ts       # DTO типи (Tradepoint, Category, Product, AppIntegration, PermsMap)
 │   └── index.ts
 └── styles/
 ```

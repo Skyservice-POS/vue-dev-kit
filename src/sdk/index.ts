@@ -49,4 +49,5 @@ export type {
   Product,
   RawProduct,
   AppIntegration,
+  PermsMap,
 } from './types';
