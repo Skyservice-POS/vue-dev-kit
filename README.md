@@ -22,7 +22,7 @@ import '@skyservice-developers/vue-dev-kit/style.css'
 import {
   // shared/ui
   Header, Modal, Dialog,
-  SkyButton, SkySelect, SkyInput, SkyCheckbox,
+  SkyButton, SkySelect, SkySelectSearch, SkyInput, SkyCheckbox,
   SkyAlert, SkyBadge, SkyLoader,
   SkyCard, SkyCardHeader, SkyCardRow,
   // widgets
@@ -360,6 +360,57 @@ import {
 --sky-select-option-hover-bg: #f3f4f6
 --sky-select-option-selected-color: #24973f
 ```
+
+---
+
+### SkySelectSearch
+
+Кастомний select **з полем пошуку** у дропдауні — для довгих списків опцій. Дизайн 1:1 зі `SkySelect`, той самий формат опцій (`{ value, text }`) та стани. Не використовує нативний `<select>`, тому працює на старих браузерах (перевірено з Chromium 84): без `flex gap`, `inset`, `:focus-visible`, `Array.at()` тощо.
+
+```vue
+<SkySelectSearch
+  v-model="selected"
+  :options="[
+    { value: 'kyiv', text: 'Київ' },
+    { value: 'lviv', text: 'Львів' },
+    { value: 'odesa', text: 'Одеса' },
+  ]"
+  placeholder="Оберіть місто"
+  search-placeholder="Почніть вводити…"
+/>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `modelValue` | `string \| number` | `undefined` | Поточне значення (v-model) |
+| `options` | `Array<{ value: string \| number; text: string }>` | — | Список опцій (обов'язковий) |
+| `id` | `String` | `undefined` | `id` тригера |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+| `state` | `'default' \| 'success' \| 'error'` | `'default'` | Візуальний стан |
+| `placeholder` | `String` | `''` | Текст, коли нічого не обрано |
+| `hint` | `String` | `''` | Підказка під полем |
+| `searchPlaceholder` | `String` | `'Пошук…'` | Placeholder поля пошуку |
+| `noResultsText` | `String` | `'Нічого не знайдено'` | Текст за відсутності збігів |
+
+#### Events
+
+| Event | Payload | Опис |
+|-------|---------|------|
+| `update:modelValue` | `string \| number` | Emit при виборі опції |
+
+#### Клавіатура
+
+| Клавіша | Дія |
+|---------|-----|
+| `Enter` / `Space` / `↓` | Відкрити дропдаун (на тригері) |
+| `↑` / `↓` | Навігація по відфільтрованих опціях |
+| `Enter` | Вибрати підсвічену опцію |
+| `Esc` | Закрити дропдаун |
+| `Tab` | Закрити і перейти далі |
+
+> **Примітка:** дропдаун позиціонується `position: absolute` (без teleport), тому в контейнерах з `overflow: hidden` (напр. усередині модалки) його може обрізати — так само, як і нативний `SkySelect`.
 
 ---
 
@@ -825,7 +876,7 @@ src/
 │       ├── Dialog/ DialogModal/ DialogNext/
 │       ├── BaseTeleport/
 │       ├── SkyButton/
-│       ├── SkySelect/ SkyInput/ SkyCheckbox/
+│       ├── SkySelect/ SkySelectSearch/ SkyInput/ SkyCheckbox/
 │       ├── SkyAlert/
 │       ├── SkyBadge/
 │       ├── SkyCard/ SkyCardHeader/ SkyCardRow/

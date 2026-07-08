@@ -146,6 +146,33 @@
           Обране: <strong>{{ selectVal ?? '—' }}</strong>
         </p>
 
+        <h3 class="section-title">SkySelectSearch</h3>
+        <p class="section-desc">Select із пошуком у дропдауні. Дизайн 1:1 зі SkySelect, працює на старих браузерах (Chromium 84).</p>
+        <div class="button-demo-grid" style="align-items: flex-start">
+          <SkySelectSearch
+            v-model="citySearchVal"
+            :options="cityOptions"
+            placeholder="Оберіть місто"
+            search-placeholder="Почніть вводити…"
+          />
+          <SkySelectSearch
+            v-model="citySearchVal"
+            :options="cityOptions"
+            placeholder="Disabled"
+            disabled
+          />
+          <SkySelectSearch
+            v-model="citySearchVal2"
+            :options="cityOptions"
+            placeholder="З помилкою"
+            state="error"
+            hint="Оберіть значення"
+          />
+        </div>
+        <p class="section-desc" style="margin-top: 8px">
+          Обране: <strong>{{ citySearchVal ?? '—' }}</strong>
+        </p>
+
         <h3 class="section-title">SkyCheckboxFilter (feature)</h3>
         <p class="section-desc">
           Кнопка-фільтр з дропдауном (мульти-вибір через <code>SkyCheckbox</code>). Стилі 1:1 з адмінкою skymarket.
@@ -618,7 +645,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Header, Dialog, Modal, SkyButton, SkySelect, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyLoader, SkyTileCard, SkyCheckboxFilter, notificationModule } from '../src'
+import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyLoader, SkyTileCard, SkyCheckboxFilter, notificationModule } from '../src'
 
 const { notify } = notificationModule
 
@@ -679,6 +706,20 @@ const btnLoading = ref(false)
 
 const selectVal = ref(null)
 const selectVal2 = ref(null)
+const citySearchVal = ref(null)
+const citySearchVal2 = ref(null)
+const cityOptions = [
+  { value: 'kyiv', text: 'Київ' },
+  { value: 'lviv', text: 'Львів' },
+  { value: 'odesa', text: 'Одеса' },
+  { value: 'kharkiv', text: 'Харків' },
+  { value: 'dnipro', text: 'Дніпро' },
+  { value: 'zaporizhzhia', text: 'Запоріжжя' },
+  { value: 'vinnytsia', text: 'Вінниця' },
+  { value: 'poltava', text: 'Полтава' },
+  { value: 'chernivtsi', text: 'Чернівці' },
+  { value: 'ternopil', text: 'Тернопіль' },
+]
 const filterCategories = ref([])
 const filterStatus = ref([])
 const filterEmpty = ref([])
