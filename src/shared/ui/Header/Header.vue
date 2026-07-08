@@ -83,8 +83,6 @@ import {
   isInsideIframe,
   getLocalStorageData,
   getWindowData,
-  setLocalStorage,
-  setRocketMode,
   trackVisit,
   navigate as navigateParent,
   exit as exitParent,
@@ -158,23 +156,7 @@ if (isInsideIframe() && props.trackPageName) {
   )
 }
 
-// Set rocketMode in parent, remember previous value to restore on unmount
-const previousRocketMode = ref(null)
-
-if (isInsideIframe()) {
-  getLocalStorageData('rocketMode').then(async (value) => {
-    previousRocketMode.value = value
-    const existingFallback = await getLocalStorageData('fallbackRocketMode')
-    if (existingFallback === null) {
-      setLocalStorage('fallbackRocketMode', value === true || value === 'true' ? 'true' : 'false')
-    }
-    setRocketMode(true)
-  })
-}
-
-onUnmounted(() => {
-  restoreRocketMode()
-})
+// rocketMode керує дашборд (meta.forcedRocketMode + router guard), а не Header.
 
 // Load translations from parent
 if (isInsideIframe()) {
@@ -271,20 +253,12 @@ const shouldShowBackButton = computed(() => {
   return props.backEvent || (props.showBackButton && isInsideIframe());
 });
 
-const restoreRocketMode = () => {
-  if (previousRocketMode.value !== null) {
-    const restore = previousRocketMode.value === true || previousRocketMode.value === 'true'
-    setRocketMode(restore)
-  }
-}
-
 const findPreviousPage = () => {
   return sortedItems.value.find(item => item.name !== props.trackPageName && item.path)
 }
 
 const handleBack = async () => {
   if (props.backEvent) {
-    restoreRocketMode()
     return props.backEvent()
   }
 
@@ -297,8 +271,6 @@ const handleBack = async () => {
       previousPage = findPreviousPage()
     }
   }
-
-  restoreRocketMode()
 
   if (previousPage) {
     navigateParent(previousPage.path)
