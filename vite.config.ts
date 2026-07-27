@@ -6,7 +6,9 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   plugins: [
-    vue(),
+    // Leave absolute asset URLs (e.g. /image/..., /svg/...) as-is — they are served by the
+    // host Skyservice app, not bundled into the library (only used in app-specific states).
+    vue({ template: { transformAssetUrls: { includeAbsolute: false } } }),
     svgLoader({ defaultImport: 'url' }),
     dts({
       include: ['src/**/*.ts', 'src/**/*.vue'],
@@ -33,11 +35,12 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['vue', 'ua-parser-js'],
+      external: ['vue', 'ua-parser-js', 'vue-virtual-scroller'],
       output: {
         globals: {
           vue: 'Vue',
           'ua-parser-js': 'UAParser',
+          'vue-virtual-scroller': 'VueVirtualScroller',
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'style.css';

@@ -8,7 +8,9 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: tag => tag.includes('-'),
+          // only the sky-* web components (e.g. sky-toast-notification) are custom
+          // elements; kebab Vue components inside SkyTable must still resolve normally
+          isCustomElement: tag => tag.startsWith('sky-'),
         },
       },
     }),

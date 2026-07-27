@@ -434,6 +434,12 @@
           Обрано: <strong>{{ checkboxArraySelected.join(', ') || '—' }}</strong>
         </p>
 
+        <h3 class="section-title">SkyTable (products table)</h3>
+        <p class="section-desc">Віртуал-скрол таблиця товарів (200 рядків) — розмітка й стилі 1:1 з POS.</p>
+        <div style="height: 380px; margin-bottom: 8px">
+          <SkyTable :params="tableParams" :json="tableJson" :main-json-data="tableItems" />
+        </div>
+
         <h3 class="section-title">NotificationElement (sky-service-ui-components)</h3>
         <p class="section-desc">
           Toast-сповіщення через <code>notify</code>. Підтримує success, error, warning, info, loading, default.
@@ -718,8 +724,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyInput, SkySearchInput, SkyCheckbox, SkyLoader, SkyTileCard, SkyCheckboxFilter, notificationModule } from '../src'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyInput, SkySearchInput, SkyCheckbox, SkyLoader, SkyTileCard, SkyTable, SkyCheckboxFilter, notificationModule } from '../src'
 
 const { notify } = notificationModule
 
@@ -839,6 +845,32 @@ const selectOptions = [
 ]
 
 // Page names for the dropdown
+// SkyTable (products table) demo — real params/json shape
+const tableItems = Array.from({ length: 200 }, (_, i) => ({
+  id: i + 1,
+  name: `Товар ${i + 1}`,
+  category: ['Напої', 'Випічка', 'Кава', 'Десерти'][i % 4],
+  price: 10 + ((i * 37) % 490),
+  status: i % 3 !== 0 ? 'Активний' : 'Прихований',
+}))
+const tableParams = reactive({
+  id: 'id',
+  name: 'demo',
+  selected: [],
+  allSelect: false,
+  massActions: { delete: { value: 'delete', title: 'Видалити' } },
+  footer: false,
+  sort: { of: '', ot: '' },
+  header: [
+    { title: 'ID', name: 'id', sort: 'id', width: 70, enable: true },
+    { title: 'Назва', name: 'name', sort: 'name', width: 240, enable: true },
+    { title: 'Категорія', name: 'category', sort: false, width: 170, enable: true },
+    { title: 'Ціна', name: 'price', sort: 'price', width: 130, enable: true },
+    { title: 'Статус', name: 'status', sort: false, width: 150, enable: true },
+  ],
+})
+const tableJson = { items: tableItems, total: tableItems.length }
+
 const pageNames = {
   home: 'Dashboard',
   products: 'Products',
