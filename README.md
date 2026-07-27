@@ -22,7 +22,7 @@ import '@skyservice-developers/vue-dev-kit/style.css'
 import {
   // shared/ui
   Header, Modal, Dialog,
-  SkyButton, SkySelect, SkySelectSearch, SkyInput, SkyCheckbox,
+  SkyButton, SkySelect, SkySelectSearch, SkyInput, SkySearchInput, SkyCheckbox,
   SkyAlert, SkyBadge, SkyLoader,
   SkyCard, SkyCardHeader, SkyCardRow,
   // widgets
@@ -455,6 +455,38 @@ import {
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
 | `state` | `String` | `'default'` | `'default'` \| `'success'` \| `'error'` |
 | `hint` | `String` | — | Підказка під input (фарбується в колір state) |
+
+---
+
+### SkySearchInput
+
+Стилізоване поле пошуку (іконка-лупа + кнопка очищення) — 1:1 з дизайном пошуку в адмінках Skyservice. Компонент чисто UI: сам не фільтрує дані, лише віддає значення через `v-model` — умови пошуку прописує споживач компонента. Підтримує режим `collapsible`: поле згорнуте до іконки і розгортається по кліку, згортається назад по кліку поза межами компонента (якщо порожнє) або по кліку на іконку.
+
+```vue
+<SkySearchInput v-model="search" placeholder="Пошук..." />
+
+<!-- Згорнутий режим: розгортається по кліку -->
+<SkySearchInput v-model="search" placeholder="Пошук..." collapsible />
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `modelValue` | `String` | `''` | Значення (v-model) |
+| `placeholder` | `String` | `''` | Текст-заглушка |
+| `id` | `String` | — | HTML id |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+| `collapsible` | `Boolean` | `false` | Якщо `true` — поле за замовчуванням згорнуте до іконки, розгортається по кліку |
+| `clearAriaLabel` | `String` | `'Очистити'` | `aria-label` кнопки очищення |
+
+#### Events
+
+| Event | Payload | Опис |
+|-------|---------|------|
+| `update:modelValue` | `string` | Emit при введенні тексту |
+
+> **Примітка:** фільтрація/пошук по даних — відповідальність батьківського компонента (напр. `computed` з `.filter()`), `SkySearchInput` лише відображає поле і керує його розгорнутим/згорнутим станом.
 
 ---
 
@@ -896,7 +928,7 @@ src/
 │       ├── Dialog/ DialogModal/ DialogNext/
 │       ├── BaseTeleport/
 │       ├── SkyButton/
-│       ├── SkySelect/ SkySelectSearch/ SkyInput/ SkyCheckbox/
+│       ├── SkySelect/ SkySelectSearch/ SkyInput/ SkySearchInput/ SkyCheckbox/
 │       ├── SkyAlert/
 │       ├── SkyBadge/
 │       ├── SkyCard/ SkyCardHeader/ SkyCardRow/
