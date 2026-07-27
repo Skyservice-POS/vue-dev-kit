@@ -360,6 +360,80 @@
           </div>
         </Modal>
 
+        <h3 class="section-title">SkyAlert</h3>
+        <p class="section-desc">
+          Інформаційне повідомлення з 4 тональностями та опціональною іконкою.
+        </p>
+        <div style="display: flex; flex-direction: column; max-width: 420px">
+          <SkyAlert tone="success">Все збережено</SkyAlert>
+          <SkyAlert tone="error">Щось пішло не так</SkyAlert>
+          <SkyAlert tone="warning">Увага: дія незворотня</SkyAlert>
+          <SkyAlert tone="info">Підказка для користувача</SkyAlert>
+          <SkyAlert tone="info" :show-icon="false">Без іконки</SkyAlert>
+        </div>
+
+        <h3 class="section-title">SkyInput</h3>
+        <p class="section-desc">
+          Текстовий input з підтримкою станів <code>default | success | error</code> та опціональною підказкою.
+        </p>
+        <div class="button-demo-grid" style="align-items: flex-start">
+          <div style="width: 220px">
+            <SkyInput v-model="inputVal" placeholder="Імʼя" />
+          </div>
+          <div style="width: 220px">
+            <SkyInput v-model="inputValSuccess" state="success" placeholder="Email" hint="Все гаразд" />
+          </div>
+          <div style="width: 220px">
+            <SkyInput v-model="inputValError" state="error" placeholder="Email" hint="Невалідний email" />
+          </div>
+          <div style="width: 220px">
+            <SkyInput model-value="Заблоковано" disabled />
+          </div>
+        </div>
+
+        <h3 class="section-title">SkySearchInput</h3>
+        <p class="section-desc">
+          Стилізоване поле пошуку (іконка + кнопка очищення). Чистий UI-компонент — фільтрація зовні, через <code>computed</code>.
+          Підтримує <code>collapsible</code>: розгортається по кліку, згортається по кліку поза межами (якщо порожнє).
+        </p>
+        <div class="button-demo-grid" style="align-items: flex-start">
+          <div style="width: 260px">
+            <SkySearchInput v-model="searchVal" placeholder="Пошук..." />
+          </div>
+          <div style="width: 260px">
+            <SkySearchInput v-model="searchValDisabled" placeholder="Disabled" disabled />
+          </div>
+          <div style="width: 260px">
+            <SkySearchInput v-model="searchValCollapsible" placeholder="Пошук..." collapsible />
+          </div>
+        </div>
+        <p class="section-desc" style="margin-top: 8px">
+          Знайдено: <strong>{{ filteredSearchDemo.join(', ') || '—' }}</strong>
+        </p>
+
+        <h3 class="section-title">SkyCheckbox</h3>
+        <p class="section-desc">
+          Чекбокс з двома режимами: класичний бокс або switch-перемикач. v-model приймає <code>Boolean</code> або масив значень.
+        </p>
+        <div class="button-demo-grid">
+          <SkyCheckbox v-model="checkboxAgreed">Погоджуюсь з умовами</SkyCheckbox>
+          <SkyCheckbox v-model="checkboxSwitch" switch>Сповіщення</SkyCheckbox>
+          <SkyCheckbox :model-value="false" disabled>Заблоковано</SkyCheckbox>
+        </div>
+        <div class="button-demo-grid" style="margin-top: 8px">
+          <SkyCheckbox
+            v-for="opt in checkboxArrayOptions"
+            :key="opt.value"
+            v-model="checkboxArraySelected"
+            :value="opt.value"
+          >
+            {{ opt.name }}
+          </SkyCheckbox>
+        </div>
+        <p class="section-desc" style="margin-top: 8px">
+          Обрано: <strong>{{ checkboxArraySelected.join(', ') || '—' }}</strong>
+        </p>
+
         <h3 class="section-title">NotificationElement (sky-service-ui-components)</h3>
         <p class="section-desc">
           Toast-сповіщення через <code>notify</code>. Підтримує success, error, warning, info, loading, default.
@@ -645,7 +719,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyLoader, SkyTileCard, SkyCheckboxFilter, notificationModule } from '../src'
+import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyInput, SkySearchInput, SkyCheckbox, SkyLoader, SkyTileCard, SkyCheckboxFilter, notificationModule } from '../src'
 
 const { notify } = notificationModule
 
@@ -735,6 +809,26 @@ const statusOptions = [
   { value: 'active', name: 'Активний' },
   { value: 'paused', name: 'Призупинений' },
   { value: 'archived', name: 'Архівний' },
+]
+const inputVal = ref('')
+const inputValSuccess = ref('john@example.com')
+const inputValError = ref('not-an-email')
+const searchVal = ref('')
+const searchValDisabled = ref('')
+const searchValCollapsible = ref('')
+const searchDemoItems = ['Київ', 'Львів', 'Одеса', 'Харків', 'Дніпро']
+const filteredSearchDemo = computed(() => {
+  const q = searchVal.value.trim().toLowerCase()
+  if (!q) return searchDemoItems
+  return searchDemoItems.filter((item) => item.toLowerCase().includes(q))
+})
+const checkboxAgreed = ref(false)
+const checkboxSwitch = ref(true)
+const checkboxArraySelected = ref(['food'])
+const checkboxArrayOptions = [
+  { value: 'alc', name: 'Алкоголь' },
+  { value: 'food', name: 'Їжа' },
+  { value: 'drink', name: 'Напої' },
 ]
 const selectOptions = [
   { label: 'Варіант 1', value: 1 },
