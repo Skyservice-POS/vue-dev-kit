@@ -17,4 +17,5 @@ export { default as SkySelect } from './SkySelect';
 export { default as SkySelectSearch } from './SkySelectSearch';
 export { default as SkySearchInput } from './SkySearchInput';
 export { default as SkyTable } from './SkyTable';
+export { default as SkyTabs } from './SkyTabs';
 export { default as SkyTileCard } from './SkyTileCard';
