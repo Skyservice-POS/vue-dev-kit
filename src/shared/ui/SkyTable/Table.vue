@@ -30,10 +30,16 @@
 
         <!-- Таблиця -->
         <div v-if="total" class="dynamic-scroller-table__table">
+          <!-- max-content замість суми оголошених ширин: браузер міряє реально
+               відрендерені колонки, тож шапка й тіло не розʼїжджаються, коли
+               клітинка ширша за свою оголошену частку. Явний minTableWidth
+               лишається як override. -->
           <div
             class="dynamic-scroller-table__table-wrapper"
             :style="{
-              'min-width': params.tableViewExpandedWidth + 'px' + '!important',
+              'min-width': params.minTableWidth
+                ? params.minTableWidth + 'px'
+                : 'max-content',
             }"
           >
             <header-table
@@ -212,27 +218,15 @@ const visibleToggleExpand = computed(() => {
 });
 
 // Watchers
+// Тримаємо header[].enable у синхроні з видимістю колонок. Ширину таблиці тут
+// більше не рахуємо: сума оголошених `width` / `widthFr * 100` була лише
+// оцінкою і розходилася з реальним рендером — тепер обгортка бере max-content.
 watch(
   selectedColumns,
   (_value) => {
-    if (props.params.minTableWidth) {
-      props.params.tableViewExpandedWidth = props.params.minTableWidth;
-    } else {
-      let width = 0;
-      props.params.header?.forEach((item) => {
-        item.enable = selectedColumns.value[item.name];
-        if (item.enable) {
-          if (item.width) {
-            width += item.width;
-          } else if (+item.widthFr) {
-            width += item.widthFr * 100;
-          } else {
-            width += 100;
-          }
-        }
-      });
-      props.params.tableViewExpandedWidth = width;
-    }
+    props.params.header?.forEach((item) => {
+      item.enable = selectedColumns.value[item.name];
+    });
   },
   { deep: true },
 );
