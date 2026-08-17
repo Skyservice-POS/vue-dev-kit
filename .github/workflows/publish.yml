@@ -1,0 +1,57 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      # У main прилітають і коміти без релізу — доки, рефакторинг, правки CI.
+      # Без цієї перевірки npm publish падав би з EPUBLISHCONFLICT на кожному
+      # такому пуші й фарбував історію Actions у червоне.
+      - name: Check whether this version is already published
+        id: check
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Пакет: $NAME@$VERSION"
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "Версія вже в реєстрі — публікацію пропускаємо."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Версії в реєстрі немає — публікуємо."
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.check.outputs.should_publish == 'true'
+        run: npm ci
+
+      # Збірку робить сам npm через prepublishOnly.
+      # Авторизація — через .npmrc у репо, який читає NPM_TOKEN з оточення.
+      - name: Publish
+        if: steps.check.outputs.should_publish == 'true'
+        run: npm publish --access public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Skipped
+        if: steps.check.outputs.should_publish != 'true'
+        run: echo "Версію не змінювали — нічого публікувати."
