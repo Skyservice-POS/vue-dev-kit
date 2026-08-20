@@ -12,12 +12,17 @@
             <!-- Header -->
             <div
               class="sky-dialog-title"
-              :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
+              :class="{
+                'sky-dialog-title-with-subtitle': hasSubtitle,
+                'sky-dialog-title-with-actions': $slots['header-actions'],
+              }"
             >
-              {{ title }}
-              <span v-if="subtitle" class="sky-dialog-subtitle">{{
-                subtitle
-              }}</span>
+              <slot name="title">{{ title }}</slot>
+              <slot name="subtitle">
+                <span v-if="subtitle" class="sky-dialog-subtitle">{{
+                  subtitle
+                }}</span>
+              </slot>
             </div>
 
             <button class="sky-dialog-close" :title="closeText" @click="close">
@@ -40,6 +45,13 @@
                 />
               </svg>
             </button>
+
+            <div
+              v-if="$slots['header-actions']"
+              class="sky-dialog-header-actions"
+            >
+              <slot name="header-actions"></slot>
+            </div>
 
             <div class="sky-dialog-clearfix" />
 
@@ -136,6 +148,9 @@ const isAndroid = computed(() => {
     return false;
   }
 });
+
+// Підзаголовок може прийти або пропом, або слотом
+const hasSubtitle = computed(() => !!props.subtitle || !!slots.subtitle);
 
 // Determine if footer should be shown
 const showFooter = computed(() => {
@@ -272,6 +287,11 @@ onUnmounted(() => {
   color: var(--sky-dialog-title-color, #252525);
 }
 
+/* Лишаємо місце під кнопку × і вміст header-actions */
+.sky-dialog-title-with-actions {
+  max-width: var(--sky-dialog-title-max-width-with-actions, 50%);
+}
+
 .sky-dialog-subtitle {
   display: block;
   font-size: var(--sky-dialog-subtitle-size, 12pt);
@@ -302,6 +322,16 @@ onUnmounted(() => {
 
 .sky-dialog-close:hover {
   background-color: var(--sky-dialog-close-hover-bg, #f0f0f0);
+}
+
+/* Рендериться після кнопки × у DOM, тому float:right ставить її ліворуч від × */
+.sky-dialog-header-actions {
+  float: right;
+  display: flex;
+  align-items: center;
+  gap: var(--sky-dialog-header-actions-gap, 8px);
+  min-height: 50px;
+  margin: 15px 0;
 }
 
 .sky-dialog-clearfix {
@@ -445,7 +475,8 @@ onUnmounted(() => {
   .sky-dialog-title {
     padding-top: calc(24px + env(safe-area-inset-top));
   }
-  .sky-dialog-close {
+  .sky-dialog-close,
+  .sky-dialog-header-actions {
     margin-top: calc(15px + env(safe-area-inset-top));
   }
   .sky-dialog-paper {

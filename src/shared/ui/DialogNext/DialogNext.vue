@@ -26,12 +26,21 @@
               </button>
               <div
                 class="sky-dialog-title"
-                :class="{ 'sky-dialog-title-with-subtitle': subtitle }"
+                :class="{ 'sky-dialog-title-with-subtitle': hasSubtitle }"
               >
-                {{ title }}
-                <span v-if="subtitle" class="sky-dialog-subtitle">{{
-                  subtitle
-                }}</span>
+                <slot name="title">{{ title }}</slot>
+                <slot name="subtitle">
+                  <span v-if="subtitle" class="sky-dialog-subtitle">{{
+                    subtitle
+                  }}</span>
+                </slot>
+              </div>
+
+              <div
+                v-if="$slots['header-actions']"
+                class="sky-dialog-header-actions"
+              >
+                <slot name="header-actions"></slot>
               </div>
             </div>
 
@@ -128,6 +137,9 @@ const isAndroid = computed(() => {
     return false;
   }
 });
+
+// Підзаголовок може прийти або пропом, або слотом
+const hasSubtitle = computed(() => !!props.subtitle || !!slots.subtitle);
 
 // Determine if footer should be shown
 const showFooter = computed(() => {
@@ -311,6 +323,14 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 
+.sky-dialog-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sky-dialog-header-actions-gap, 8px);
+  margin-left: auto;
+  padding-left: 12px;
+  flex-shrink: 0;
+}
 
 .sky-dialog-paper {
   flex: 1;

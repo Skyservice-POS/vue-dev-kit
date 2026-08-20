@@ -72,6 +72,79 @@
           </template>
         </Modal>
 
+        <h3 class="section-title">Header slots (Modal / Dialog)</h3>
+        <p class="section-desc">
+          Слоти шапки <code>#title</code>, <code>#subtitle</code>, <code>#header-actions</code> —
+          так само як у <code>Header</code>.
+        </p>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <button class="demo-btn" @click="showHeaderSlotsModal = true">Modal</button>
+          <button class="demo-btn" @click="showHeaderSlotsDialogNext = true">Dialog Next</button>
+          <button class="demo-btn" @click="showHeaderSlotsDialogClassic = true">Dialog Classic</button>
+        </div>
+
+        <Modal v-model="showHeaderSlotsModal" title="Fallback title" width="600px" height="360px">
+          <template #title>
+            <h4 style="margin: 0; display: flex; align-items: center; gap: 8px">
+              Замовлення №1042
+              <SkyBadge tone="success" label="Оплачено" />
+            </h4>
+          </template>
+          <template #subtitle>
+            <span style="font-size: 13px; color: #6c757d">Оновлено щойно</span>
+          </template>
+          <template #header-actions>
+            <SkyButton variant="outline">Друк</SkyButton>
+            <SkyButton variant="primary">Зберегти</SkyButton>
+          </template>
+          <div style="padding: 16px">
+            <p>Шапка зібрана зі слотів: кастомний заголовок з бейджем, підзаголовок і кнопки справа.</p>
+          </div>
+          <template #footer>
+            <button class="demo-btn" @click="showHeaderSlotsModal = false">Close</button>
+          </template>
+        </Modal>
+
+        <Dialog v-model="showHeaderSlotsDialogNext" mode="next" title="Fallback title">
+          <template #title>
+            <span style="display: inline-flex; align-items: center; gap: 8px">
+              Замовлення №1042
+              <SkyBadge tone="pending" label="В обробці" />
+            </span>
+          </template>
+          <template #subtitle>
+            <span style="display: block; font-size: 13px; color: #6c757d">3 позиції · 1 240 ₴</span>
+          </template>
+          <template #header-actions>
+            <SkyButton variant="outline">Друк</SkyButton>
+          </template>
+          <div style="padding: 20px">
+            <p>DialogNext з кастомною шапкою.</p>
+          </div>
+          <template #buttons>
+            <button class="demo-btn" @click="showHeaderSlotsDialogNext = false">Cancel</button>
+            <button class="demo-btn primary" @click="showHeaderSlotsDialogNext = false">OK</button>
+          </template>
+        </Dialog>
+
+        <Dialog v-model="showHeaderSlotsDialogClassic" mode="classic" title="Fallback title">
+          <template #title>
+            <span style="display: inline-flex; align-items: center; gap: 8px">
+              Замовлення №1042
+              <SkyBadge tone="error" label="Скасовано" />
+            </span>
+          </template>
+          <template #header-actions>
+            <SkyButton variant="outline">Друк</SkyButton>
+          </template>
+          <div style="padding: 20px">
+            <p>DialogModal (classic) з кастомною шапкою.</p>
+          </div>
+          <template #buttons>
+            <button class="demo-btn" @click="showHeaderSlotsDialogClassic = false">Close</button>
+          </template>
+        </Dialog>
+
         <h3 class="section-title">SkyButton</h3>
         <p class="section-desc">Variants: primary, danger, secondary, outline. Підтримує loading, disabled, block, icon.</p>
         <div class="button-demo-grid">
@@ -779,6 +852,9 @@ const showHomeDialogNext = ref(false)
 const showHomeDialogClassic = ref(false)
 const showHomeModal = ref(false)
 const showHomeModalSized = ref(false)
+const showHeaderSlotsModal = ref(false)
+const showHeaderSlotsDialogNext = ref(false)
+const showHeaderSlotsDialogClassic = ref(false)
 const showModalFooterMany = ref(false)
 const showModalFooterOne = ref(false)
 const showModalFooterNone = ref(false)

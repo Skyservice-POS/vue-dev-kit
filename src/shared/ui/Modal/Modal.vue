@@ -21,10 +21,18 @@
               </svg>
             </button>
             <div class="sky-modal-title-wrapper">
-              <h4 class="sky-modal-title">{{ title }}</h4>
-              <div v-if="subtitle" class="sky-modal-subtitle">
-                {{ subtitle }}
-              </div>
+              <slot name="title">
+                <h4 class="sky-modal-title">{{ title }}</h4>
+              </slot>
+              <slot name="subtitle">
+                <div v-if="subtitle" class="sky-modal-subtitle">
+                  {{ subtitle }}
+                </div>
+              </slot>
+            </div>
+
+            <div v-if="$slots['header-actions']" class="sky-modal-header-actions">
+              <slot name="header-actions"></slot>
             </div>
           </div>
 
@@ -215,6 +223,14 @@ onUnmounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sky-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sky-modal-header-actions-gap, 8px);
+  margin-left: 12px;
+  flex-shrink: 0;
 }
 
 .sky-modal-body {

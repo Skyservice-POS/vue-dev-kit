@@ -209,6 +209,24 @@ import {
 </Modal>
 ```
 
+Шапку можна зібрати слотами — так само як у `Header`: `#title` / `#subtitle`
+перекривають відповідні props, `#header-actions` додає елементи справа
+(кнопка "Назад" лишається на місці).
+
+```vue
+<Modal v-model="show">
+  <template #title>
+    <h4 style="margin: 0">Замовлення №1042 <SkyBadge tone="success" label="Оплачено" /></h4>
+  </template>
+  <template #subtitle>Оновлено щойно</template>
+  <template #header-actions>
+    <SkyButton variant="outline">Друк</SkyButton>
+  </template>
+
+  <p>Контент</p>
+</Modal>
+```
+
 #### Props
 
 | Prop | Тип | За замовчуванням | Опис |
@@ -227,7 +245,16 @@ import {
 | Slot | Опис |
 |------|------|
 | `default` | Основний контент |
+| `title` | Кастомний заголовок (замість пропа `title`) |
+| `subtitle` | Кастомний підзаголовок (замість пропа `subtitle`) |
+| `header-actions` | Елементи справа в шапці (кнопки, бейджі) |
 | `footer` | Футер з кнопками |
+
+#### CSS змінні
+
+| Змінна | За замовчуванням | Опис |
+|--------|------------------|------|
+| `--sky-modal-header-actions-gap` | `8px` | Відступ між елементами в `#header-actions` |
 
 #### Events
 
@@ -271,7 +298,32 @@ import {
 | Slot | Опис |
 |------|------|
 | `default` | Основний контент |
+| `title` | Кастомний заголовок (замість пропа `title`) |
+| `subtitle` | Кастомний підзаголовок (замість пропа `subtitle`) |
+| `header-actions` | Елементи справа в шапці (кнопки, бейджі) |
 | `buttons` | Кнопки у футері |
+
+Слоти шапки працюють в обох режимах — `next` (ліворуч кнопка "Назад") і
+`classic` (праворуч ×); `#header-actions` рендериться ліворуч від ×.
+
+```vue
+<Dialog v-model="show" mode="next">
+  <template #title>Замовлення №1042</template>
+  <template #subtitle>3 позиції · 1 240 ₴</template>
+  <template #header-actions>
+    <SkyButton variant="outline">Друк</SkyButton>
+  </template>
+
+  <div style="padding: 20px">Контент</div>
+</Dialog>
+```
+
+#### CSS змінні
+
+| Змінна | За замовчуванням | Опис |
+|--------|------------------|------|
+| `--sky-dialog-header-actions-gap` | `8px` | Відступ між елементами в `#header-actions` |
+| `--sky-dialog-title-max-width-with-actions` | `50%` | Ширина заголовка в `classic`, коли є `#header-actions` |
 
 #### Events
 

@@ -11,9 +11,9 @@
     @close="$emit('close')"
     @save="$emit('save')"
   >
-    <slot></slot>
-    <template v-if="$slots.buttons" #buttons>
-      <slot name="buttons"></slot>
+    <!-- Прокидуємо всі слоти (default, buttons, title, subtitle, header-actions) -->
+    <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps || {}"></slot>
     </template>
   </component>
 </template>
