@@ -1,0 +1,58 @@
+name: Deploy Playground
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+  workflow_dispatch:
+
+jobs:
+  deploy-playground:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Без cache: npm — lock-файл навмисно в .gitignore, а кеш setup-node
+      # без нього падає ("Dependencies lock file is not found").
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      # Білдимо плейграунд тут, а не на боці сервісу деплою: у package.json "build"
+      # збирає бібліотеку (lib-режим, без index.html) — це не деплоїться як сайт.
+      # На виході — playground/dist зі статичним index.html.
+      - name: Build playground
+        run: npm run build:playground
+
+      - name: Create deploy archive
+        working-directory: playground/dist
+        run: |
+          zip -r ../../project.zip .
+          cd ../..
+          ls -lh project.zip
+
+      - name: Deploy to Skyservice
+        run: |
+          DOMAIN_ARG=""
+          if [ -n "${{ secrets.CUSTOM_DOMAIN_PLAYGROUND }}" ]; then
+            DOMAIN_ARG="-F domain=${{ secrets.CUSTOM_DOMAIN_PLAYGROUND }}"
+          fi
+
+          curl -X POST \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN_PLAYGROUND }}" \
+            -F "file=@project.zip" \
+            -F "deployment_id=${{ secrets.DEPLOYMENT_ID_PLAYGROUND }}" \
+            $DOMAIN_ARG \
+            "${{ secrets.SERVER_URL }}?section=deployments&action=autoRedeploy"
+
+      - name: Deployment status
+        run: echo "Playground deployment completed successfully!"
