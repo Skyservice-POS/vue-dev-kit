@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          # Нотатки релізу читають історію від попереднього тега — за дефолтним
+          # shallow-клоном (depth 1) git describe і git log range не працюють.
+          fetch-depth: 0
 
       # Без cache: npm — lock-файл навмисно в .gitignore, а кеш setup-node
       # без нього падає ("Dependencies lock file is not found").
@@ -62,13 +66,15 @@ jobs:
 
       # Тег і реліз ставимо після публікації, а не до неї — щоб у GitHub не
       # з'являлись теги на версії, які до реєстру так і не доїхали.
-      # --generate-notes сам збирає нотатки з комітів від попереднього релізу.
       - name: Create GitHub release
         if: steps.check.outputs.should_publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.check.outputs.version }}
-        run: gh release create "v$VERSION" --title "v$VERSION" --generate-notes
+        run: |
+          .github/scripts/release-notes.sh "$VERSION" > notes.md
+          cat notes.md
+          gh release create "v$VERSION" --title "v$VERSION" --notes-file notes.md
 
       - name: Skipped
         if: steps.check.outputs.should_publish != 'true'
