@@ -1,0 +1,87 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+    # Тут саме paths, а не paths-ignore. Документація — це переважно .md,
+    # тож звичний для решти воркфлоу ігнор "**.md" вимкнув би деплой рівно
+    # на тих комітах, заради яких він і потрібен.
+    paths:
+      - "docs/**"
+      - "src/**" # живі демо в доках імпортують компоненти з src
+      - "package.json"
+      - ".github/workflows/deploy-docs.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Без cache: npm — lock-файл навмисно в .gitignore, а кеш setup-node
+      # без нього падає ("Dependencies lock file is not found").
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Секрети однойменні з рештою наших репо (shopify, public-docs, mcp-server…).
+      # Без цієї перевірки curl нижче просто отримує 401 без пояснення причини.
+      - name: Check deploy secrets
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
+        run: |
+          MISSING=""
+          [ -n "$DEPLOY_TOKEN" ] || MISSING="$MISSING DEPLOY_TOKEN"
+          [ -n "$DEPLOYMENT_ID" ] || MISSING="$MISSING DEPLOYMENT_ID"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Немає секретів репозиторію:$MISSING — додайте їх у Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      # Саме документація, а не playground: "build" збирає бібліотеку в lib-режимі
+      # (без index.html) і як сайт не деплоїться. На виході — docs/.vitepress/dist.
+      - name: Build docs
+        run: npm run docs:build
+
+      # Платформа збирає з архіву Docker-образ (blue-green), тому в корені zip
+      # мають лежати Dockerfile + nginx.conf + зібраний dist — так само, як у public-docs.
+      - name: Assemble container archive
+        run: |
+          rm -rf deploy && mkdir deploy
+          cp -r docs/.vitepress/dist deploy/dist
+          cp docs/nginx.conf deploy/nginx.conf
+          cat > deploy/Dockerfile <<'EOF'
+          FROM nginx:alpine
+          COPY dist /usr/share/nginx/html
+          COPY nginx.conf /etc/nginx/conf.d/default.conf
+          EXPOSE 80
+          CMD ["nginx", "-g", "daemon off;"]
+          EOF
+          (cd deploy && zip -rq ../project.zip .)
+          echo "== archive root ==" && ls -la deploy
+          ls -lh project.zip
+
+      - name: Deploy to server
+        run: |
+          curl -fsS -X POST \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
+            -F "file=@project.zip" \
+            -F "deployment_id=${{ secrets.DEPLOYMENT_ID }}" \
+            "https://api.cabinet.developer.skyservice.online/index.php?section=deployments&action=autoRedeploy"
+
+      - name: Deployment status
+        if: success()
+        run: echo "Docs deployment completed successfully!"
+
+      - name: Deployment failed
+        if: failure()
+        run: echo "Docs deployment failed!"
