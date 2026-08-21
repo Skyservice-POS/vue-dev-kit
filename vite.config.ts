@@ -12,7 +12,6 @@ export default defineConfig({
     svgLoader({ defaultImport: 'url' }),
     dts({
       include: ['src/**/*.ts', 'src/**/*.vue'],
-      exclude: ['playground/**'],
       tsconfigPath: resolve(__dirname, 'tsconfig.json'),
       rollupTypes: false,
     }),

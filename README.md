@@ -1231,11 +1231,14 @@ import iconRaw from '@/shared/assets/icons/home.svg?raw'
 ```bash
 npm install
 
-# Playground (live preview компонентів)
-npm run playground
+# Документація з живими демо (localhost:5173)
+npm run docs:dev
 
 # Білд (компоненти + SDK → dist/)
 npm run build
+
+# Типи
+npm run typecheck
 ```
 
 ## Реліз

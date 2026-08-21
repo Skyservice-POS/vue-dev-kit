@@ -1,6 +1,6 @@
 # Компоненти — огляд
 
-`vue-dev-kit` містить 20 UI-компонентів із єдиним фірмовим стилем Skyservice. Усі імпортуються з кореня пакета й кастомізуються через [CSS-змінні](/guide/theming).
+`vue-dev-kit` містить 21 UI-компонент із єдиним фірмовим стилем Skyservice. Усі імпортуються з кореня пакета й кастомізуються через [CSS-змінні](/guide/theming).
 
 ```ts
 import '@skyservice-developers/vue-dev-kit/style.css'
@@ -33,7 +33,9 @@ import { SkyButton, Modal, SkyCard /* ... */ } from '@skyservice-developers/vue-
 
 | Компонент | Призначення |
 |-----------|-------------|
-| [`SkyTable`](/components/sky-table) | Віртуал-скрол таблиця: сортування, масові дії, inline-редагування |
+| [`SkyDataTable`](/components/data-table) | Грід на TanStack Table v9: сортування, пошук, вибір, пагінація |
+| [Примітиви таблиці](/components/table) | `SkyTableRoot` / `Header` / `Head` / `Body` / `Row` / `Cell` + композабли |
+| [`SkyTable`](/components/sky-table) | Стара віртуал-скрол таблиця POS: масові дії, inline-редагування |
 | [`SkyCard`](/components/sky-card) | Shell-контейнер картки (+ `SkyCardHeader`, `SkyCardRow`) |
 | [`SkyTileCard`](/components/sky-tile-card) | Тайл-картка для списків інтеграцій/додатків |
 | [`SkyAlert`](/components/sky-alert) | Інформаційне повідомлення (4 тональності) |
@@ -61,10 +63,10 @@ import { SkyButton, Modal, SkyCard /* ... */ } from '@skyservice-developers/vue-
 
 ## Демо
 
-Живий playground усіх компонентів можна запустити локально:
+Усі компоненти в одному місці — на сторінці [Галерея](/components/gallery): живі, клікабельні, з посиланням на сторінку кожного.
+
+Локально документація піднімається так:
 
 ```bash
-npm run playground
+npm run docs:dev
 ```
-
-Він піднімає Vite-застосунок (`playground/App.vue`) з усіма компонентами в основних станах.

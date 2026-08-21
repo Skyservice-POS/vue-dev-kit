@@ -36,6 +36,11 @@ Semver і доречність бампу CI не перевіряє.
 `cache: npm`; `npm ci` і кеш setup-node без lock-файлу в репозиторії падають з
 `Dependencies lock file is not found`. Не повертати їх назад.
 
+## Playground
+**Папки `playground/` більше немає** — її замінили доки з живими демо
+(`npm run docs:dev`) і галерея `/components/gallery`. Не відроджувати:
+демо мають жити поряд з документацією, інакше вони розходяться.
+
 ## Додавання нового компонента
 Коли додаєш новий компонент/фічу/віджет — **обов'язково оновлюй**:
 1. **Експорт у layer's `index.ts`** (`src/shared/ui/index.ts`, `src/features/index.ts`, `src/widgets/index.ts`). Без цього компонент не потрапляє в публічний API і не імпортується з пакета.
@@ -43,6 +48,10 @@ Semver і доречність бампу CI не перевіряє.
    - додати компонент у "Підключення → Компоненти + SDK (разом)" import-приклад;
    - додати окрему секцію з описом, prop-таблицею, slot/event-таблицями та CSS-змінними (якщо є);
    - оновити дерево в секції "Структура проекту".
-3. **Demo в `playground/App.vue`** з основними станами (default / disabled / варіанти).
+3. **Демо в доках** (`npm run docs:dev`):
+   - сторінка `docs/components/<component>.md` з описом, prop/slot/event-таблицями та CSS-змінними;
+   - демо-компонент `docs/.vitepress/theme/demos/<Component>Demo.vue` з основними станами
+     (default / disabled / варіанти) — він імпортує компонент напряму з `src`;
+   - картка в галереї `docs/.vitepress/theme/ComponentGallery.vue` і пункт у сайдбарі `docs/.vitepress/config.mts`.
 
 Це стосується і випадків, коли merge-иш PR з новими компонентами — пройдись по чек-листу і виправ, якщо щось пропустили.

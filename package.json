@@ -30,9 +30,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "playground": "vite --config playground/vite.config.js playground",
     "build": "vite build",
-    "build:playground": "vite build --config playground/vite.config.js playground",
     "preview": "vite preview",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
