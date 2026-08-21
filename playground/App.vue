@@ -72,6 +72,17 @@
           </template>
         </Modal>
 
+        <h3 class="section-title">SkyTabs</h3>
+        <p class="section-desc">Сегментовані таби з анімованим індикатором. Підтримує disabled.</p>
+        <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+          <SkyTabs v-model="tabsPeriod" :options="tabsPeriods" />
+          <SkyTabs v-model="tabsView" :options="tabsViews" />
+          <SkyTabs v-model="tabsPeriod" :options="tabsPeriods" disabled />
+          <span style="font-size: 13px; color: #6c757d">
+            period: {{ tabsPeriod }} · view: {{ tabsView }}
+          </span>
+        </div>
+
         <h3 class="section-title">Header slots (Modal / Dialog)</h3>
         <p class="section-desc">
           Слоти шапки <code>#title</code>, <code>#subtitle</code>, <code>#header-actions</code> —
@@ -798,7 +809,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyInput, SkySearchInput, SkyCheckbox, SkyLoader, SkyTileCard, SkyTable, SkyCheckboxFilter, notificationModule } from '../src'
+import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyInput, SkySearchInput, SkyCheckbox, SkyLoader, SkyTileCard, SkyTable, SkyTabs, SkyCheckboxFilter, notificationModule } from '../src'
 
 const { notify } = notificationModule
 
@@ -852,6 +863,20 @@ const showHomeDialogNext = ref(false)
 const showHomeDialogClassic = ref(false)
 const showHomeModal = ref(false)
 const showHomeModalSized = ref(false)
+const tabsPeriod = ref('week')
+const tabsPeriods = [
+  { value: 'day', text: 'День' },
+  { value: 'week', text: 'Тиждень' },
+  { value: 'month', text: 'Місяць' },
+]
+const tabsView = ref('all')
+const tabsViews = [
+  { value: 'all', text: 'Усі' },
+  { value: 'active', text: 'Активні' },
+  { value: 'archived', text: 'В архіві' },
+  { value: 'drafts', text: 'Чернетки' },
+]
+
 const showHeaderSlotsModal = ref(false)
 const showHeaderSlotsDialogNext = ref(false)
 const showHeaderSlotsDialogClassic = ref(false)

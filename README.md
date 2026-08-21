@@ -22,7 +22,7 @@ import '@skyservice-developers/vue-dev-kit/style.css'
 import {
   // shared/ui
   Header, Modal, Dialog,
-  SkyButton, SkySelect, SkySelectSearch, SkyInput, SkySearchInput, SkyCheckbox,
+  SkyButton, SkySelect, SkySelectSearch, SkyInput, SkySearchInput, SkyCheckbox, SkyTabs,
   SkyAlert, SkyBadge, SkyLoader,
   SkyCard, SkyCardHeader, SkyCardRow,
   SkyTable,
@@ -579,6 +579,39 @@ import {
 
 ---
 
+### SkyTabs
+
+Сегментовані таби з анімованим індикатором: біла «пігулка» плавно переїжджає під активну опцію й підлаштовує ширину під довжину тексту.
+
+```vue
+<SkyTabs
+  v-model="period"
+  :options="[
+    { value: 'day', text: 'День' },
+    { value: 'week', text: 'Тиждень' },
+    { value: 'month', text: 'Місяць' },
+  ]"
+/>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `modelValue` | `string \| number` | — | Активне значення (v-model) |
+| `options` | `Array<{ value: string \| number; text: string }>` | — | Список табів (обов'язковий) |
+| `disabled` | `Boolean` | `false` | Блокує весь набір |
+
+#### Events
+
+| Event | Payload | Опис |
+|-------|---------|------|
+| `update:modelValue` | `string \| number` | Emit при виборі таба |
+
+> Індикатор вимірює активну кнопку через `getBoundingClientRect()`: на першому рендері стає на місце без анімації, далі — з переходом. Реагує на `resize` вікна і зміну кількості опцій. У прихованому контейнері (`display: none`) розміри нульові — позиція виправиться після показу.
+
+---
+
 ### SkyAlert
 
 Інформаційне повідомлення з 4 тональностями та опціональною іконкою.
@@ -1097,6 +1130,7 @@ src/
 │       ├── BaseTeleport/
 │       ├── SkyButton/
 │       ├── SkySelect/ SkySelectSearch/ SkyInput/ SkySearchInput/ SkyCheckbox/
+│       ├── SkyTabs/     # сегментовані таби з анімованим індикатором
 │       ├── SkyAlert/
 │       ├── SkyBadge/
 │       ├── SkyCard/ SkyCardHeader/ SkyCardRow/
