@@ -29,11 +29,23 @@ defineProps({
 
 <style scoped>
 .vdk-demo {
+  /* Без overflow: hidden — інакше сцена обрізає все, що виходить за її межі:
+     дропдауни Header, SkySelect, SkySelectSearch, SkyCheckboxFilter. Замість
+     клипу заокруглюємо крайні блоки самі. */
   margin: 16px 0;
   border: 1px solid var(--vp-c-divider);
   border-radius: 12px;
-  overflow: hidden;
   background: var(--vp-c-bg);
+}
+
+.vdk-demo > :first-child {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.vdk-demo > :last-child {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .vdk-demo__label {

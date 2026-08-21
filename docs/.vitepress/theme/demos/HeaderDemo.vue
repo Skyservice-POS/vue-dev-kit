@@ -30,10 +30,11 @@ const recentPages = [
 
 <style scoped>
 .vdk-header-frame {
+  /* Без overflow: hidden — він обрізав дропдаун нещодавніх розділів. Фон самої
+     шапки прозорий, тож заокруглення рамки видно й без клипу. */
   width: 100%;
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
-  overflow: hidden;
   background: var(--vp-c-bg);
 }
 </style>
