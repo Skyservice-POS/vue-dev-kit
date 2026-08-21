@@ -1,5 +1,18 @@
 # Vue Dev Kit — Claude Notes
 
+## Документація (VitePress)
+Живий сайт: **https://74cfe434-a2b3-4d49-8fa7-db7343e399dc.apps.platform365.online/**
+
+Джерело — папка `docs/`, локально: `npm run docs:dev`, збірка: `npm run docs:build`.
+Деплой автоматичний: workflow `Deploy Docs` (`.github/workflows/deploy-docs.yml`)
+на кожен пуш у `main`, що зачіпає `docs/**`, `src/**` або `package.json`. Архів
+іде на платформу як Docker-образ (Dockerfile + `docs/nginx.conf` + `dist` у корені
+zip), секрети — `DEPLOY_TOKEN` і `DEPLOYMENT_ID`, як у решти наших репо.
+
+**Демо в доках імпортують компоненти напряму з `src`** (alias `@`), тож будь-яка
+зміна API компонента одразу видно на сайті — але й ламає демо, якщо не оновити
+його разом з компонентом.
+
 ## Реліз і публікація на npm
 Публікація автоматична: пуш у `main` запускає workflow `Publish to npm`
 (`.github/workflows/publish.yml`), який сам збирає й публікує пакет.

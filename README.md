@@ -2,6 +2,8 @@
 
 Vue 3 developer toolkit для Skyservice mini-apps: UI компоненти + TypeScript SDK (iframe bridge + HTTP API клієнт).
 
+📖 **Документація з живими демо:** https://74cfe434-a2b3-4d49-8fa7-db7343e399dc.apps.platform365.online/
+
 > **v2.0.0 breaking changes:**
 > - Vue 2 більше не підтримується (тільки Vue 3.4+).
 > - Додано повноцінний SDK (`bridge` + `SkyserviceAPI`), раніше опублікований як окремий пакет `skyservice-sdk` (задепрекейтнутий).
