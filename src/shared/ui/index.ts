@@ -21,3 +21,6 @@ export { default as SkySearchInput } from './SkySearchInput';
 export { default as SkyTable } from './SkyTable';
 export { default as SkyTabs } from './SkyTabs';
 export { default as SkyTileCard } from './SkyTileCard';
+
+// Композиційні примітиви таблиці (див. shared/lib/table для логіки)
+export * from './table';
