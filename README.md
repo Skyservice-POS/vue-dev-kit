@@ -26,6 +26,7 @@ import {
   SkyAlert, SkyBadge, SkyLoader,
   SkyCard, SkyCardHeader, SkyCardRow,
   SkyTable,
+  FunctionalCalendar, SkyDateRangePicker,
   // widgets
   SkyTileCard,
   // features
@@ -960,6 +961,33 @@ const json = { items, total: items.length }
 
 ---
 
+### FunctionalCalendar
+
+Перенесено зі SkyMarket (`src/lib/functional-calendar`), стилі й розмітка 1:1. Форк [vue-functional-calendar](https://github.com/ManukMinasyan/vue-functional-calendar) під Vue 3 — пропси, події та слоти без змін відносно оригіналу.
+
+```vue
+<FunctionalCalendar
+  :value="calendarData"
+  @input="calendarData = $event"
+  is-date-range
+  is-modal
+/>
+```
+
+### SkyDateRangePicker
+
+Перенесено зі SkyMarket (`DatePickerRange.vue`) — готовий попап-піка діапазону дат на базі `FunctionalCalendar`: іконка-тригер, лейбл періоду, пресети (Сьогодні / Вчора / Тиждень / Місяць / Минулий-Поточний місяць / За весь час), стилі 1:1. На відміну від оригіналу, який читав `store`/`@/langs` конкретного застосунку, тут стан і тексти (з UA-фолбеками) локальні.
+
+```vue
+<SkyDateRangePicker v-model="range" @set-date="onPreset" />
+```
+
+```js
+const range = reactive({ start: '', end: '' }) // { start, end } у форматі yyyy-mm-dd
+```
+
+---
+
 ## Features
 
 ### SkyCheckboxFilter
@@ -1137,6 +1165,8 @@ src/
 │       ├── SkyLoader/
 │       ├── SkyTable/     # віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)
 │       ├── SkyTileCard/
+│       ├── functional-calendar/ # форк vue-functional-calendar, перенесений зі SkyMarket 1:1
+│       ├── SkyDateRangePicker/  # DatePickerRange зі SkyMarket, store/langs → props/локальний стан
 │       └── <Component>/
 │           ├── <Component>.vue
 │           └── index.ts

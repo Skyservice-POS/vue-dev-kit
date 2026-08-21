@@ -34,47 +34,103 @@
         <h2 style="margin-top: 32px">Components</h2>
 
         <h3 class="section-title">Dialog (Next)</h3>
-        <p class="section-desc">Full-screen dialog with back button. Modern style.</p>
-        <button class="demo-btn" @click="showHomeDialogNext = true">Open Dialog Next</button>
-        <Dialog v-model="showHomeDialogNext" mode="next" title="Dialog Next" subtitle="Modern full-screen dialog">
+        <p class="section-desc">
+          Full-screen dialog with back button. Modern style.
+        </p>
+        <button class="demo-btn" @click="showHomeDialogNext = true">
+          Open Dialog Next
+        </button>
+        <Dialog
+          v-model="showHomeDialogNext"
+          mode="next"
+          title="Dialog Next"
+          subtitle="Modern full-screen dialog"
+        >
           <div style="padding: 20px">
-            <p>This is the <strong>Next</strong> style dialog — full-screen with a back arrow button.</p>
-            <p style="margin-top: 12px; color: #888">Used as the default dialog style in rocketMode.</p>
+            <p>
+              This is the <strong>Next</strong> style dialog — full-screen with
+              a back arrow button.
+            </p>
+            <p style="margin-top: 12px; color: #888">
+              Used as the default dialog style in rocketMode.
+            </p>
           </div>
           <template #buttons>
-            <button class="demo-btn" @click="showHomeDialogNext = false">Cancel</button>
-            <button class="demo-btn primary" @click="showHomeDialogNext = false">OK</button>
+            <button class="demo-btn" @click="showHomeDialogNext = false">
+              Cancel
+            </button>
+            <button
+              class="demo-btn primary"
+              @click="showHomeDialogNext = false"
+            >
+              OK
+            </button>
           </template>
         </Dialog>
 
         <h3 class="section-title">Dialog (Classic)</h3>
-        <p class="section-desc">Full-screen dialog with close (X) button. Classic style.</p>
-        <button class="demo-btn" @click="showHomeDialogClassic = true">Open Dialog Classic</button>
-        <Dialog v-model="showHomeDialogClassic" mode="classic" title="Dialog Classic" subtitle="Classic full-screen dialog">
+        <p class="section-desc">
+          Full-screen dialog with close (X) button. Classic style.
+        </p>
+        <button class="demo-btn" @click="showHomeDialogClassic = true">
+          Open Dialog Classic
+        </button>
+        <Dialog
+          v-model="showHomeDialogClassic"
+          mode="classic"
+          title="Dialog Classic"
+          subtitle="Classic full-screen dialog"
+        >
           <div style="padding: 20px">
-            <p>This is the <strong>Classic</strong> style dialog — full-screen with an X close button.</p>
-            <p style="margin-top: 12px; color: #888">Used when rocketMode is off.</p>
+            <p>
+              This is the <strong>Classic</strong> style dialog — full-screen
+              with an X close button.
+            </p>
+            <p style="margin-top: 12px; color: #888">
+              Used when rocketMode is off.
+            </p>
           </div>
           <template #buttons>
-            <button class="demo-btn" @click="showHomeDialogClassic = false">Close</button>
+            <button class="demo-btn" @click="showHomeDialogClassic = false">
+              Close
+            </button>
           </template>
         </Dialog>
 
         <h3 class="section-title">Modal (Full-screen)</h3>
-        <p class="section-desc">Overlay modal with back button, scrollable body, optional footer.</p>
-        <button class="demo-btn" @click="showHomeModal = true">Open Full Modal</button>
-        <Modal v-model="showHomeModal" title="Full-screen Modal" subtitle="With scrollable content">
+        <p class="section-desc">
+          Overlay modal with back button, scrollable body, optional footer.
+        </p>
+        <button class="demo-btn" @click="showHomeModal = true">
+          Open Full Modal
+        </button>
+        <Modal
+          v-model="showHomeModal"
+          title="Full-screen Modal"
+          subtitle="With scrollable content"
+        >
           <div style="padding: 16px">
             <p v-for="i in 15" :key="i">Content line {{ i }}</p>
           </div>
           <template #footer>
-            <button class="demo-btn" @click="showHomeModal = false">Close</button>
+            <button class="demo-btn" @click="showHomeModal = false">
+              Close
+            </button>
           </template>
         </Modal>
 
         <h3 class="section-title">SkyTabs</h3>
-        <p class="section-desc">Сегментовані таби з анімованим індикатором. Підтримує disabled.</p>
-        <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+        <p class="section-desc">
+          Сегментовані таби з анімованим індикатором. Підтримує disabled.
+        </p>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+          "
+        >
           <SkyTabs v-model="tabsPeriod" :options="tabsPeriods" />
           <SkyTabs v-model="tabsView" :options="tabsViews" />
           <SkyTabs v-model="tabsPeriod" :options="tabsPeriods" disabled />
@@ -85,16 +141,27 @@
 
         <h3 class="section-title">Header slots (Modal / Dialog)</h3>
         <p class="section-desc">
-          Слоти шапки <code>#title</code>, <code>#subtitle</code>, <code>#header-actions</code> —
-          так само як у <code>Header</code>.
+          Слоти шапки <code>#title</code>, <code>#subtitle</code>,
+          <code>#header-actions</code> — так само як у <code>Header</code>.
         </p>
         <div style="display: flex; gap: 8px; flex-wrap: wrap">
-          <button class="demo-btn" @click="showHeaderSlotsModal = true">Modal</button>
-          <button class="demo-btn" @click="showHeaderSlotsDialogNext = true">Dialog Next</button>
-          <button class="demo-btn" @click="showHeaderSlotsDialogClassic = true">Dialog Classic</button>
+          <button class="demo-btn" @click="showHeaderSlotsModal = true">
+            Modal
+          </button>
+          <button class="demo-btn" @click="showHeaderSlotsDialogNext = true">
+            Dialog Next
+          </button>
+          <button class="demo-btn" @click="showHeaderSlotsDialogClassic = true">
+            Dialog Classic
+          </button>
         </div>
 
-        <Modal v-model="showHeaderSlotsModal" title="Fallback title" width="600px" height="360px">
+        <Modal
+          v-model="showHeaderSlotsModal"
+          title="Fallback title"
+          width="600px"
+          height="360px"
+        >
           <template #title>
             <h4 style="margin: 0; display: flex; align-items: center; gap: 8px">
               Замовлення №1042
@@ -109,14 +176,23 @@
             <SkyButton variant="primary">Зберегти</SkyButton>
           </template>
           <div style="padding: 16px">
-            <p>Шапка зібрана зі слотів: кастомний заголовок з бейджем, підзаголовок і кнопки справа.</p>
+            <p>
+              Шапка зібрана зі слотів: кастомний заголовок з бейджем,
+              підзаголовок і кнопки справа.
+            </p>
           </div>
           <template #footer>
-            <button class="demo-btn" @click="showHeaderSlotsModal = false">Close</button>
+            <button class="demo-btn" @click="showHeaderSlotsModal = false">
+              Close
+            </button>
           </template>
         </Modal>
 
-        <Dialog v-model="showHeaderSlotsDialogNext" mode="next" title="Fallback title">
+        <Dialog
+          v-model="showHeaderSlotsDialogNext"
+          mode="next"
+          title="Fallback title"
+        >
           <template #title>
             <span style="display: inline-flex; align-items: center; gap: 8px">
               Замовлення №1042
@@ -124,7 +200,9 @@
             </span>
           </template>
           <template #subtitle>
-            <span style="display: block; font-size: 13px; color: #6c757d">3 позиції · 1 240 ₴</span>
+            <span style="display: block; font-size: 13px; color: #6c757d"
+              >3 позиції · 1 240 ₴</span
+            >
           </template>
           <template #header-actions>
             <SkyButton variant="outline">Друк</SkyButton>
@@ -133,12 +211,23 @@
             <p>DialogNext з кастомною шапкою.</p>
           </div>
           <template #buttons>
-            <button class="demo-btn" @click="showHeaderSlotsDialogNext = false">Cancel</button>
-            <button class="demo-btn primary" @click="showHeaderSlotsDialogNext = false">OK</button>
+            <button class="demo-btn" @click="showHeaderSlotsDialogNext = false">
+              Cancel
+            </button>
+            <button
+              class="demo-btn primary"
+              @click="showHeaderSlotsDialogNext = false"
+            >
+              OK
+            </button>
           </template>
         </Dialog>
 
-        <Dialog v-model="showHeaderSlotsDialogClassic" mode="classic" title="Fallback title">
+        <Dialog
+          v-model="showHeaderSlotsDialogClassic"
+          mode="classic"
+          title="Fallback title"
+        >
           <template #title>
             <span style="display: inline-flex; align-items: center; gap: 8px">
               Замовлення №1042
@@ -152,45 +241,97 @@
             <p>DialogModal (classic) з кастомною шапкою.</p>
           </div>
           <template #buttons>
-            <button class="demo-btn" @click="showHeaderSlotsDialogClassic = false">Close</button>
+            <button
+              class="demo-btn"
+              @click="showHeaderSlotsDialogClassic = false"
+            >
+              Close
+            </button>
           </template>
         </Dialog>
 
         <h3 class="section-title">SkyButton</h3>
-        <p class="section-desc">Variants: primary, danger, secondary, outline. Підтримує loading, disabled, block, icon.</p>
+        <p class="section-desc">
+          Variants: primary, danger, secondary, outline. Підтримує loading,
+          disabled, block, icon.
+        </p>
         <div class="button-demo-grid">
           <SkyButton variant="primary">Primary</SkyButton>
           <SkyButton variant="danger">Danger</SkyButton>
           <SkyButton variant="secondary">Secondary</SkyButton>
           <SkyButton variant="outline">Outline</SkyButton>
-          <SkyButton variant="primary" :loading="btnLoading" @click="btnLoading = !btnLoading">Loading</SkyButton>
+          <SkyButton
+            variant="primary"
+            :loading="btnLoading"
+            @click="btnLoading = !btnLoading"
+            >Loading</SkyButton
+          >
           <SkyButton variant="primary" disabled>Disabled</SkyButton>
         </div>
         <div class="button-demo-grid" style="margin-top: 8px">
           <SkyButton variant="primary" icon title="Add">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path
+                d="M8 2v12M2 8h12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
             </svg>
           </SkyButton>
           <SkyButton variant="danger" icon title="Delete">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9h8l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9h8l1-9"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </SkyButton>
           <SkyButton variant="secondary" icon title="Edit">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M11 2l3 3-8 8H3v-3l8-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M11 2l3 3-8 8H3v-3l8-8z"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </SkyButton>
           <SkyButton variant="outline" icon title="Search">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M9.5 9.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle
+                cx="6.5"
+                cy="6.5"
+                r="4"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <path
+                d="M9.5 9.5L14 14"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
             </svg>
           </SkyButton>
-          <SkyButton variant="primary" icon :loading="btnLoading" @click="btnLoading = !btnLoading" title="Loading icon">
+          <SkyButton
+            variant="primary"
+            icon
+            :loading="btnLoading"
+            @click="btnLoading = !btnLoading"
+            title="Loading icon"
+          >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1v3M8 12v3M1 8h3M12 8h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path
+                d="M8 1v3M8 12v3M1 8h3M12 8h3"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
             </svg>
           </SkyButton>
         </div>
@@ -199,7 +340,9 @@
         </div>
 
         <h3 class="section-title">SkySelect</h3>
-        <p class="section-desc">Кастомний select. Підтримує placeholder, disabled, block, клавіатуру.</p>
+        <p class="section-desc">
+          Кастомний select. Підтримує placeholder, disabled, block, клавіатуру.
+        </p>
         <div class="button-demo-grid" style="align-items: flex-start">
           <SkySelect
             v-model="selectVal"
@@ -227,11 +370,14 @@
           />
         </div>
         <p class="section-desc" style="margin-top: 8px">
-          Обране: <strong>{{ selectVal ?? '—' }}</strong>
+          Обране: <strong>{{ selectVal ?? "—" }}</strong>
         </p>
 
         <h3 class="section-title">SkySelectSearch</h3>
-        <p class="section-desc">Select із пошуком у дропдауні. Дизайн 1:1 зі SkySelect, працює на старих браузерах (Chromium 84).</p>
+        <p class="section-desc">
+          Select із пошуком у дропдауні. Дизайн 1:1 зі SkySelect, працює на
+          старих браузерах (Chromium 84).
+        </p>
         <div class="button-demo-grid" style="align-items: flex-start">
           <SkySelectSearch
             v-model="citySearchVal"
@@ -254,14 +400,22 @@
           />
         </div>
         <p class="section-desc" style="margin-top: 8px">
-          Обране: <strong>{{ citySearchVal ?? '—' }}</strong>
+          Обране: <strong>{{ citySearchVal ?? "—" }}</strong>
         </p>
 
         <h3 class="section-title">SkyCheckboxFilter (feature)</h3>
         <p class="section-desc">
-          Кнопка-фільтр з дропдауном (мульти-вибір через <code>SkyCheckbox</code>). Стилі 1:1 з адмінкою skymarket.
+          Кнопка-фільтр з дропдауном (мульти-вибір через
+          <code>SkyCheckbox</code>). Стилі 1:1 з адмінкою skymarket.
         </p>
-        <div style="display: flex; gap: 5px; flex-wrap: wrap; align-items: flex-start">
+        <div
+          style="
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+          "
+        >
           <SkyCheckboxFilter
             v-model="filterCategories"
             title="Категорії"
@@ -286,8 +440,9 @@
 
         <h3 class="section-title">SkyLoader</h3>
         <p class="section-desc">
-          Фірмовий лоадер з двома кільцями. <code>position: absolute</code> + <code>z-index: 20000</code>,
-          центрується відносно найближчого позиціонованого батька.
+          Фірмовий лоадер з двома кільцями. <code>position: absolute</code> +
+          <code>z-index: 20000</code>, центрується відносно найближчого
+          позиціонованого батька.
         </p>
         <div class="sky-loader-demo-grid">
           <div class="sky-loader-demo-box">
@@ -300,25 +455,35 @@
           </div>
           <div class="sky-loader-demo-box sky-loader-demo-box--dark">
             <SkyLoader text="Темний фон" />
-            <span class="sky-loader-demo-label" style="color: #fff">На темному фоні</span>
+            <span class="sky-loader-demo-label" style="color: #fff"
+              >На темному фоні</span
+            >
           </div>
         </div>
 
         <h3 class="section-title">SkyTileCard</h3>
         <p class="section-desc">
-          Проста картка: обовʼязковий <code>title</code>, опціональний <code>subtitle</code>,
-          опціональний <code>imageUrl</code> або слот <code>#icon</code> (фон іконки = primary).
+          Проста картка: обовʼязковий <code>title</code>, опціональний
+          <code>subtitle</code>, опціональний <code>imageUrl</code> або слот
+          <code>#icon</code> (фон іконки = primary).
         </p>
 
         <div class="sky-tile-demo-grid">
           <SkyTileCard title="Без іконки" subtitle="Тільки title + subtitle" />
 
-          <SkyTileCard title="З imageUrl" subtitle="Завантажує по URL" image-url="/img.svg" />
+          <SkyTileCard
+            title="З imageUrl"
+            subtitle="Завантажує по URL"
+            image-url="/img.svg"
+          />
 
           <SkyTileCard title="Без subtitle">
             <template #icon>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z" fill="currentColor"/>
+                <path
+                  d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"
+                  fill="currentColor"
+                />
               </svg>
             </template>
           </SkyTileCard>
@@ -326,7 +491,10 @@
           <SkyTileCard title="Slot-іконка" subtitle="Повна композиція">
             <template #icon>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                  fill="currentColor"
+                />
               </svg>
             </template>
           </SkyTileCard>
@@ -334,10 +502,11 @@
 
         <h3 class="section-title">SkyCard</h3>
         <p class="section-desc">
-          Композиційний card: <code>SkyCard</code> (shell зі слотами ribbon / header / default / footer) +
-          <code>SkyCardHeader</code> (іконка + title + subtitle) +
-          <code>SkyCardRow</code> (label + value) + <code>SkyBadge</code> (статусна pill) +
-          <code>SkyAlert</code> (inline alert). Паддінги адаптивні (1180-1430 / 500).
+          Композиційний card: <code>SkyCard</code> (shell зі слотами ribbon /
+          header / default / footer) + <code>SkyCardHeader</code> (іконка +
+          title + subtitle) + <code>SkyCardRow</code> (label + value) +
+          <code>SkyBadge</code> (статусна pill) + <code>SkyAlert</code> (inline
+          alert). Паддінги адаптивні (1180-1430 / 500).
         </p>
 
         <div class="sky-card-demo-grid">
@@ -350,7 +519,10 @@
               >
                 <template #icon>
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                    <path
+                      d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                      fill="currentColor"
+                    />
                   </svg>
                 </template>
               </SkyCardHeader>
@@ -385,7 +557,10 @@
 
           <SkyCard>
             <template #header>
-              <SkyCardHeader title="Торгова точка 3" subtitle="Адреса не вказана" />
+              <SkyCardHeader
+                title="Торгова точка 3"
+                subtitle="Адреса не вказана"
+              />
             </template>
 
             <SkyCardRow label="Store Address ID" value="438291" />
@@ -400,47 +575,98 @@
         </div>
 
         <h3 class="section-title">Modal (Sized)</h3>
-        <p class="section-desc">Centered modal with custom width/height. Closes on overlay click or Esc.</p>
-        <button class="demo-btn" @click="showHomeModalSized = true">Open Sized Modal</button>
-        <Modal v-model="showHomeModalSized" title="Sized Modal" width="500px" height="300px">
+        <p class="section-desc">
+          Centered modal with custom width/height. Closes on overlay click or
+          Esc.
+        </p>
+        <button class="demo-btn" @click="showHomeModalSized = true">
+          Open Sized Modal
+        </button>
+        <Modal
+          v-model="showHomeModalSized"
+          title="Sized Modal"
+          width="500px"
+          height="300px"
+        >
           <div style="padding: 16px">
             <p>A compact modal with fixed dimensions.</p>
           </div>
           <template #footer>
-            <button class="demo-btn" @click="showHomeModalSized = false">Done</button>
+            <button class="demo-btn" @click="showHomeModalSized = false">
+              Done
+            </button>
           </template>
         </Modal>
 
         <h3 class="section-title">Modal (Footer states)</h3>
         <p class="section-desc">
-          Footer renders only if <code>#footer</code> slot is passed. Gap between elements = 14px.
+          Footer renders only if <code>#footer</code> slot is passed. Gap
+          between elements = 14px.
         </p>
         <div class="button-demo-grid">
-          <button class="demo-btn" @click="showModalFooterMany = true">Multiple buttons</button>
-          <button class="demo-btn" @click="showModalFooterOne = true">One button</button>
-          <button class="demo-btn" @click="showModalFooterNone = true">No footer</button>
+          <button class="demo-btn" @click="showModalFooterMany = true">
+            Multiple buttons
+          </button>
+          <button class="demo-btn" @click="showModalFooterOne = true">
+            One button
+          </button>
+          <button class="demo-btn" @click="showModalFooterNone = true">
+            No footer
+          </button>
         </div>
-        <Modal v-model="showModalFooterMany" title="Footer — multiple" width="500px" height="260px">
+        <Modal
+          v-model="showModalFooterMany"
+          title="Footer — multiple"
+          width="500px"
+          height="260px"
+        >
           <div style="padding: 16px">
             <p>Three buttons in the footer — spaced with 14px gap.</p>
           </div>
           <template #footer>
-            <button class="demo-btn" @click="showModalFooterMany = false">Cancel</button>
-            <button class="demo-btn" @click="showModalFooterMany = false">Save draft</button>
-            <button class="demo-btn primary" @click="showModalFooterMany = false">Confirm</button>
+            <button class="demo-btn" @click="showModalFooterMany = false">
+              Cancel
+            </button>
+            <button class="demo-btn" @click="showModalFooterMany = false">
+              Save draft
+            </button>
+            <button
+              class="demo-btn primary"
+              @click="showModalFooterMany = false"
+            >
+              Confirm
+            </button>
           </template>
         </Modal>
-        <Modal v-model="showModalFooterOne" title="Footer — one" width="500px" height="260px">
+        <Modal
+          v-model="showModalFooterOne"
+          title="Footer — one"
+          width="500px"
+          height="260px"
+        >
           <div style="padding: 16px">
             <p>Single button — footer is still rendered.</p>
           </div>
           <template #footer>
-            <button class="demo-btn primary" @click="showModalFooterOne = false">OK</button>
+            <button
+              class="demo-btn primary"
+              @click="showModalFooterOne = false"
+            >
+              OK
+            </button>
           </template>
         </Modal>
-        <Modal v-model="showModalFooterNone" title="Footer — none" width="500px" height="260px">
+        <Modal
+          v-model="showModalFooterNone"
+          title="Footer — none"
+          width="500px"
+          height="260px"
+        >
           <div style="padding: 16px">
-            <p>No <code>#footer</code> slot passed — footer block is not rendered at all.</p>
+            <p>
+              No <code>#footer</code> slot passed — footer block is not rendered
+              at all.
+            </p>
           </div>
         </Modal>
 
@@ -458,17 +684,28 @@
 
         <h3 class="section-title">SkyInput</h3>
         <p class="section-desc">
-          Текстовий input з підтримкою станів <code>default | success | error</code> та опціональною підказкою.
+          Текстовий input з підтримкою станів
+          <code>default | success | error</code> та опціональною підказкою.
         </p>
         <div class="button-demo-grid" style="align-items: flex-start">
           <div style="width: 220px">
             <SkyInput v-model="inputVal" placeholder="Імʼя" />
           </div>
           <div style="width: 220px">
-            <SkyInput v-model="inputValSuccess" state="success" placeholder="Email" hint="Все гаразд" />
+            <SkyInput
+              v-model="inputValSuccess"
+              state="success"
+              placeholder="Email"
+              hint="Все гаразд"
+            />
           </div>
           <div style="width: 220px">
-            <SkyInput v-model="inputValError" state="error" placeholder="Email" hint="Невалідний email" />
+            <SkyInput
+              v-model="inputValError"
+              state="error"
+              placeholder="Email"
+              hint="Невалідний email"
+            />
           </div>
           <div style="width: 220px">
             <SkyInput model-value="Заблоковано" disabled />
@@ -477,30 +714,43 @@
 
         <h3 class="section-title">SkySearchInput</h3>
         <p class="section-desc">
-          Стилізоване поле пошуку (іконка + кнопка очищення). Чистий UI-компонент — фільтрація зовні, через <code>computed</code>.
-          Підтримує <code>collapsible</code>: розгортається по кліку, згортається по кліку поза межами (якщо порожнє).
+          Стилізоване поле пошуку (іконка + кнопка очищення). Чистий
+          UI-компонент — фільтрація зовні, через <code>computed</code>.
+          Підтримує <code>collapsible</code>: розгортається по кліку,
+          згортається по кліку поза межами (якщо порожнє).
         </p>
         <div class="button-demo-grid" style="align-items: flex-start">
           <div style="width: 260px">
             <SkySearchInput v-model="searchVal" placeholder="Пошук..." />
           </div>
           <div style="width: 260px">
-            <SkySearchInput v-model="searchValDisabled" placeholder="Disabled" disabled />
+            <SkySearchInput
+              v-model="searchValDisabled"
+              placeholder="Disabled"
+              disabled
+            />
           </div>
           <div style="width: 260px">
-            <SkySearchInput v-model="searchValCollapsible" placeholder="Пошук..." collapsible />
+            <SkySearchInput
+              v-model="searchValCollapsible"
+              placeholder="Пошук..."
+              collapsible
+            />
           </div>
         </div>
         <p class="section-desc" style="margin-top: 8px">
-          Знайдено: <strong>{{ filteredSearchDemo.join(', ') || '—' }}</strong>
+          Знайдено: <strong>{{ filteredSearchDemo.join(", ") || "—" }}</strong>
         </p>
 
         <h3 class="section-title">SkyCheckbox</h3>
         <p class="section-desc">
-          Чекбокс з двома режимами: класичний бокс або switch-перемикач. v-model приймає <code>Boolean</code> або масив значень.
+          Чекбокс з двома режимами: класичний бокс або switch-перемикач. v-model
+          приймає <code>Boolean</code> або масив значень.
         </p>
         <div class="button-demo-grid">
-          <SkyCheckbox v-model="checkboxAgreed">Погоджуюсь з умовами</SkyCheckbox>
+          <SkyCheckbox v-model="checkboxAgreed"
+            >Погоджуюсь з умовами</SkyCheckbox
+          >
           <SkyCheckbox v-model="checkboxSwitch" switch>Сповіщення</SkyCheckbox>
           <SkyCheckbox :model-value="false" disabled>Заблоковано</SkyCheckbox>
         </div>
@@ -515,29 +765,93 @@
           </SkyCheckbox>
         </div>
         <p class="section-desc" style="margin-top: 8px">
-          Обрано: <strong>{{ checkboxArraySelected.join(', ') || '—' }}</strong>
+          Обрано: <strong>{{ checkboxArraySelected.join(", ") || "—" }}</strong>
         </p>
 
         <h3 class="section-title">SkyTable (products table)</h3>
-        <p class="section-desc">Віртуал-скрол таблиця товарів (200 рядків) — розмітка й стилі 1:1 з POS.</p>
+        <p class="section-desc">
+          Віртуал-скрол таблиця товарів (200 рядків) — розмітка й стилі 1:1 з
+          POS.
+        </p>
         <div style="height: 380px; margin-bottom: 8px">
-          <SkyTable :params="tableParams" :json="tableJson" :main-json-data="tableItems" />
+          <SkyTable
+            :params="tableParams"
+            :json="tableJson"
+            :main-json-data="tableItems"
+          />
         </div>
 
-        <h3 class="section-title">NotificationElement (sky-service-ui-components)</h3>
+        <h3 class="section-title">FunctionalCalendar</h3>
+        <p class="section-desc">Перенесено зі SkyMarket, стилі 1:1.</p>
+        <div style="max-width: 320px">
+          <FunctionalCalendar
+            :value="calendarRangeValue"
+            is-date-range
+            is-modal
+            change-month-function
+            change-year-function
+            can-clear-range
+            is-auto-closeable
+          />
+        </div>
+        <p class="section-desc" style="margin-top: 8px">
+          Обрано:
+          <strong
+            >{{ calendarRangeValue.dateRange.start || "—" }} —
+            {{ calendarRangeValue.dateRange.end || "—" }}</strong
+          >
+        </p>
+
+        <h3 class="section-title">SkyDateRangePicker</h3>
         <p class="section-desc">
-          Toast-сповіщення через <code>notify</code>. Підтримує success, error, warning, info, loading, default.
-          Loading не закривається автоматично — потрібен <code>notify.dismiss(id)</code>.
+          Перенесено зі SkyMarket (<code>DatePickerRange.vue</code>), стилі 1:1
+          — іконка-тригер, пресети (Сьогодні / Вчора / Тиждень / Місяць /
+          Минулий-Поточний місяць), лейбл періоду.
+        </p>
+        <div style="max-width: 320px">
+          <SkyDateRangePicker
+            v-model="dateRangeValue"
+            @set-date="onDateRangeSetDate"
+          />
+        </div>
+        <p class="section-desc" style="margin-top: 8px">
+          Обрано:
+          <strong>{{
+            dateRangeSetDate
+              ? `${dateRangeSetDate.pr1 || "—"} — ${dateRangeSetDate.pr2 || "—"}`
+              : "—"
+          }}</strong>
+        </p>
+
+        <h3 class="section-title">
+          NotificationElement (sky-service-ui-components)
+        </h3>
+        <p class="section-desc">
+          Toast-сповіщення через <code>notify</code>. Підтримує success, error,
+          warning, info, loading, default. Loading не закривається автоматично —
+          потрібен <code>notify.dismiss(id)</code>.
         </p>
         <div class="button-demo-grid">
-          <button class="demo-btn" @click="showNotify('success')">Success</button>
+          <button class="demo-btn" @click="showNotify('success')">
+            Success
+          </button>
           <button class="demo-btn" @click="showNotify('error')">Error</button>
-          <button class="demo-btn" @click="showNotify('warning')">Warning</button>
+          <button class="demo-btn" @click="showNotify('warning')">
+            Warning
+          </button>
           <button class="demo-btn" @click="showNotify('info')">Info</button>
-          <button class="demo-btn" @click="showNotify('default')">Default</button>
-          <button class="demo-btn" @click="showNotifyLoading">Loading → dismiss</button>
-          <button class="demo-btn" @click="showNotifyWithButtons">З кнопками</button>
-          <button class="demo-btn" @click="showNotifyTopCenter">Top-center</button>
+          <button class="demo-btn" @click="showNotify('default')">
+            Default
+          </button>
+          <button class="demo-btn" @click="showNotifyLoading">
+            Loading → dismiss
+          </button>
+          <button class="demo-btn" @click="showNotifyWithButtons">
+            З кнопками
+          </button>
+          <button class="demo-btn" @click="showNotifyTopCenter">
+            Top-center
+          </button>
         </div>
       </div>
     </template>
@@ -553,12 +867,18 @@
         :dropdown-items="recentPages"
         @navigate="navigate"
       >
-        <button class="demo-btn primary" @click="showDialog = true">+ Add</button>
+        <button class="demo-btn primary" @click="showDialog = true">
+          + Add
+        </button>
       </Header>
       <div class="page-content">
         <table class="demo-table">
           <thead>
-            <tr><th>Name</th><th>Price</th><th>Stock</th></tr>
+            <tr>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Stock</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="i in 8" :key="i">
@@ -569,7 +889,12 @@
           </tbody>
         </table>
       </div>
-      <Dialog v-model="showDialog" mode="next" title="New Product" subtitle="Add to catalog">
+      <Dialog
+        v-model="showDialog"
+        mode="next"
+        title="New Product"
+        subtitle="Add to catalog"
+      >
         <div style="padding: 20px">
           <label class="demo-label">Name</label>
           <input class="demo-input" placeholder="Product name" />
@@ -578,7 +903,9 @@
         </div>
         <template #buttons>
           <button class="demo-btn" @click="showDialog = false">Cancel</button>
-          <button class="demo-btn primary" @click="showDialog = false">Save</button>
+          <button class="demo-btn primary" @click="showDialog = false">
+            Save
+          </button>
         </template>
       </Dialog>
     </template>
@@ -592,8 +919,12 @@
         :dropdown-items="recentPages"
         @navigate="navigate"
       >
-        <button class="demo-btn" @click="showDialogClassic = true">Export</button>
-        <button class="demo-btn primary" @click="showDialogNext = true">+ New order</button>
+        <button class="demo-btn" @click="showDialogClassic = true">
+          Export
+        </button>
+        <button class="demo-btn primary" @click="showDialogNext = true">
+          + New order
+        </button>
       </Header>
       <div class="page-content">
         <div class="demo-list">
@@ -602,22 +933,42 @@
               <strong>Order #{{ 1000 + i }}</strong>
               <div class="text-muted">Customer {{ i }}</div>
             </div>
-            <span :class="['status', i % 3 === 0 ? 'status-done' : i % 3 === 1 ? 'status-pending' : 'status-new']">
-              {{ i % 3 === 0 ? 'Done' : i % 3 === 1 ? 'Pending' : 'New' }}
+            <span
+              :class="[
+                'status',
+                i % 3 === 0
+                  ? 'status-done'
+                  : i % 3 === 1
+                    ? 'status-pending'
+                    : 'status-new',
+              ]"
+            >
+              {{ i % 3 === 0 ? "Done" : i % 3 === 1 ? "Pending" : "New" }}
             </span>
           </div>
         </div>
       </div>
-      <Dialog v-model="showDialogClassic" mode="classic" title="Export Orders" subtitle="Download as file">
+      <Dialog
+        v-model="showDialogClassic"
+        mode="classic"
+        title="Export Orders"
+        subtitle="Download as file"
+      >
         <div style="padding: 20px">
           <p>Choose export format:</p>
           <div style="display: flex; gap: 8px; margin-top: 12px">
-            <button class="demo-btn" @click="showDialogClassic = false">CSV</button>
-            <button class="demo-btn" @click="showDialogClassic = false">Excel</button>
+            <button class="demo-btn" @click="showDialogClassic = false">
+              CSV
+            </button>
+            <button class="demo-btn" @click="showDialogClassic = false">
+              Excel
+            </button>
           </div>
         </div>
         <template #buttons>
-          <button class="demo-btn" @click="showDialogClassic = false">Close</button>
+          <button class="demo-btn" @click="showDialogClassic = false">
+            Close
+          </button>
         </template>
       </Dialog>
       <Dialog v-model="showDialogNext" mode="next" title="New Order">
@@ -625,11 +976,19 @@
           <label class="demo-label">Customer</label>
           <input class="demo-input" placeholder="Customer name" />
           <label class="demo-label">Notes</label>
-          <textarea class="demo-input" rows="3" placeholder="Order notes"></textarea>
+          <textarea
+            class="demo-input"
+            rows="3"
+            placeholder="Order notes"
+          ></textarea>
         </div>
         <template #buttons>
-          <button class="demo-btn" @click="showDialogNext = false">Cancel</button>
-          <button class="demo-btn primary" @click="showDialogNext = false">Create</button>
+          <button class="demo-btn" @click="showDialogNext = false">
+            Cancel
+          </button>
+          <button class="demo-btn primary" @click="showDialogNext = false">
+            Create
+          </button>
         </template>
       </Dialog>
     </template>
@@ -643,8 +1002,12 @@
         :dropdown-items="recentPages"
         @navigate="navigate"
       >
-        <button class="demo-btn" @click="showSettingsModal = true">About</button>
-        <button class="demo-btn primary" @click="navigate('settings-profile')">Profile</button>
+        <button class="demo-btn" @click="showSettingsModal = true">
+          About
+        </button>
+        <button class="demo-btn primary" @click="navigate('settings-profile')">
+          Profile
+        </button>
       </Header>
       <div class="page-content">
         <div class="nav-grid">
@@ -658,14 +1021,24 @@
           </div>
         </div>
       </div>
-      <Modal v-model="showSettingsModal" title="About" subtitle="Application info" width="500px" height="300px">
+      <Modal
+        v-model="showSettingsModal"
+        title="About"
+        subtitle="Application info"
+        width="500px"
+        height="300px"
+      >
         <div style="padding: 16px">
           <p><strong>Vue Dev Kit</strong></p>
           <p style="color: #888; margin-top: 4px">Version 1.2.0</p>
-          <p style="margin-top: 12px">A shared component library for Skyservice microservices.</p>
+          <p style="margin-top: 12px">
+            A shared component library for Skyservice microservices.
+          </p>
         </div>
         <template #footer>
-          <button class="demo-btn" @click="showSettingsModal = false">Close</button>
+          <button class="demo-btn" @click="showSettingsModal = false">
+            Close
+          </button>
         </template>
       </Modal>
     </template>
@@ -679,7 +1052,9 @@
         :dropdown-items="recentPages"
         @navigate="navigate"
       >
-        <button class="demo-btn primary" @click="showProfileDialog = true">Edit</button>
+        <button class="demo-btn primary" @click="showProfileDialog = true">
+          Edit
+        </button>
       </Header>
       <div class="page-content">
         <div class="demo-list">
@@ -697,7 +1072,12 @@
           </div>
         </div>
       </div>
-      <Dialog v-model="showProfileDialog" mode="next" title="Edit Profile" subtitle="Update your info">
+      <Dialog
+        v-model="showProfileDialog"
+        mode="next"
+        title="Edit Profile"
+        subtitle="Update your info"
+      >
         <div style="padding: 20px">
           <label class="demo-label">Name</label>
           <input class="demo-input" value="John Doe" />
@@ -707,8 +1087,12 @@
           <input class="demo-input" value="+380 99 123 4567" />
         </div>
         <template #buttons>
-          <button class="demo-btn" @click="showProfileDialog = false">Cancel</button>
-          <button class="demo-btn primary" @click="showProfileDialog = false">Save</button>
+          <button class="demo-btn" @click="showProfileDialog = false">
+            Cancel
+          </button>
+          <button class="demo-btn primary" @click="showProfileDialog = false">
+            Save
+          </button>
         </template>
       </Dialog>
     </template>
@@ -722,7 +1106,9 @@
         :dropdown-items="recentPages"
         @navigate="navigate"
       >
-        <button class="demo-btn" @click="showNotifyModal = true">Preview</button>
+        <button class="demo-btn" @click="showNotifyModal = true">
+          Preview
+        </button>
       </Header>
       <div class="page-content">
         <div class="demo-list">
@@ -740,7 +1126,12 @@
           </div>
         </div>
       </div>
-      <Modal v-model="showNotifyModal" title="Notification Preview" width="500px" height="350px">
+      <Modal
+        v-model="showNotifyModal"
+        title="Notification Preview"
+        width="500px"
+        height="350px"
+      >
         <div style="padding: 16px">
           <div class="demo-list">
             <div class="demo-list-item">
@@ -767,7 +1158,9 @@
           </div>
         </div>
         <template #footer>
-          <button class="demo-btn" @click="showNotifyModal = false">Close</button>
+          <button class="demo-btn" @click="showNotifyModal = false">
+            Close
+          </button>
         </template>
       </Modal>
     </template>
@@ -782,12 +1175,18 @@
         @navigate="navigate"
       >
         <button class="demo-btn" @click="showModal = true">Full Report</button>
-        <button class="demo-btn" @click="showModalSized = true">Quick View</button>
+        <button class="demo-btn" @click="showModalSized = true">
+          Quick View
+        </button>
       </Header>
       <div class="page-content">
         <p>Click the buttons above to see Modal examples.</p>
       </div>
-      <Modal v-model="showModal" title="Full Report" subtitle="Monthly analytics">
+      <Modal
+        v-model="showModal"
+        title="Full Report"
+        subtitle="Monthly analytics"
+      >
         <div style="padding: 16px">
           <p v-for="i in 20" :key="i">Report line {{ i }} — data placeholder</p>
         </div>
@@ -795,7 +1194,12 @@
           <button class="demo-btn" @click="showModal = false">Close</button>
         </template>
       </Modal>
-      <Modal v-model="showModalSized" title="Quick View" width="600px" height="400px">
+      <Modal
+        v-model="showModalSized"
+        title="Quick View"
+        width="600px"
+        height="400px"
+      >
         <div style="padding: 16px">
           <p>Summary stats go here.</p>
         </div>
@@ -808,245 +1212,306 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import { Header, Dialog, Modal, SkyButton, SkySelect, SkySelectSearch, SkyCard, SkyCardHeader, SkyCardRow, SkyBadge, SkyAlert, SkyInput, SkySearchInput, SkyCheckbox, SkyLoader, SkyTileCard, SkyTable, SkyTabs, SkyCheckboxFilter, notificationModule } from '../src'
+import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
+import {
+  Header,
+  Dialog,
+  Modal,
+  SkyButton,
+  SkySelect,
+  SkySelectSearch,
+  SkyCard,
+  SkyCardHeader,
+  SkyCardRow,
+  SkyBadge,
+  SkyAlert,
+  SkyInput,
+  SkySearchInput,
+  SkyCheckbox,
+  SkyLoader,
+  SkyTileCard,
+  SkyTable,
+  SkyCheckboxFilter,
+  FunctionalCalendar,
+  SkyDateRangePicker,
+  notificationModule,
+} from "../src";
 
-const { notify } = notificationModule
+const { notify } = notificationModule;
 
 function showNotify(type) {
   const titles = {
-    success: 'Успішно збережено!',
-    error: 'Помилка завантаження',
-    warning: 'Увага! Перевірте дані',
-    info: 'Нове повідомлення',
-    default: 'Звичайне сповіщення',
-  }
-  notify[type]({ toastData: { title: titles[type], description: type === 'error' ? 'Перевірте з\'єднання з інтернетом' : undefined } })
+    success: "Успішно збережено!",
+    error: "Помилка завантаження",
+    warning: "Увага! Перевірте дані",
+    info: "Нове повідомлення",
+    default: "Звичайне сповіщення",
+  };
+  notify[type]({
+    toastData: {
+      title: titles[type],
+      description:
+        type === "error" ? "Перевірте з'єднання з інтернетом" : undefined,
+    },
+  });
 }
 
 async function showNotifyLoading() {
-  const id = await notify.loading({ toastData: { title: 'Зберігається...', useCloseButton: false } })
+  const id = await notify.loading({
+    toastData: { title: "Зберігається...", useCloseButton: false },
+  });
   setTimeout(() => {
-    if (id !== null) notify.dismiss(id)
-    notify.success({ toastData: { title: 'Готово!' } })
-  }, 2000)
+    if (id !== null) notify.dismiss(id);
+    notify.success({ toastData: { title: "Готово!" } });
+  }, 2000);
 }
 
 function showNotifyWithButtons() {
   notify.warning({
-    toastData: { title: 'Видалити запис?', useCloseButton: false },
+    toastData: { title: "Видалити запис?", useCloseButton: false },
     toastAdditionalInfo: {
-      leftBtn: { buttonText: 'Скасувати', buttonAction: ({ close }) => close() },
-      rightBtn: { buttonText: 'Видалити', buttonAction: ({ close }) => { close(); notify.success({ toastData: { title: 'Видалено' } }) } },
+      leftBtn: {
+        buttonText: "Скасувати",
+        buttonAction: ({ close }) => close(),
+      },
+      rightBtn: {
+        buttonText: "Видалити",
+        buttonAction: ({ close }) => {
+          close();
+          notify.success({ toastData: { title: "Видалено" } });
+        },
+      },
     },
-  })
+  });
 }
 
 function showNotifyTopCenter() {
   notify.info({
-    toastData: { title: 'Top-center позиція', description: 'duration: 6000, pauseOnHover' },
-    toastOptions: { position: 'top-center', duration: 6000, pauseOnHover: true },
-  })
+    toastData: {
+      title: "Top-center позиція",
+      description: "duration: 6000, pauseOnHover",
+    },
+    toastOptions: {
+      position: "top-center",
+      duration: 6000,
+      pauseOnHover: true,
+    },
+  });
 }
 
-const page = ref('home')
+const page = ref("home");
 
-const showDialog = ref(false)
-const showDialogClassic = ref(false)
-const showDialogNext = ref(false)
-const showModal = ref(false)
-const showModalSized = ref(false)
-const showSettingsModal = ref(false)
-const showProfileDialog = ref(false)
-const showNotifyModal = ref(false)
-const showHomeDialogNext = ref(false)
-const showHomeDialogClassic = ref(false)
-const showHomeModal = ref(false)
-const showHomeModalSized = ref(false)
-const tabsPeriod = ref('week')
+const showDialog = ref(false);
+const showDialogClassic = ref(false);
+const showDialogNext = ref(false);
+const showModal = ref(false);
+const showModalSized = ref(false);
+const showSettingsModal = ref(false);
+const showProfileDialog = ref(false);
+const showNotifyModal = ref(false);
+const showHomeDialogNext = ref(false);
+const showHomeDialogClassic = ref(false);
+const showHomeModal = ref(false);
+const showHomeModalSized = ref(false);
+const tabsPeriod = ref("week");
 const tabsPeriods = [
-  { value: 'day', text: 'День' },
-  { value: 'week', text: 'Тиждень' },
-  { value: 'month', text: 'Місяць' },
-]
-const tabsView = ref('all')
+  { value: "day", text: "День" },
+  { value: "week", text: "Тиждень" },
+  { value: "month", text: "Місяць" },
+];
+const tabsView = ref("all");
 const tabsViews = [
-  { value: 'all', text: 'Усі' },
-  { value: 'active', text: 'Активні' },
-  { value: 'archived', text: 'В архіві' },
-  { value: 'drafts', text: 'Чернетки' },
-]
+  { value: "all", text: "Усі" },
+  { value: "active", text: "Активні" },
+  { value: "archived", text: "В архіві" },
+  { value: "drafts", text: "Чернетки" },
+];
 
-const showHeaderSlotsModal = ref(false)
-const showHeaderSlotsDialogNext = ref(false)
-const showHeaderSlotsDialogClassic = ref(false)
-const showModalFooterMany = ref(false)
-const showModalFooterOne = ref(false)
-const showModalFooterNone = ref(false)
-const btnLoading = ref(false)
+const showHeaderSlotsModal = ref(false);
+const showHeaderSlotsDialogNext = ref(false);
+const showHeaderSlotsDialogClassic = ref(false);
+const showModalFooterMany = ref(false);
+const showModalFooterOne = ref(false);
+const showModalFooterNone = ref(false);
+const btnLoading = ref(false);
 
-const selectVal = ref(null)
-const selectVal2 = ref(null)
-const citySearchVal = ref(null)
-const citySearchVal2 = ref(null)
+const selectVal = ref(null);
+const selectVal2 = ref(null);
+const citySearchVal = ref(null);
+const citySearchVal2 = ref(null);
 const cityOptions = [
-  { value: 'kyiv', text: 'Київ' },
-  { value: 'lviv', text: 'Львів' },
-  { value: 'odesa', text: 'Одеса' },
-  { value: 'kharkiv', text: 'Харків' },
-  { value: 'dnipro', text: 'Дніпро' },
-  { value: 'zaporizhzhia', text: 'Запоріжжя' },
-  { value: 'vinnytsia', text: 'Вінниця' },
-  { value: 'poltava', text: 'Полтава' },
-  { value: 'chernivtsi', text: 'Чернівці' },
-  { value: 'ternopil', text: 'Тернопіль' },
-]
-const filterCategories = ref([])
-const filterStatus = ref([])
-const filterEmpty = ref([])
+  { value: "kyiv", text: "Київ" },
+  { value: "lviv", text: "Львів" },
+  { value: "odesa", text: "Одеса" },
+  { value: "kharkiv", text: "Харків" },
+  { value: "dnipro", text: "Дніпро" },
+  { value: "zaporizhzhia", text: "Запоріжжя" },
+  { value: "vinnytsia", text: "Вінниця" },
+  { value: "poltava", text: "Полтава" },
+  { value: "chernivtsi", text: "Чернівці" },
+  { value: "ternopil", text: "Тернопіль" },
+];
+const filterCategories = ref([]);
+const filterStatus = ref([]);
+const filterEmpty = ref([]);
 const categoryOptions = [
-  { value: 'alc', name: 'Алкоголь' },
-  { value: 'food', name: 'Їжа' },
-  { value: 'drink', name: 'Напої' },
-  { value: 'snack', name: 'Снеки' },
-  { value: 'sweet', name: 'Солодощі' },
-  { value: 'frozen', name: 'Заморозка' },
-]
+  { value: "alc", name: "Алкоголь" },
+  { value: "food", name: "Їжа" },
+  { value: "drink", name: "Напої" },
+  { value: "snack", name: "Снеки" },
+  { value: "sweet", name: "Солодощі" },
+  { value: "frozen", name: "Заморозка" },
+];
 const statusOptions = [
-  { value: 'active', name: 'Активний' },
-  { value: 'paused', name: 'Призупинений' },
-  { value: 'archived', name: 'Архівний' },
-]
-const inputVal = ref('')
-const inputValSuccess = ref('john@example.com')
-const inputValError = ref('not-an-email')
-const searchVal = ref('')
-const searchValDisabled = ref('')
-const searchValCollapsible = ref('')
-const searchDemoItems = ['Київ', 'Львів', 'Одеса', 'Харків', 'Дніпро']
+  { value: "active", name: "Активний" },
+  { value: "paused", name: "Призупинений" },
+  { value: "archived", name: "Архівний" },
+];
+const inputVal = ref("");
+const inputValSuccess = ref("john@example.com");
+const inputValError = ref("not-an-email");
+const searchVal = ref("");
+const searchValDisabled = ref("");
+const searchValCollapsible = ref("");
+const searchDemoItems = ["Київ", "Львів", "Одеса", "Харків", "Дніпро"];
 const filteredSearchDemo = computed(() => {
-  const q = searchVal.value.trim().toLowerCase()
-  if (!q) return searchDemoItems
-  return searchDemoItems.filter((item) => item.toLowerCase().includes(q))
-})
-const checkboxAgreed = ref(false)
-const checkboxSwitch = ref(true)
-const checkboxArraySelected = ref(['food'])
+  const q = searchVal.value.trim().toLowerCase();
+  if (!q) return searchDemoItems;
+  return searchDemoItems.filter((item) => item.toLowerCase().includes(q));
+});
+const checkboxAgreed = ref(false);
+const checkboxSwitch = ref(true);
+const checkboxArraySelected = ref(["food"]);
 const checkboxArrayOptions = [
-  { value: 'alc', name: 'Алкоголь' },
-  { value: 'food', name: 'Їжа' },
-  { value: 'drink', name: 'Напої' },
-]
+  { value: "alc", name: "Алкоголь" },
+  { value: "food", name: "Їжа" },
+  { value: "drink", name: "Напої" },
+];
 const selectOptions = [
-  { label: 'Варіант 1', value: 1 },
-  { label: 'Варіант 2', value: 2 },
-  { label: 'Варіант 3', value: 3 },
-  { label: 'Варіант 4', value: 4 },
-  { label: 'Варіант 5', value: 5 },
-]
+  { label: "Варіант 1", value: 1 },
+  { label: "Варіант 2", value: 2 },
+  { label: "Варіант 3", value: 3 },
+  { label: "Варіант 4", value: 4 },
+  { label: "Варіант 5", value: 5 },
+];
 
 // Page names for the dropdown
 // SkyTable (products table) demo — real params/json shape
 const tableItems = Array.from({ length: 200 }, (_, i) => ({
   id: i + 1,
   name: `Товар ${i + 1}`,
-  category: ['Напої', 'Випічка', 'Кава', 'Десерти'][i % 4],
+  category: ["Напої", "Випічка", "Кава", "Десерти"][i % 4],
   price: 10 + ((i * 37) % 490),
-  status: i % 3 !== 0 ? 'Активний' : 'Прихований',
-}))
+  status: i % 3 !== 0 ? "Активний" : "Прихований",
+}));
 const tableParams = reactive({
-  id: 'id',
-  name: 'demo',
+  id: "id",
+  name: "demo",
   selected: [],
   allSelect: false,
-  massActions: { delete: { value: 'delete', title: 'Видалити' } },
+  massActions: { delete: { value: "delete", title: "Видалити" } },
   footer: false,
-  sort: { of: '', ot: '' },
+  sort: { of: "", ot: "" },
   header: [
-    { title: 'ID', name: 'id', sort: 'id', width: 70, enable: true },
-    { title: 'Назва', name: 'name', sort: 'name', width: 240, enable: true },
-    { title: 'Категорія', name: 'category', sort: false, width: 170, enable: true },
-    { title: 'Ціна', name: 'price', sort: 'price', width: 130, enable: true },
-    { title: 'Статус', name: 'status', sort: false, width: 150, enable: true },
+    { title: "ID", name: "id", sort: "id", width: 70, enable: true },
+    { title: "Назва", name: "name", sort: "name", width: 240, enable: true },
+    {
+      title: "Категорія",
+      name: "category",
+      sort: false,
+      width: 170,
+      enable: true,
+    },
+    { title: "Ціна", name: "price", sort: "price", width: 130, enable: true },
+    { title: "Статус", name: "status", sort: false, width: 150, enable: true },
   ],
-})
-const tableJson = { items: tableItems, total: tableItems.length }
+});
+const tableJson = { items: tableItems, total: tableItems.length };
+
+const calendarRangeValue = reactive({ dateRange: { start: "", end: "" } });
+
+// SkyDateRangePicker demo — modelValue shape is { start, end }
+const dateRangeValue = reactive({ start: "", end: "" });
+const dateRangeSetDate = ref(null);
+function onDateRangeSetDate(payload) {
+  dateRangeSetDate.value = payload;
+}
 
 const pageNames = {
-  home: 'Dashboard',
-  products: 'Products',
-  orders: 'Orders',
-  settings: 'Settings',
-  'settings-profile': 'Profile',
-  'settings-notifications': 'Notifications',
-  reports: 'Reports',
-}
+  home: "Dashboard",
+  products: "Products",
+  orders: "Orders",
+  settings: "Settings",
+  "settings-profile": "Profile",
+  "settings-notifications": "Notifications",
+  reports: "Reports",
+};
 
 // Read/write componentStats from localStorage — same as dashboard
 function getStats() {
   try {
-    return JSON.parse(localStorage.componentStats || '{}').pages || {}
+    return JSON.parse(localStorage.componentStats || "{}").pages || {};
   } catch {
-    return {}
+    return {};
   }
 }
 
 function saveStats(pages) {
   try {
-    const stats = JSON.parse(localStorage.componentStats || '{}')
-    stats.pages = pages
-    localStorage.componentStats = JSON.stringify(stats)
+    const stats = JSON.parse(localStorage.componentStats || "{}");
+    stats.pages = pages;
+    localStorage.componentStats = JSON.stringify(stats);
   } catch {
-    localStorage.componentStats = JSON.stringify({ pages })
+    localStorage.componentStats = JSON.stringify({ pages });
   }
 }
 
 function trackVisit(pageName) {
-  const pages = getStats()
+  const pages = getStats();
   pages[pageName] = {
     name: pageNames[pageName] || pageName,
     path: pageName,
     lastVisit: Date.now(),
-  }
-  saveStats(pages)
+  };
+  saveStats(pages);
   // Trigger reactivity
-  statsVersion.value++
+  statsVersion.value++;
 }
 
-const statsVersion = ref(0)
+const statsVersion = ref(0);
 
 const recentPages = computed(() => {
   // eslint-disable-next-line no-unused-vars
-  const _ = statsVersion.value // trigger reactivity
-  const pages = getStats()
-  return Object.values(pages)
-})
+  const _ = statsVersion.value; // trigger reactivity
+  const pages = getStats();
+  return Object.values(pages);
+});
 
 function navigate(target) {
-  page.value = target
-  window.location.hash = target
-  window.scrollTo(0, 0)
-  trackVisit(target)
+  page.value = target;
+  window.location.hash = target;
+  window.scrollTo(0, 0);
+  trackVisit(target);
 }
 
 function onHashChange() {
-  const hash = window.location.hash.slice(1)
+  const hash = window.location.hash.slice(1);
   if (hash) {
-    page.value = hash
-    trackVisit(hash)
+    page.value = hash;
+    trackVisit(hash);
   } else {
-    page.value = 'home'
+    page.value = "home";
   }
 }
 
 onMounted(() => {
-  window.addEventListener('hashchange', onHashChange)
-  onHashChange()
-})
+  window.addEventListener("hashchange", onHashChange);
+  onHashChange();
+});
 
 onUnmounted(() => {
-  window.removeEventListener('hashchange', onHashChange)
-})
+  window.removeEventListener("hashchange", onHashChange);
+});
 </script>
 
 <style>
@@ -1057,7 +1522,8 @@ onUnmounted(() => {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #333;
   background: #f5f5f5;
 }
@@ -1099,7 +1565,9 @@ body {
   border-radius: 8px;
   padding: 16px;
   cursor: pointer;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
 }
 
 .nav-card:hover {
@@ -1161,9 +1629,18 @@ body {
   border-radius: 12px;
 }
 
-.status-new { background: #dbeafe; color: #1e40af; }
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-done { background: #d1fae5; color: #065f46; }
+.status-new {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+.status-done {
+  background: #d1fae5;
+  color: #065f46;
+}
 
 /* Form elements */
 .demo-label {
