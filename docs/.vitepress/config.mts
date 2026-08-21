@@ -109,7 +109,10 @@ export default defineConfig({
       '/components/': [
         {
           text: 'Компоненти',
-          items: [{ text: 'Огляд', link: '/components/overview' }],
+          items: [
+            { text: 'Галерея — всі компоненти', link: '/components/gallery' },
+            { text: 'Огляд', link: '/components/overview' },
+          ],
         },
         {
           text: 'Layout',
@@ -137,6 +140,8 @@ export default defineConfig({
           text: 'Дані та статуси',
           collapsed: false,
           items: [
+            { text: 'SkyDataTable (TanStack)', link: '/components/data-table' },
+            { text: 'Таблиця — примітиви', link: '/components/table' },
             { text: 'SkyTable', link: '/components/sky-table' },
             { text: 'SkyCard', link: '/components/sky-card' },
             { text: 'SkyTileCard', link: '/components/sky-tile-card' },

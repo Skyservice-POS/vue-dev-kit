@@ -28,11 +28,16 @@ import {
   SkyAlert, SkyBadge, SkyLoader,
   SkyCard, SkyCardHeader, SkyCardRow,
   SkyTable,
+  // грід на TanStack + примітиви таблиці + композабли
+  SkyDataTable, createSkyColumnHelper, skyTableFeatures,
+  SkyTableRoot, SkyTableHeader, SkyTableHead, SkyTableBody, SkyTableRow, SkyTableCell,
+  useTableSort, useTableSelection, useColumnVisibility,
   FunctionalCalendar, SkyDateRangePicker,
   // widgets
   SkyTileCard,
   // features
   SkyCheckboxFilter,
+  TableMassActions, TableColumnSettings, TableVirtualBody,
   // sdk
   navigate, SkyserviceAPI, isInsideIframe,
   // sky-service-ui-components
@@ -854,6 +859,129 @@ Shell-контейнер для карток: ribbon / header / body / footer �
 
 ---
 
+### SkyDataTable
+
+Грід на [TanStack Table v9](https://tanstack.com/table/latest): headless-ядро тримає стан і обчислення, розмітка й стилі — наші. Візуально це та сама таблиця, що в POS. Повний опис — у [документації](https://74cfe434-a2b3-4d49-8fa7-db7343e399dc.apps.platform365.online/components/data-table).
+
+```vue
+<script setup lang="ts">
+import { h } from 'vue'
+import { SkyDataTable, SkyBadge, createSkyColumnHelper } from '@skyservice-developers/vue-dev-kit'
+
+const column = createSkyColumnHelper<Product>()
+
+const columns = [
+  column.accessor('name', { header: 'Назва', meta: { widthFr: 2 } }),
+  column.accessor('price', {
+    header: 'Ціна',
+    size: 110,
+    meta: { align: 'right' },
+    cell: ({ getValue }) => `${getValue()} ₴`,
+  }),
+  column.accessor('status', {
+    header: 'Статус',
+    size: 150,
+    enableSorting: false,
+    cell: ({ getValue }) =>
+      h(SkyBadge, { tone: getValue() === 'Активний' ? 'success' : 'default', label: getValue() }),
+  }),
+]
+</script>
+
+<template>
+  <SkyDataTable :columns="columns" :data="products" :page-size="25" row-id="id" searchable />
+</template>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `columns` | `ColumnDef[]` | — | Опис колонок (TanStack) |
+| `data` | `TData[]` | — | Дані |
+| `features` | `TableFeatures` | `skyTableFeatures` | Власний набір фіч |
+| `rowId` | `String \| (row) => string` | — | Ключ рядка |
+| `pageSize` | `Number` | `0` | Розмір сторінки; `0` — без пагінації |
+| `searchable` | `Boolean` | `false` | Поле глобального пошуку в тулбарі |
+| `initialSorting` | `SortingState` | — | Початкове сортування |
+| `emptyText` | `String` | `'Даних немає'` | Текст порожнього стану |
+| `interactiveRows` | `Boolean` | `false` | Курсор і hover на рядках |
+
+Слоти: `toolbar`, `actions`, `footer`, `empty` (усі отримують `{ table }`). Подія: `row-click`. Інстанс таблиці доступний через `ref` → `tableRef.table`.
+
+#### Набір фіч
+
+Фічі TanStack v9 вмикаються явно — кіт експортує стабільний `skyTableFeatures` (сортування, вибір, видимість колонок, пагінація, фільтрація + слоти row-моделей і реєстри `sortFns`/`filterFns`). Потрібно більше — зберіть свій обʼєкт і передайте пропом `features`:
+
+```ts
+import { tableFeatures, rowExpandingFeature, createExpandedRowModel } from '@tanstack/vue-table'
+import { skyTableFeatures } from '@skyservice-developers/vue-dev-kit'
+
+const features = tableFeatures({
+  ...skyTableFeatures,
+  rowExpandingFeature,
+  expandedRowModel: createExpandedRowModel(),
+})
+```
+
+Ширина колонок: `size: 150` — фіксовані px, `meta: { widthFr: 2 }` — гнучка частка (має пріоритет над `size`), `meta: { align }` і `meta: { minWidthScreen }` — вирівнювання й приховування на вузьких екранах.
+
+> `@tanstack/vue-table` входить у залежності пакета й лишається зовнішнім у бандлі — застосунки, які гріда не використовують, його не тягнуть.
+
+---
+
+### Таблиця з примітивів (композиційна)
+
+Набір примітивів і композаблів замість одного великого компонента: береш тільки те, що треба. Без вибору рядків, без масових дій, без віртуалізації — і нічого з цього не потрапляє в бандл. Повний опис — у [документації](https://74cfe434-a2b3-4d49-8fa7-db7343e399dc.apps.platform365.online/components/table).
+
+```vue
+<script setup>
+import {
+  SkyTableRoot, SkyTableHeader, SkyTableHead,
+  SkyTableBody, SkyTableRow, SkyTableCell,
+} from '@skyservice-developers/vue-dev-kit'
+
+const columns = [
+  { name: 'name', title: 'Товар', widthFr: 2 },
+  { name: 'price', title: 'Ціна', width: 90, align: 'right' },
+]
+</script>
+
+<template>
+  <SkyTableRoot :columns="columns">
+    <SkyTableHeader>
+      <SkyTableHead v-for="c in columns" :key="c.name" :column="c" />
+    </SkyTableHeader>
+    <SkyTableBody>
+      <SkyTableRow v-for="row in rows" :key="row.id">
+        <SkyTableCell>{{ row.name }}</SkyTableCell>
+        <SkyTableCell align="right">{{ row.price }}</SkyTableCell>
+      </SkyTableRow>
+    </SkyTableBody>
+  </SkyTableRoot>
+</template>
+```
+
+#### Що входить
+
+| Шар | Експорти | Коли підключати |
+|-----|----------|-----------------|
+| Примітиви (`shared/ui/table`) | `SkyTableRoot`, `SkyTableHeader`, `SkyTableHead`, `SkyTableBody`, `SkyTableRow`, `SkyTableCell`, `SkyTableEmpty` | завжди |
+| Композабли (`shared/lib/table`) | `useTableSort`, `useTableSelection`, `useColumnVisibility` | за потреби |
+| Фічі (`features/table`) | `TableMassActions`, `TableColumnSettings`, `TableVirtualBody` | опційно, кожна окремо |
+
+```ts
+const { sort, toggle } = useTableSort({ initial: { of: 'name', ot: 'asc' } })
+const { selected, isSelected, toggle: select, toggleAll } = useTableSelection(rows, { rowId: 'id' })
+const { visibility, visibleColumns } = useColumnVisibility(columns, { storageKey: 'products' })
+```
+
+Композабли не сортують і не фільтрують дані — вони тримають стан, а дані лишаються за застосунком (зазвичай сортує сервер). Колонка вибору описується як звичайна колонка (`{ name: '_select', width: 44 }`), щоб грід шапки й рядків рахувався з одного джерела.
+
+> `vue-virtual-scroller` імпортує лише `TableVirtualBody`. Не потрібна віртуалізація — беріть `SkyTableBody`, і залежність не знадобиться.
+
+---
+
 ### SkyTable
 
 Віртуал-скрол таблиця (на `vue-virtual-scroller`) для великих списків — у DOM тримаються лише видимі рядки. Розмітка й стилі 1:1 з таблицею товарів POS: чекбокси, масові дії, сортування, зміна ширини/видимості колонок, розкриття вкладених рядків (модифікацій), inline-редагування комірок і теги.
@@ -1152,16 +1280,21 @@ src/
 │       ├── SkyBadge/
 │       ├── SkyCard/ SkyCardHeader/ SkyCardRow/
 │       ├── SkyLoader/
-│       ├── SkyTable/     # віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)
+│       ├── table/       # примітиви композиційної таблиці (Root/Header/Head/Body/Row/Cell/Empty)
+│       ├── SkyTable/     # готова віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)
 │       ├── SkyTileCard/
 │       ├── functional-calendar/ # форк vue-functional-calendar, перенесений зі SkyMarket 1:1
 │       ├── SkyDateRangePicker/  # DatePickerRange зі SkyMarket, store/langs → props/локальний стан
 │       └── <Component>/
 │           ├── <Component>.vue
 │           └── index.ts
+│   └── lib/
+│       └── table/   # skyTableFeatures + useTableSort / useTableSelection / useColumnVisibility
 ├── features/          # фічові блоки (orchestration shared/ui)
 │   ├── index.ts
-│   └── SkyCheckboxFilter/
+│   ├── SkyCheckboxFilter/
+│   ├── table/         # TableMassActions / TableColumnSettings / TableVirtualBody
+│   └── data-table/    # SkyDataTable на TanStack v9 + перемикач колонок
 ├── sdk/               # TypeScript SDK (без Vue залежностей)
 │   ├── bridge.ts      # iframe postMessage API
 │   ├── api.ts         # SkyserviceAPI HTTP клієнт
