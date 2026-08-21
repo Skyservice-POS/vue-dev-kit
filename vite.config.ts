@@ -35,12 +35,22 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['vue', 'ua-parser-js', 'vue-virtual-scroller'],
+      // TanStack тримаємо зовнішнім, як і vue-virtual-scroller: він у
+      // dependencies, тож npm поставить його споживачу сам, а в бандл кіта не
+      // потрапить (інакше +100 kB усім, включно з тими, хто гріда не бере,
+      // і другий екземпляр ядра в застосунках, які вже мають свій TanStack).
+      external: [
+        'vue',
+        'ua-parser-js',
+        'vue-virtual-scroller',
+        /^@tanstack\//,
+      ],
       output: {
         globals: {
           vue: 'Vue',
           'ua-parser-js': 'UAParser',
           'vue-virtual-scroller': 'VueVirtualScroller',
+          '@tanstack/vue-table': 'TanStackVueTable',
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'style.css';
