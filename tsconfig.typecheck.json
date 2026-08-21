@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "playground/**/*.vue", "playground/**/*.js"],
+  "exclude": ["node_modules", "dist"]
+}

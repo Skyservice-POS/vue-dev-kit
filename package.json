@@ -33,6 +33,7 @@
     "playground": "vite --config playground/vite.config.js playground",
     "build": "vite build",
     "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.typecheck.json",
     "prepublishOnly": "npm run build",
     "release": "npm publish --access public"
   },
@@ -52,6 +53,7 @@
     "vite-plugin-dts": "^3.9.1",
     "vite-svg-loader": "^5.1.1",
     "vue": "^3.4.21",
+    "vue-tsc": "^3.0.0",
     "sass": "^1.77.0"
   },
   "keywords": [

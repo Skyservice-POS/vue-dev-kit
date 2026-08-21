@@ -1,0 +1,29 @@
+name: Typecheck
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+  workflow_dispatch:
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Без cache: npm — lock-файл навмисно в .gitignore, а кеш setup-node
+      # без нього падає ("Dependencies lock file is not found").
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type-check src + playground
+        run: npm run typecheck
