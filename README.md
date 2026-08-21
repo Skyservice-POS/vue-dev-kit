@@ -382,60 +382,47 @@ import {
 
 ### SkySelect
 
-Кастомний select з дропдауном, клавіатурною навігацією та підтримкою рядків і об'єктів як опцій.
+Нативний `<select>` у фірмовому стилі, зі станами `default | success | error` та підказкою під полем.
 
 ```vue
-<!-- Об'єкти -->
 <SkySelect
-  v-model="selected"
+  v-model="payment"
   :options="[
-    { label: 'Готівка', value: 'cash' },
-    { label: 'Картка', value: 'card' },
+    { value: 'cash', text: 'Готівка' },
+    { value: 'card', text: 'Картка' },
   ]"
   placeholder="Оберіть спосіб оплати"
 />
 
-<!-- Рядки -->
-<SkySelect v-model="selected" :options="['Кг', 'Шт', 'Л']" />
-
-<!-- На всю ширину -->
-<SkySelect v-model="selected" :options="options" block />
+<SkySelect v-model="payment" :options="options" state="error" hint="Оберіть спосіб" />
+<SkySelect v-model="payment" :options="options" disabled />
 ```
 
 #### Props
 
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
-| `modelValue` / `value` | `any` | `null` | Поточне значення (v-model) |
-| `options` | `Array` | `[]` | `Array<{ label, value } \| string>` |
-| `placeholder` | `String` | `''` | Текст-заглушка |
+| `modelValue` | `string \| number` | — | Поточне значення (v-model) |
+| `options` | `Array<{ value: string \| number; text: string }>` | — | Список опцій (обов'язковий) |
+| `id` | `String` | — | HTML id |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
-| `block` | `Boolean` | `false` | Повна ширина |
-| `teleport` | `Boolean` | `false` | Рендерить дропдаун в `<body>` (для модалок/overflow:hidden контейнерів) |
+| `state` | `'default' \| 'success' \| 'error'` | `'default'` | Візуальний стан рамки |
+| `placeholder` | `String` | `''` | Текст-заглушка (рендериться як `disabled hidden` опція) |
+| `hint` | `String` | `''` | Підказка під полем у кольорі `state` |
 
-#### Клавіатура
+#### Events
 
-| Клавіша | Дія |
-|---------|-----|
-| `Enter` / `Space` | Відкрити дропдаун |
-| `↑` / `↓` | Навігація по опціях |
-| `Enter` | Вибрати поточну опцію |
-| `Esc` | Закрити дропдаун |
+| Event | Payload | Опис |
+|-------|---------|------|
+| `update:modelValue` | `string \| number` | Emit при виборі опції |
 
-#### CSS змінні
+> **Формат опцій — тільки `{ value, text }`.** Масив рядків або `{ label, value }` дадуть порожні пункти:
+> компонент читає `option.value` і `option.text`. Мапте дані заздалегідь — `units.map(u => ({ value: u, text: u }))`.
 
-```css
---sky-select-padding: 10px 14px
---sky-select-radius: 6px
---sky-select-font-size: 14px
---sky-select-border: 1px solid #d1d5db
---sky-select-dropdown-shadow: 0 4px 12px rgba(0,0,0,0.1)
---sky-select-dropdown-max-height: 220px
---sky-select-option-hover-bg: #f3f4f6
---sky-select-option-selected-color: #24973f
-```
+> Список малює браузер, тож клавіатура й поведінка на мобільних — рідні для платформи, а дропдаун
+> не обрізається контейнерами з `overflow: hidden` (усередині `Modal` teleport не потрібен).
+> Компонент займає всю ширину контейнера — обмежуйте батьківський блок, якщо треба вужче.
 
----
 
 ### SkySelectSearch
 
