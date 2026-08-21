@@ -4,3 +4,7 @@ package-lock.json
 
 # Build output
 dist/
+
+# VitePress
+docs/.vitepress/cache/
+docs/.vitepress/dist/
