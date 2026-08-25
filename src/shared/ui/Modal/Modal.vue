@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <div class="sky-modal-body">
+          <div class="sky-modal-body" :class="{ 'sky-modal-body--no-footer': !$slots.footer }">
             <slot></slot>
           </div>
 
@@ -245,6 +245,11 @@ onUnmounted(() => {
   padding: var(--sky-modal-body-padding, 14px);
 }
 
+/* Без футера контент впритул до низу модалки — додаємо запасний відступ */
+.sky-modal-body--no-footer {
+  padding-bottom: var(--sky-modal-body-padding-bottom-no-footer, 15px);
+}
+
 .sky-modal-footer {
   padding: var(--sky-modal-footer-padding, 10px 14px);
   border-top: 1px solid var(--sky-modal-border-color, #dee2e6);
@@ -262,8 +267,10 @@ onUnmounted(() => {
   .sky-modal--fullscreen .sky-modal-footer {
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
-  .sky-modal--fullscreen .sky-modal-body:last-child {
-    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  .sky-modal--fullscreen .sky-modal-body--no-footer {
+    padding-bottom: calc(
+      var(--sky-modal-body-padding-bottom-no-footer, 15px) + env(safe-area-inset-bottom)
+    );
   }
 }
 </style>
