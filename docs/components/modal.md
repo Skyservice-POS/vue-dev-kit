@@ -42,6 +42,7 @@ const show = ref(false)
 | `closeOnEsc` | `Boolean` | `true` | Закривати при натисканні Esc |
 | `width` | `String` | `'100%'` | Ширина модалки |
 | `height` | `String` | `'100%'` | Висота модалки |
+| `borderRadius` | `String` | `'12px'` | Радіус заокруглення модалки (ігнорується в повноекранному режимі) |
 
 ## Slots
 

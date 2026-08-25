@@ -85,18 +85,23 @@ const props = defineProps({
     type: String,
     default: "100%",
   },
+  borderRadius: {
+    type: String,
+    default: "12px",
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "close"]);
 
-const modalStyle = computed(() => ({
-  width: props.width,
-  height: props.height,
-}));
-
 const isFullscreen = computed(
   () => props.width === "100%" && props.height === "100%"
 );
+
+const modalStyle = computed(() => ({
+  width: props.width,
+  height: props.height,
+  ...(isFullscreen.value ? {} : { borderRadius: props.borderRadius }),
+}));
 
 const close = () => {
   emit("update:modelValue", false);
@@ -153,7 +158,7 @@ onUnmounted(() => {
 
 .sky-modal {
   background: var(--sky-modal-bg, white);
-  border-radius: var(--sky-modal-radius, 8);
+  border-radius: var(--sky-modal-radius, 12px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24);
   display: flex;
   flex-direction: column;
@@ -168,7 +173,7 @@ onUnmounted(() => {
 .sky-modal-header {
   display: flex;
   align-items: center;
-  padding: var(--sky-modal-header-padding, 10px 14px);
+  padding: var(--sky-modal-header-padding, 16px 20px);
   border-bottom: 1px solid var(--sky-modal-border-color, #dee2e6);
   flex-shrink: 0;
 }
@@ -252,7 +257,7 @@ onUnmounted(() => {
 /* iOS safe area — only when modal occupies the full viewport */
 @supports (padding-top: env(safe-area-inset-top)) {
   .sky-modal--fullscreen .sky-modal-header {
-    padding-top: calc(10px + env(safe-area-inset-top));
+    padding-top: calc(16px + env(safe-area-inset-top));
   }
   .sky-modal--fullscreen .sky-modal-footer {
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
