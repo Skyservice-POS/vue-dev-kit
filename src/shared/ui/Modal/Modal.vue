@@ -5,46 +5,53 @@
       class="sky-modal-overlay"
       @mousedown.self="handleOverlayClick"
     >
-        <div class="sky-modal" :class="{ 'sky-modal--fullscreen': isFullscreen }" :style="modalStyle">
-          <div class="sky-modal-header">
-            <button class="sky-modal-back" @click="close" :title="closeTitle">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 451.847 451.847"
-                style="transform: rotate(90deg)"
-              >
-                <path
-                  fill="currentColor"
-                  d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
-                />
-              </svg>
-            </button>
-            <div class="sky-modal-title-wrapper">
-              <slot name="title">
-                <h4 class="sky-modal-title">{{ title }}</h4>
-              </slot>
-              <slot name="subtitle">
-                <div v-if="subtitle" class="sky-modal-subtitle">
-                  {{ subtitle }}
-                </div>
-              </slot>
-            </div>
-
-            <div v-if="$slots['header-actions']" class="sky-modal-header-actions">
-              <slot name="header-actions"></slot>
-            </div>
+      <div
+        class="sky-modal"
+        :class="{ 'sky-modal--fullscreen': isFullscreen }"
+        :style="modalStyle"
+      >
+        <div class="sky-modal-header">
+          <button class="sky-modal-back" @click="close" :title="closeTitle">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 451.847 451.847"
+              style="transform: rotate(90deg)"
+            >
+              <path
+                fill="currentColor"
+                d="M225.923,354.706c-8.098,0-16.195-3.092-22.369-9.263L9.27,151.157c-12.359-12.359-12.359-32.397,0-44.751c12.354-12.354,32.388-12.354,44.748,0l171.905,171.915l171.906-171.909c12.359-12.354,32.391-12.354,44.744,0c12.365,12.354,12.365,32.392,0,44.751L248.292,345.449C242.115,351.621,234.018,354.706,225.923,354.706z"
+              />
+            </svg>
+          </button>
+          <div class="sky-modal-title-wrapper">
+            <slot name="title">
+              <h4 class="sky-modal-title">{{ title }}</h4>
+            </slot>
+            <slot name="subtitle">
+              <div v-if="subtitle" class="sky-modal-subtitle">
+                {{ subtitle }}
+              </div>
+            </slot>
           </div>
 
-          <div class="sky-modal-body" :class="{ 'sky-modal-body--no-footer': !$slots.footer }">
-            <slot></slot>
-          </div>
-
-          <div v-if="$slots.footer" class="sky-modal-footer">
-            <slot name="footer"></slot>
+          <div v-if="$slots['header-actions']" class="sky-modal-header-actions">
+            <slot name="header-actions"></slot>
           </div>
         </div>
+
+        <div
+          class="sky-modal-body"
+          :class="{ 'sky-modal-body--no-footer': !$slots.footer }"
+        >
+          <slot></slot>
+        </div>
+
+        <div v-if="$slots.footer" class="sky-modal-footer">
+          <slot name="footer"></slot>
+        </div>
       </div>
+    </div>
   </BaseTeleport>
 </template>
 
@@ -94,7 +101,7 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue", "close"]);
 
 const isFullscreen = computed(
-  () => props.width === "100%" && props.height === "100%"
+  () => props.width === "100%" && props.height === "100%",
 );
 
 const modalStyle = computed(() => ({
@@ -159,7 +166,9 @@ onUnmounted(() => {
 .sky-modal {
   background: var(--sky-modal-bg, white);
   border-radius: var(--sky-modal-radius, 12px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.24);
   display: flex;
   flex-direction: column;
   max-width: 100%;
@@ -248,6 +257,7 @@ onUnmounted(() => {
 /* Без футера контент впритул до низу модалки — додаємо запасний відступ */
 .sky-modal-body--no-footer {
   padding-bottom: var(--sky-modal-body-padding-bottom-no-footer, 15px);
+  margin-bottom: 10px;
 }
 
 .sky-modal-footer {
@@ -269,8 +279,10 @@ onUnmounted(() => {
   }
   .sky-modal--fullscreen .sky-modal-body--no-footer {
     padding-bottom: calc(
-      var(--sky-modal-body-padding-bottom-no-footer, 15px) + env(safe-area-inset-bottom)
+      var(--sky-modal-body-padding-bottom-no-footer, 15px) +
+        env(safe-area-inset-bottom)
     );
+    margin-bottom: 10px;
   }
 }
 </style>
