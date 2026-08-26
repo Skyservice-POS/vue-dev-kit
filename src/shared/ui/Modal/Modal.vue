@@ -56,8 +56,11 @@
 </template>
 
 <script setup>
-import { computed, watch, onMounted, onUnmounted } from "vue";
+import { computed, watch, onMounted, onUnmounted, ref } from "vue";
 import BaseTeleport from "../BaseTeleport/BaseTeleport.vue";
+
+// Найпоширеніший брейкпоінт "мобільного" в цьому пакеті (SkyTileCard, SkyCard, DialogModal, Header).
+const MOBILE_BREAKPOINT = 500;
 
 const props = defineProps({
   modelValue: {
@@ -100,8 +103,21 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue", "close"]);
 
+const viewportWidth = ref(
+  typeof window === "undefined" ? Infinity : window.innerWidth,
+);
+const updateViewportWidth = () => {
+  viewportWidth.value = window.innerWidth;
+};
+const isNarrowViewport = computed(() => viewportWidth.value <= MOBILE_BREAKPOINT);
+
+// На вузькому viewport модалка через max-width: 100% і так виглядає
+// fullscreen незалежно від пропсів width/height — тож і safe-area padding,
+// і border-radius:0 мають діяти в цьому випадку теж.
 const isFullscreen = computed(
-  () => props.width === "100%" && props.height === "100%",
+  () =>
+    (props.width === "100%" && props.height === "100%") ||
+    isNarrowViewport.value,
 );
 
 const modalStyle = computed(() => ({
@@ -140,10 +156,12 @@ watch(
 
 onMounted(() => {
   document.addEventListener("keydown", handleKeydown);
+  window.addEventListener("resize", updateViewportWidth);
 });
 
 onUnmounted(() => {
   document.removeEventListener("keydown", handleKeydown);
+  window.removeEventListener("resize", updateViewportWidth);
   document.body.style.overflow = "";
 });
 </script>
