@@ -10,7 +10,7 @@
         :class="{ 'sky-modal--fullscreen': isFullscreen }"
         :style="modalStyle"
       >
-        <div class="sky-modal-header">
+        <div class="sky-modal-header" ref="modalHeaderRef">
           <button class="sky-modal-back" @click="close" :title="closeTitle">
             <svg
               width="15"
@@ -56,8 +56,9 @@
 </template>
 
 <script setup>
-import { computed, watch, onMounted, onUnmounted, ref } from "vue";
+import { computed, watch, onMounted, onUnmounted, ref, nextTick } from "vue";
 import BaseTeleport from "../BaseTeleport/BaseTeleport.vue";
+import { isAndroidWebview } from "../../../sdk";
 
 // Найпоширеніший брейкпоінт "мобільного" в цьому пакеті (SkyTileCard, SkyCard, DialogModal, Header).
 const MOBILE_BREAKPOINT = 500;
@@ -126,6 +127,36 @@ const modalStyle = computed(() => ({
   ...(isFullscreen.value ? {} : { borderRadius: props.borderRadius }),
 }));
 
+const modalHeaderRef = ref(null);
+
+const isAndroid = computed(() => {
+  try {
+    return isAndroidWebview();
+  } catch {
+    return false;
+  }
+});
+
+// Android WebView не прокидує window insets у env(safe-area-inset-top)
+// (на відміну від iOS WKWebView), тож CSS-фолбек нижче там завжди дає 0 і
+// заголовок наїжджає на статус-бар/виріз. Питаємо реальну висоту напряму
+// в нативного хоста — той самий підхід, що й androidFix() в DialogModal.
+const androidFix = () => {
+  if (!isAndroid.value || !isFullscreen.value || !modalHeaderRef.value) return;
+
+  try {
+    if (typeof Android !== "undefined" && Android.getDisplayCutoutTop) {
+      const cutoutTop = Android.getDisplayCutoutTop();
+      if (cutoutTop && window.devicePixelRatio > 1.0) {
+        const paddingTop = cutoutTop / window.devicePixelRatio;
+        modalHeaderRef.value.style.paddingTop = `calc(16px + ${paddingTop}px)`;
+      }
+    }
+  } catch {
+    // Android interface not available
+  }
+};
+
 const close = () => {
   emit("update:modelValue", false);
   emit("close");
@@ -148,6 +179,7 @@ watch(
   (value) => {
     if (value) {
       document.body.style.overflow = "hidden";
+      nextTick(androidFix);
     } else {
       document.body.style.overflow = "";
     }
@@ -157,11 +189,13 @@ watch(
 onMounted(() => {
   document.addEventListener("keydown", handleKeydown);
   window.addEventListener("resize", updateViewportWidth);
+  window.addEventListener("resize", androidFix);
 });
 
 onUnmounted(() => {
   document.removeEventListener("keydown", handleKeydown);
   window.removeEventListener("resize", updateViewportWidth);
+  window.removeEventListener("resize", androidFix);
   document.body.style.overflow = "";
 });
 </script>
