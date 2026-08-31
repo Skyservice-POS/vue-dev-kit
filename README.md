@@ -33,10 +33,11 @@ import {
   SkyTableRoot, SkyTableHeader, SkyTableHead, SkyTableBody, SkyTableRow, SkyTableCell,
   useTableSort, useTableSelection, useColumnVisibility,
   FunctionalCalendar, SkyDateRangePicker,
+  SkyFilterDropdown,
   // widgets
   SkyTileCard,
   // features
-  SkyCheckboxFilter,
+  SkyCheckboxFilter, SkySelectFilter,
   TableMassActions, TableColumnSettings, TableVirtualBody,
   // sdk
   navigate, SkyserviceAPI, isInsideIframe,
@@ -1110,7 +1111,7 @@ const range = reactive({ start: '', end: '' }) // { start, end } у формат
 
 ### SkyCheckboxFilter
 
-Кнопка-фільтр з дропдауном, пошуком і мульти-вибором (через `SkyCheckbox`). Лочить скрол сторінки, поки відкритий. Стилі повторюють адмінку Skymarket 1:1.
+Кнопка-фільтр з дропдауном, пошуком і мульти-вибором (через `SkyCheckbox`). Оболонку — тригер, панель, позиціювання, закриття — тримає `SkyFilterDropdown`. Стилі повторюють адмінку Skymarket 1:1.
 
 ```vue
 <SkyCheckboxFilter
@@ -1135,6 +1136,77 @@ const range = reactive({ start: '', end: '' }) // { start, end } у формат
 | `doneLabel` | `String` | `'Готово'` | Лейбл кнопки "Готово" |
 | `searchPlaceholder` | `String` | `'Пошук'` | Placeholder пошуку |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+### SkySelectFilter
+
+Той самий фільтр-чіп, але з **одиничним** вибором — для випадків, коли бекенд приймає рівно
+одне значення. Після вибору дропдаун закривається.
+
+```vue
+<SkySelectFilter
+  v-model="categoryId"
+  title="Категорія"
+  all-label="Усі категорії"
+  :options="[
+    { value: 10, name: 'Напої', depth: 0 },
+    { value: 11, name: 'Кава', depth: 1 },
+  ]"
+/>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | — | Заголовок фільтра (показується у тригері) |
+| `options` | `Array<{ value, name, depth? }>` | — | Опції; `depth` лише відступає рядок |
+| `modelValue` | `String\|Number\|null` | `null` | Обране значення (v-model); `null` — фільтр вимкнено |
+| `allLabel` | `String` | `''` | Лейбл рядка «без фільтра»; порожній — рядка немає |
+| `searchPlaceholder` | `String` | `'Пошук'` | Placeholder пошуку |
+| `emptyLabel` | `String` | `'Нічого не знайдено'` | Текст порожнього результату пошуку |
+| `searchable` | `Boolean` | `true` | Показувати поле пошуку |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+---
+
+## SkyFilterDropdown
+
+Оболонка фільтра: тригер-чіп + панель. Бере на себе тільки спільне — стан відкриття,
+позиціювання, закриття і доступність; вміст панелі за викликачем. На ній побудовані
+`SkyCheckboxFilter` і `SkySelectFilter`; бери її напряму для фільтра з власним вмістом.
+
+Панель телепортується у `<body>` (щоб `transform` у предка не ламав `position: fixed`),
+перепозиціюється на скрол і resize, притискається до країв екрана й розкривається вгору,
+коли знизу тісно. Скрол сторінки **не** локиться. Закриття — клік поза межами, `Esc`.
+
+```vue
+<SkyFilterDropdown title="Період" summary="Цей тиждень">
+  <template #default="{ close }">
+    <button @click="close">Готово</button>
+  </template>
+</SkyFilterDropdown>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | — | Лейбл чіпа |
+| `summary` | `String` | `''` | Заміняє `title`, коли обрано рівно одне |
+| `badge` | `String\|Number` | `''` | Показується поруч із `title` (напр. лічильник) |
+| `align` | `'start'\|'end'` | `'start'` | До якого краю тригера притискається панель |
+| `width` | `Number` | `280` | Ширина панелі в px |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+#### Slots / Events / Expose
+
+| | |
+|---|---|
+| slot `default` | `{ close }` — вміст панелі |
+| events | `open`, `close` |
+| expose | `open()`, `close()`, `toggle()`, `isOpen` |
+
+CSS-змінні (`--sky-filter-*`) — див. [доки](https://74cfe434-a2b3-4d49-8fa7-db7343e399dc.apps.platform365.online/components/sky-filter-dropdown).
 
 ---
 
@@ -1287,6 +1359,7 @@ src/
 │       ├── table/       # примітиви композиційної таблиці (Root/Header/Head/Body/Row/Cell/Empty)
 │       ├── SkyTable/     # готова віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)
 │       ├── SkyTileCard/
+│       ├── SkyFilterDropdown/  # оболонка фільтра (тригер + панель) + FilterSearch
 │       ├── functional-calendar/ # форк vue-functional-calendar, перенесений зі SkyMarket 1:1
 │       ├── SkyDateRangePicker/  # DatePickerRange зі SkyMarket, store/langs → props/локальний стан
 │       └── <Component>/
@@ -1296,7 +1369,8 @@ src/
 │       └── table/   # skyTableFeatures + useTableSort / useTableSelection / useColumnVisibility
 ├── features/          # фічові блоки (orchestration shared/ui)
 │   ├── index.ts
-│   ├── SkyCheckboxFilter/
+│   ├── SkyCheckboxFilter/  # мульти-вибір на SkyFilterDropdown
+│   ├── SkySelectFilter/    # одиничний вибір на SkyFilterDropdown
 │   ├── table/         # TableMassActions / TableColumnSettings / TableVirtualBody
 │   └── data-table/    # SkyDataTable на TanStack v9 + перемикач колонок
 ├── sdk/               # TypeScript SDK (без Vue залежностей)
