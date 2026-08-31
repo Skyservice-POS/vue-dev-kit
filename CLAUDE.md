@@ -32,9 +32,10 @@ zip), секрети — `DEPLOY_TOKEN` і `DEPLOYMENT_ID`, як у решти �
 Умова публікації одна: чи зайнятий уже цей номер версії (`npm view NAME@VERSION`).
 Semver і доречність бампу CI не перевіряє.
 
-**`package-lock.json` навмисно в `.gitignore`.** Тому в CI — `npm install` без
-`cache: npm`; `npm ci` і кеш setup-node без lock-файлу в репозиторії падають з
-`Dependencies lock file is not found`. Не повертати їх назад.
+**`package-lock.json` лежить у репозиторії.** Тому в CI — `npm ci` з `cache: npm`:
+збірки відтворювані, а setup-node кешує залежності. Раніше lock був у `.gitignore`,
+через що доводилось тримати `npm install` без кешу — це не давало нічого, крім
+розбіжних збірок. Не повертати назад.
 
 ## Playground
 **Папки `playground/` більше немає** — її замінили доки з живими демо
