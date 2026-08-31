@@ -166,6 +166,14 @@ function clearAll(): void {
   margin-bottom: 13px;
 }
 
+/* Єдине свідоме відхилення від адмінки, і воно невидиме: там лейбл завширшки з
+   текст, тож клік праворуч від напису нікуди не потрапляє. Розтягуємо його на
+   весь рядок — позиція тексту та сама, ціль для кліка нормальна. */
+.sky-checkbox-filter__option :deep(.sky-checkbox) {
+  flex: 1;
+  min-width: 0;
+}
+
 .sky-checkbox-filter__sep {
   flex-shrink: 0;
   margin: 0 0 2px;
