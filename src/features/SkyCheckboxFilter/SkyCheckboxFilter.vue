@@ -157,13 +157,21 @@ function clearAll(): void {
   /* flex, а не block: інлайновий SkyCheckbox інакше тягне за собою strut
      від line-height хоста, і крок рядків їде. */
   display: flex;
+  /* Бокс 20px, не Bootstrap-івський дефолт 16: Dashboard.vue глобально перебиває
+     .custom-checkbox > .custom-control-label::before на 20px !important. Текст при
+     цьому лишається на 24px від краю рядка, тож зазор виходить 4px, а не 8. */
+  --sky-checkbox-size: 20px;
+  --sky-checkbox-gap: 4px;
   --sky-checkbox-font-size: 10pt;
   --sky-checkbox-line-height: 20px;
   --sky-checkbox-align: flex-start;
   --sky-checkbox-box-offset: 4px;
   --sky-checkbox-label-margin: 0;
   --sky-checkbox-label-offset: 2px;
-  margin-bottom: 13px;
+  /* Крок рядків 35px, як в адмінці (34.98). Там бокс абсолютно спозиційований і у
+     висоту рядка не входить, у нас він флексовий і робить рядок 24px (20 + 4 зсув),
+     тож лишок — 11, а не 13. Візуально збігається до пікселя. */
+  margin-bottom: 11px;
 }
 
 /* Єдине свідоме відхилення від адмінки, і воно невидиме: там лейбл завширшки з

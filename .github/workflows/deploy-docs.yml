@@ -22,12 +22,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      # Без cache: npm — lock-файл навмисно в .gitignore, а кеш setup-node
-      # без нього падає ("Dependencies lock file is not found").
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
           node-version: 22
+          cache: npm
 
       # Секрети однойменні з рештою наших репо (shopify, public-docs, mcp-server…).
       # Без цієї перевірки curl нижче просто отримує 401 без пояснення причини.
@@ -45,7 +44,7 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       # Саме документація, а не playground: "build" збирає бібліотеку в lib-режимі
       # (без index.html) і як сайт не деплоїться. На виході — docs/.vitepress/dist.

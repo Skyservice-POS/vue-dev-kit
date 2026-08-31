@@ -103,6 +103,7 @@ const isChecked = () => {
 /* ── Classic checkbox ── */
 .sky-checkbox__box {
   flex-shrink: 0;
+  box-sizing: border-box;
   width: var(--sky-checkbox-size, 16px);
   height: var(--sky-checkbox-size, 16px);
   margin-top: var(--sky-checkbox-box-offset, 0);
@@ -118,8 +119,9 @@ const isChecked = () => {
 }
 
 .sky-checkbox__check {
-  width: 9px;
-  height: 7px;
+  /* Пропорція галочки до бокса (9×7 при 16px) — щоб вона їхала разом із розміром. */
+  width: calc(var(--sky-checkbox-size, 16px) * 0.5625);
+  height: calc(var(--sky-checkbox-size, 16px) * 0.4375);
   opacity: 0;
   transition: opacity 0.1s ease-in-out;
 }

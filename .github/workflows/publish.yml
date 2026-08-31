@@ -26,12 +26,11 @@ jobs:
           # shallow-клоном (depth 1) git describe і git log range не працюють.
           fetch-depth: 0
 
-      # Без cache: npm — lock-файл навмисно в .gitignore, а кеш setup-node
-      # без нього падає ("Dependencies lock file is not found").
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
           node-version: 22
+          cache: npm
 
       # У main прилітають і коміти без релізу — доки, рефакторинг, правки CI.
       # Без цієї перевірки npm publish падав би з EPUBLISHCONFLICT на кожному
@@ -51,10 +50,9 @@ jobs:
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # npm install, а не npm ci — останній вимагає lock-файл у репозиторії.
       - name: Install dependencies
         if: steps.check.outputs.should_publish == 'true'
-        run: npm install
+        run: npm ci
 
       # Збірку робить сам npm через prepublishOnly.
       # Авторизація — через .npmrc у репо, який читає NPM_TOKEN з оточення.
