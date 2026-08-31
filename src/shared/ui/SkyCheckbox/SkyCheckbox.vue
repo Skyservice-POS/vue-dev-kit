@@ -75,14 +75,14 @@ const isChecked = () => {
 <style scoped>
 .sky-checkbox {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  align-items: var(--sky-checkbox-align, center);
+  gap: var(--sky-checkbox-gap, 8px);
   cursor: pointer;
   user-select: none;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: var(--sky-checkbox-font-size, 14px);
+  line-height: var(--sky-checkbox-line-height, 1.5);
   font-weight: 400;
-  color: #212529;
+  color: var(--sky-checkbox-color, #212529);
   margin-bottom: 0;
 }
 
@@ -103,10 +103,11 @@ const isChecked = () => {
 /* ── Classic checkbox ── */
 .sky-checkbox__box {
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  border: 1px solid #adb5bd;
+  width: var(--sky-checkbox-size, 16px);
+  height: var(--sky-checkbox-size, 16px);
+  margin-top: var(--sky-checkbox-box-offset, 0);
+  border-radius: var(--sky-checkbox-radius, 4px);
+  border: 1px solid var(--sky-checkbox-border-color, #adb5bd);
   background: #fff;
   display: flex;
   align-items: center;
@@ -124,8 +125,8 @@ const isChecked = () => {
 }
 
 .sky-checkbox__input:checked ~ .sky-checkbox__box {
-  background-color: #28a745;
-  border-color: #28a745;
+  background-color: var(--sky-checkbox-accent, #28a745);
+  border-color: var(--sky-checkbox-accent, #28a745);
 }
 
 .sky-checkbox__input:checked ~ .sky-checkbox__box .sky-checkbox__check {
@@ -135,12 +136,12 @@ const isChecked = () => {
 .sky-checkbox:not(.sky-checkbox--disabled):hover
   .sky-checkbox__input:not(:checked)
   ~ .sky-checkbox__box {
-  border-color: #28a745;
+  border-color: var(--sky-checkbox-accent, #28a745);
 }
 
 .sky-checkbox__input:focus ~ .sky-checkbox__box {
   box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
-  border-color: #28a745;
+  border-color: var(--sky-checkbox-accent, #28a745);
 }
 
 /* ── Switch ── */
@@ -185,7 +186,8 @@ const isChecked = () => {
 
 /* ── Label ── */
 .sky-checkbox__label {
-  margin-left: 4px;
+  margin-left: var(--sky-checkbox-label-margin, 4px);
+  padding-top: var(--sky-checkbox-label-offset, 0);
   flex: 1;
   min-width: 0;
 }

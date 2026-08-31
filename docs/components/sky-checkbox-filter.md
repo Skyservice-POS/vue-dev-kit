@@ -42,10 +42,11 @@ const categoryOptions = [
 | `title` | `String` | — | Заголовок фільтра (показується у тригері) |
 | `options` | `Array<{ value, name }>` | `[]` | Опції для вибору |
 | `modelValue` | `Array<String \| Number>` | `[]` | Вибрані значення (v-model) |
-| `selectAllLabel` | `String` | `'Вибрати всі'` | Лейбл кнопки «Вибрати всі» |
+| `selectAllLabel` | `String` | `'Обрати все'` | Лейбл кнопки «Вибрати всі» |
 | `clearLabel` | `String` | `'Очистити'` | Лейбл кнопки «Очистити» |
 | `doneLabel` | `String` | `'Готово'` | Лейбл кнопки «Готово» |
 | `searchPlaceholder` | `String` | `'Пошук'` | Placeholder пошуку |
+| `selectAll` | `Boolean` | `true` | Показувати «Обрати все». Вимикай, коли споживач приймає лише одне значення |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
 
 ## Формат опцій

@@ -20,11 +20,14 @@ const props = withDefaults(
     clearLabel?: string;
     doneLabel?: string;
     searchPlaceholder?: string;
+    /** Сховати «Обрати все» — коли споживач не може прийняти більше одного значення. */
+    selectAll?: boolean;
     disabled?: boolean;
   }>(),
   {
     modelValue: () => [],
-    selectAllLabel: 'Вибрати всі',
+    selectAll: true,
+    selectAllLabel: 'Обрати все',
     clearLabel: 'Очистити',
     doneLabel: 'Готово',
     searchPlaceholder: 'Пошук',
@@ -60,7 +63,7 @@ const oneSelectedLabel = computed(() => {
 const triggerSummary = computed(() => oneSelectedLabel.value);
 const triggerBadge = computed(() => (selected.value.length > 1 ? selected.value.length : ''));
 
-function selectAll(): void {
+function selectAllOptions(): void {
   selected.value = props.options.map((o) => o.value);
 }
 
@@ -81,7 +84,7 @@ function clearAll(): void {
   >
     <template #default="{ close }">
       <div class="sky-checkbox-filter__actions">
-        <button type="button" class="sky-checkbox-filter__link" @click="selectAll">
+        <button v-if="selectAll" type="button" class="sky-checkbox-filter__link" @click="selectAllOptions">
           {{ selectAllLabel }}
         </button>
         <button type="button" class="sky-checkbox-filter__link" @click="clearAll">
@@ -108,12 +111,21 @@ function clearAll(): void {
 </template>
 
 <style scoped>
+/* Метрики зняті з адмінки (Bootstrap 4.6 .custom-control + правила
+   headerFiltersNew/Dashboard) і відтворені 1:1:
+   .dialog-buttons  → 16px / 500 / #106090, знизу 10px у шапці, зверху 10px у футері
+   .dialogHF        → padding-left: 3px
+   рядок            → бокс 16px зі зсувом 4px, текст із 24px, крок між рядками 34.98px
+   label            → 10pt / line-height 20px / padding-top 2px */
 .sky-checkbox-filter__actions {
   display: flex;
   flex-shrink: 0;
   justify-content: space-between;
-  padding: 8px 0;
-  font-size: 13px;
+  gap: 12px;
+  padding: 0 0 10px;
+  font-size: var(--sky-filter-action-font-size, 1rem);
+  font-weight: var(--sky-filter-action-font-weight, 500);
+  white-space: nowrap;
 }
 
 .sky-checkbox-filter__actions--footer {
@@ -133,20 +145,31 @@ function clearAll(): void {
   text-decoration: underline;
 }
 
-/* The panel caps its own height, so the option list is what scrolls inside it. */
+/* Панель сама обмежує висоту, тож скролиться список, а не сторінка. */
 .sky-checkbox-filter__options {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  padding-left: 3px;
 }
 
 .sky-checkbox-filter__option {
-  padding: 0 4px;
-  margin-bottom: 5px;
+  /* flex, а не block: інлайновий SkyCheckbox інакше тягне за собою strut
+     від line-height хоста, і крок рядків їде. */
+  display: flex;
+  --sky-checkbox-font-size: 10pt;
+  --sky-checkbox-line-height: 20px;
+  --sky-checkbox-align: flex-start;
+  --sky-checkbox-box-offset: 4px;
+  --sky-checkbox-label-margin: 0;
+  --sky-checkbox-label-offset: 2px;
+  margin-bottom: 13px;
 }
 
 .sky-checkbox-filter__sep {
   flex-shrink: 0;
   margin: 0 0 2px;
+  border: 0;
+  border-top: 1px solid var(--sky-filter-separator-color, rgba(0, 0, 0, 0.1));
 }
 </style>

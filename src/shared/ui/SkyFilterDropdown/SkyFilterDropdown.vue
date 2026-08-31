@@ -197,7 +197,9 @@ defineExpose({ open, close, toggle, isOpen });
   align-items: center;
   height: var(--sky-filter-trigger-height, 38px);
   padding: var(--sky-filter-trigger-padding, 0 10px);
-  border: 1px solid var(--sky-filter-trigger-border-color, #ced4da);
+  /* Фільтр-чіпи в системному дизайні без рамки — її малює лише :focus-visible.
+     Радіус лишається на випадок, коли споживач задає бордер або фон. */
+  border: var(--sky-filter-trigger-border, none);
   border-radius: var(--sky-filter-trigger-radius, 5px);
   background: var(--sky-filter-trigger-bg, transparent);
   color: var(--sky-filter-trigger-color, inherit);
