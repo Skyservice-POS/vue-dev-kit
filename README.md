@@ -1131,10 +1131,11 @@ const range = reactive({ start: '', end: '' }) // { start, end } у формат
 | `title` | `String` | — | Заголовок фільтра (показується у тригері) |
 | `options` | `Array<{ value, name }>` | `[]` | Опції для вибору |
 | `modelValue` | `Array<String\|Number>` | `[]` | Вибрані значення (v-model) |
-| `selectAllLabel` | `String` | `'Вибрати всі'` | Лейбл кнопки "Вибрати всі" |
+| `selectAllLabel` | `String` | `'Обрати все'` | Лейбл кнопки "Обрати все" |
 | `clearLabel` | `String` | `'Очистити'` | Лейбл кнопки "Очистити" |
 | `doneLabel` | `String` | `'Готово'` | Лейбл кнопки "Готово" |
 | `searchPlaceholder` | `String` | `'Пошук'` | Placeholder пошуку |
+| `selectAll` | `Boolean` | `true` | Показувати «Обрати все» |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
 
 ### SkySelectFilter

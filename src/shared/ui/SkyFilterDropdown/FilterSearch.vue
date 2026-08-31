@@ -57,6 +57,9 @@ const emit = defineEmits<{
   width: 100%;
   margin: 0;
   padding: 4px 24px 4px 0;
+  /* Прибитий явно: успадкований від хоста line-height роздував рядок пошуку
+     (в адмінці він рівно 28px). */
+  line-height: 1.5;
   border: none;
   outline: none;
   background: transparent;

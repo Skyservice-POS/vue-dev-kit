@@ -12,6 +12,7 @@
 - **Закриття:** клік поза межами, `Esc` (фокус повертається на тригер), `disabled` на льоту.
 - **Доступність:** тригер — справжній `<button>` з `aria-haspopup` та `aria-expanded`, панель — `role="dialog"` з `aria-label`.
 - **Слухачі живуть лише поки панель відкрита** — сторінка з десятком фільтрів не тримає десяток слухачів `document`.
+- **Чіп без рамки** — так фільтри виглядають в адмінці. Рамку малює тільки `:focus-visible`; якщо вона таки потрібна, задай `--sky-filter-trigger-border`.
 
 ## Приклад
 
@@ -64,7 +65,7 @@ import { SkyFilterDropdown } from '@skyservice-developers/vue-dev-kit'
 |--------|------------------|------|
 | `--sky-filter-trigger-height` | `38px` | Висота чіпа |
 | `--sky-filter-trigger-padding` | `0 10px` | Падінги чіпа |
-| `--sky-filter-trigger-border-color` | `#ced4da` | Бордер чіпа |
+| `--sky-filter-trigger-border` | `none` | Рамка чіпа. У системному дизайні її немає — задавай лише свідомо |
 | `--sky-filter-trigger-radius` | `5px` | Радіус чіпа |
 | `--sky-filter-trigger-bg` | `transparent` | Фон чіпа |
 | `--sky-filter-trigger-color` | `inherit` | Колір тексту чіпа |
