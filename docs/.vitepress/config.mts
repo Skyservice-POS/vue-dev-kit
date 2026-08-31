@@ -155,8 +155,16 @@ export default defineConfig({
           collapsed: false,
           items: [
             {
+              text: 'SkyFilterDropdown',
+              link: '/components/sky-filter-dropdown',
+            },
+            {
               text: 'SkyCheckboxFilter',
               link: '/components/sky-checkbox-filter',
+            },
+            {
+              text: 'SkySelectFilter',
+              link: '/components/sky-select-filter',
             },
           ],
         },

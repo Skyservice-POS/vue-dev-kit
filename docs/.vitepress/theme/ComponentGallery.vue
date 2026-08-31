@@ -19,6 +19,7 @@ import Modal from '@/shared/ui/Modal/Modal.vue'
 import Dialog from '@/shared/ui/Dialog/Dialog.vue'
 import Header from '@/shared/ui/Header/Header.vue'
 import SkyCheckboxFilter from '@/features/SkyCheckboxFilter/SkyCheckboxFilter.vue'
+import SkySelectFilter from '@/features/SkySelectFilter/SkySelectFilter.vue'
 import SkyDataTable from '@/features/data-table/SkyDataTable.vue'
 import SkyTableRoot from '@/shared/ui/table/SkyTableRoot.vue'
 import SkyTableHeader from '@/shared/ui/table/SkyTableHeader.vue'
@@ -35,6 +36,7 @@ const selectSearch = ref('')
 const checked = ref(true)
 const period = ref('week')
 const filter = ref([])
+const selectFilter = ref(null)
 const showModal = ref(false)
 const showDialog = ref(false)
 
@@ -166,6 +168,25 @@ const primitiveColumns = [
           <SkyCheckboxFilter
             v-model="filter"
             title="Категорії"
+            :options="[
+              { value: 'drinks', name: 'Напої' },
+              { value: 'food', name: 'Їжа' },
+            ]"
+          />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-select-filter">SkySelectFilter</a>
+          <code>одиничний вибір</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkySelectFilter
+            v-model="selectFilter"
+            title="Категорія"
+            all-label="Усі категорії"
+            :searchable="false"
             :options="[
               { value: 'drinks', name: 'Напої' },
               { value: 'food', name: 'Їжа' },
