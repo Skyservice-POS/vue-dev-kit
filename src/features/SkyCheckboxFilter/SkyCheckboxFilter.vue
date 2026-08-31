@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { computed, ref } from 'vue';
 import SkyCheckbox from '@/shared/ui/SkyCheckbox/SkyCheckbox.vue';
+import SkyFilterDropdown from '@/shared/ui/SkyFilterDropdown/SkyFilterDropdown.vue';
+import FilterSearch from '@/shared/ui/SkyFilterDropdown/FilterSearch.vue';
 
 type OptionValue = string | number;
 
@@ -34,9 +36,6 @@ const emit = defineEmits<{
   'update:modelValue': [OptionValue[]];
 }>();
 
-const triggerRef = ref<HTMLDivElement | null>(null);
-const dropdownStyle = ref<Record<string, string>>({});
-const isOpen = ref(false);
 const searchQuery = ref('');
 
 const filteredOptions = computed(() => {
@@ -50,6 +49,7 @@ const selected = computed({
   set: (v) => emit('update:modelValue', v),
 });
 
+/** One pick reads better as the option's own name than as "Title: 1". */
 const oneSelectedLabel = computed(() => {
   if (selected.value.length !== 1) return '';
   const found = props.options.find((o) => o.value === selected.value[0]);
@@ -57,302 +57,96 @@ const oneSelectedLabel = computed(() => {
   return found.name.length < 20 ? found.name : found.name.slice(0, 20) + '...';
 });
 
-function toggle() {
-  if (props.disabled) return;
-  if (isOpen.value) {
-    close();
-    return;
-  }
-  open();
-}
+const triggerSummary = computed(() => oneSelectedLabel.value);
+const triggerBadge = computed(() => (selected.value.length > 1 ? selected.value.length : ''));
 
-function open() {
-  isOpen.value = true;
-  searchQuery.value = '';
-  nextTick(() => {
-    const el = triggerRef.value;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    dropdownStyle.value = {
-      left: `${rect.left}px`,
-      top: `${rect.bottom + 5}px`,
-    };
-  });
-}
-
-function close() {
-  isOpen.value = false;
-  searchQuery.value = '';
-}
-
-function selectAll() {
+function selectAll(): void {
   selected.value = props.options.map((o) => o.value);
 }
 
-function clearAll() {
+function clearAll(): void {
   selected.value = [];
 }
-
-function clearSearch() {
-  searchQuery.value = '';
-}
-
-function onDocumentClick(e: MouseEvent) {
-  if (!isOpen.value) return;
-  const target = e.target as Node;
-  if (triggerRef.value?.contains(target)) return;
-  const dropdown = document.querySelector('.sky-checkbox-filter__dropdown');
-  if (dropdown && dropdown.contains(target)) return;
-  close();
-}
-
-let prevBodyOverflow = '';
-
-watch(isOpen, (open) => {
-  if (open) {
-    prevBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = prevBodyOverflow;
-  }
-});
-
-onMounted(() => document.addEventListener('click', onDocumentClick));
-onBeforeUnmount(() => {
-  document.removeEventListener('click', onDocumentClick);
-  if (isOpen.value) document.body.style.overflow = prevBodyOverflow;
-});
 </script>
 
 <template>
-  <div class="sky-checkbox-filter">
-    <div
-      ref="triggerRef"
-      :class="[
-        'header-filter-block',
-        { 'hf-check': isOpen, 'hf-disabled': disabled },
-      ]"
-      @click="toggle"
-    >
-      <span v-if="selected.length === 1" class="header-filter-block__title">
-        {{ oneSelectedLabel || title }}
-      </span>
-      <span v-else class="header-filter-block__title">
-        {{ title }}{{ selected.length > 0 ? ':' : '' }}
-      </span>
-      <div
-        v-if="!disabled && selected.length > 1"
-        class="header-filter-block__count"
-      >
-        {{ selected.length }}
+  <SkyFilterDropdown
+    class="sky-checkbox-filter"
+    :title="title"
+    :summary="triggerSummary"
+    :badge="triggerBadge"
+    :disabled="disabled"
+    @open="searchQuery = ''"
+    @close="searchQuery = ''"
+  >
+    <template #default="{ close }">
+      <div class="sky-checkbox-filter__actions">
+        <button type="button" class="sky-checkbox-filter__link" @click="selectAll">
+          {{ selectAllLabel }}
+        </button>
+        <button type="button" class="sky-checkbox-filter__link" @click="clearAll">
+          {{ clearLabel }}
+        </button>
       </div>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="sol-caret"
-      >
-        <path d="m6 9 6 6 6-6" />
-      </svg>
-    </div>
 
-    <transition name="fade-select">
-      <div
-        v-if="isOpen"
-        class="selectColumn selectHeaderFilter sky-checkbox-filter__dropdown"
-        :style="dropdownStyle"
-      >
-        <div class="dialog-buttons">
-          <span style="cursor: pointer" @click="selectAll">{{
-            selectAllLabel
-          }}</span>
-          <span style="cursor: pointer" @click="clearAll">{{
-            clearLabel
-          }}</span>
-        </div>
-        <div class="filtersCurtain__innerWrap_middle">
-          <input
-            v-model="searchQuery"
-            class="searchInput"
-            type="text"
-            :placeholder="searchPlaceholder"
-          />
-          <i
-            v-if="searchQuery.trim()"
-            class="filtersCurtain__innerWrap_middleIcon"
-            @click="clearSearch"
-            >×</i
-          >
-        </div>
+      <FilterSearch v-model="searchQuery" :placeholder="searchPlaceholder" :label="title" />
 
-        <div class="sky-checkbox-filter__options">
-          <div
-            v-for="opt in filteredOptions"
-            :key="opt.value"
-            class="filter-option"
-          >
-            <SkyCheckbox v-model="selected" :value="opt.value">
-              {{ opt.name }}
-            </SkyCheckbox>
-          </div>
-        </div>
-
-        <hr style="margin-top: 0; margin-bottom: 2px" />
-        <div class="dialog-buttons" style="padding-top: 10px; padding-bottom: 0">
-          <span style="cursor: pointer" @click="close">{{ doneLabel }}</span>
+      <div class="sky-checkbox-filter__options">
+        <div v-for="opt in filteredOptions" :key="opt.value" class="sky-checkbox-filter__option">
+          <SkyCheckbox v-model="selected" :value="opt.value">{{ opt.name }}</SkyCheckbox>
         </div>
       </div>
-    </transition>
-  </div>
+
+      <hr class="sky-checkbox-filter__sep" />
+      <div class="sky-checkbox-filter__actions sky-checkbox-filter__actions--footer">
+        <button type="button" class="sky-checkbox-filter__link" @click="close">
+          {{ doneLabel }}
+        </button>
+      </div>
+    </template>
+  </SkyFilterDropdown>
 </template>
 
 <style scoped>
-.sky-checkbox-filter {
-  display: inline-block;
-}
-
-.header-filter-block {
-  border: none !important;
-  position: relative;
+.sky-checkbox-filter__actions {
   display: flex;
-  white-space: nowrap;
-  line-height: 38px;
-  cursor: pointer;
-  padding: 0 10px;
-  height: 38px;
-  font-size: 16px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-}
-
-.header-filter-block__title {
-  font-size: 12pt;
-  font-weight: 500;
-}
-
-.header-filter-block__count {
-  margin-top: 1px;
-  font-size: 12px;
-  margin-left: 4px;
-  color: gray;
-}
-
-.sol-caret {
-  margin-left: 4px;
-  transition: transform 0.2s ease-in-out;
   flex-shrink: 0;
-  align-self: center;
-}
-
-.hf-check,
-.hf-disabled {
-  color: #b4b4b4;
-}
-
-.hf-check > .sol-caret {
-  transform: rotate(180deg);
-}
-
-.hf-disabled {
-  cursor: default;
-}
-
-.hf-disabled > .sol-caret {
-  opacity: 0.5;
-}
-
-/* Dropdown */
-.selectColumn.selectHeaderFilter {
-  position: fixed;
-  z-index: 1000;
-  padding: 10px 15px;
-  border-radius: 5px;
-  background: white;
-  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
-  min-width: 280px;
-}
-
-.dialog-buttons {
-  display: flex;
   justify-content: space-between;
   padding: 8px 0;
   font-size: 13px;
-  color: #106090;
 }
 
-.dialog-buttons span:hover {
+.sky-checkbox-filter__actions--footer {
+  padding: 10px 0 0;
+}
+
+.sky-checkbox-filter__link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: var(--sky-filter-accent, #106090);
+  cursor: pointer;
+}
+
+.sky-checkbox-filter__link:hover {
   text-decoration: underline;
 }
 
-.filtersCurtain__innerWrap_middle {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 15px;
-  border-bottom: #d3d3d3 solid 2px;
-  padding-left: unset;
-}
-
-.searchInput {
-  margin: 0;
-  outline: none;
-  border: none;
-  flex-grow: 2;
-  font-size: 12px;
-  padding: 4px 24px 4px 0;
-  background: transparent;
-  width: 100%;
-}
-
-.filtersCurtain__innerWrap_middle:has(.searchInput:focus) {
-  transition: all 200ms;
-  border-bottom: #106090 solid 2px;
-}
-
-.filtersCurtain__innerWrap_middleIcon {
-  position: absolute;
-  font-size: 16px;
-  font-style: normal;
-  right: 5px;
-  top: 0;
-  color: #adb5bd;
-  cursor: pointer;
-  line-height: 1;
-}
-
+/* The panel caps its own height, so the option list is what scrolls inside it. */
 .sky-checkbox-filter__options {
-  max-height: 250px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
 }
 
-.filter-option {
+.sky-checkbox-filter__option {
   padding: 0 4px;
   margin-bottom: 5px;
 }
 
-/* Transition */
-.fade-select-enter-active {
-  animation: fade-select-in 0.2s;
-}
-
-.fade-select-leave-active {
-  animation: fade-select-in 0.2s reverse;
-}
-
-@keyframes fade-select-in {
-  0% {
-    transform: translate3d(0, -10px, 0);
-    opacity: 0;
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-    opacity: 1;
-  }
+.sky-checkbox-filter__sep {
+  flex-shrink: 0;
+  margin: 0 0 2px;
 }
 </style>
