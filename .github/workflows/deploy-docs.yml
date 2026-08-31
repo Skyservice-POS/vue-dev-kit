@@ -44,7 +44,7 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       # Саме документація, а не playground: "build" збирає бібліотеку в lib-режимі
       # (без index.html) і як сайт не деплоїться. На виході — docs/.vitepress/dist.

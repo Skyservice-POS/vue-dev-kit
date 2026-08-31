@@ -32,10 +32,15 @@ zip), секрети — `DEPLOY_TOKEN` і `DEPLOYMENT_ID`, як у решти �
 Умова публікації одна: чи зайнятий уже цей номер версії (`npm view NAME@VERSION`).
 Semver і доречність бампу CI не перевіряє.
 
-**`package-lock.json` лежить у репозиторії.** Тому в CI — `npm ci` з `cache: npm`:
-збірки відтворювані, а setup-node кешує залежності. Раніше lock був у `.gitignore`,
-через що доводилось тримати `npm install` без кешу — це не давало нічого, крім
-розбіжних збірок. Не повертати назад.
+**`package-lock.json` лежить у репозиторії** — раніше він був у `.gitignore`, що не
+давало нічого, крім розбіжних збірок і `npm install` без кешу. Тепер `cache: npm`
+у setup-node працює.
+
+У CI лишається **`npm install`, не `npm ci`**: npm на раннері новіший за локальний і
+хоче в локу опційний peer `search-insights` (Algolia у VitePress), якого локальний
+npm туди не кладе — `npm ci` через це падає з `Missing … from lock file`. Якщо
+переводити на `npm ci`, спершу треба зрівняти версії npm або додати `search-insights`
+у devDependencies явно.
 
 ## Playground
 **Папки `playground/` більше немає** — її замінили доки з живими демо
