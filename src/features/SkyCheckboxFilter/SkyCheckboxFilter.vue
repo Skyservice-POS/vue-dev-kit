@@ -164,14 +164,13 @@ function clearAll(): void {
   --sky-checkbox-gap: 4px;
   --sky-checkbox-font-size: 10pt;
   --sky-checkbox-line-height: 20px;
-  --sky-checkbox-align: flex-start;
-  --sky-checkbox-box-offset: 4px;
   --sky-checkbox-label-margin: 0;
-  --sky-checkbox-label-offset: 2px;
-  /* Крок рядків 35px, як в адмінці (34.98). Там бокс абсолютно спозиційований і у
-     висоту рядка не входить, у нас він флексовий і робить рядок 24px (20 + 4 зсув),
-     тож лишок — 11, а не 13. Візуально збігається до пікселя. */
-  margin-bottom: 11px;
+  /* Текст центрується по боксу, а не як в адмінці. Там Bootstrap ставить ::before на
+     top: 4px під розмір 16px, а Dashboard.vue роздуває бокс до 20px, не чіпаючи top —
+     через це текст виявляється на 3px вище центру. Це баг, а не рішення, тож не
+     копіюємо: у нас обидва по 20px і align-items: center дає рівно 0.
+     Крок рядків лишається 35px (рядок 20 + 15). */
+  margin-bottom: 15px;
 }
 
 /* Єдине свідоме відхилення від адмінки, і воно невидиме: там лейбл завширшки з
