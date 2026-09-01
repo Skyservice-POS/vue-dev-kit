@@ -12,6 +12,9 @@ export default defineConfig({
     svgLoader({ defaultImport: 'url' }),
     dts({
       include: ['src/**/*.ts', 'src/**/*.vue'],
+      // Tests sit next to the components they cover, so they have to be kept out of
+      // the published types explicitly — otherwise every *.test.ts ships a .d.ts.
+      exclude: ['src/**/*.test.ts'],
       tsconfigPath: resolve(__dirname, 'tsconfig.json'),
       rollupTypes: false,
     }),
