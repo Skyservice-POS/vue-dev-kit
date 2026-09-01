@@ -1,39 +1,80 @@
 <script setup lang="ts">
+import { computed, useAttrs } from "vue";
+
 const props = defineProps<{
   modelValue: boolean | (string | number)[];
+  /** Обов'язковий, коли `modelValue` — масив: саме він кладеться/знімається. */
   value?: string | number;
   switch?: boolean;
   disabled?: boolean;
+  /**
+   * Третій стан нативного чекбокса — «обрано частину». Візуально це риска
+   * замість галочки; на `checked` не впливає, як і в DOM.
+   */
+  indeterminate?: boolean;
 }>();
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean | (string | number)[]];
 }>();
 
-const switchMode = props.switch;
+defineOptions({ inheritAttrs: false });
+
+// class/style лишаються на корені (споживачі позиціонують саме обгортку), решта
+// атрибутів їде на <input> — name, required, tabindex, aria-* стосуються контрола,
+// і на <label> вони просто нічого не роблять.
+const attrs = useAttrs();
+const rootAttrs = computed(() => ({ class: attrs.class, style: attrs.style }));
+const inputAttrs = computed(() => {
+  const { class: _class, style: _style, ...rest } = attrs;
+  return rest;
+});
+
+// computed, а не значення з setup: props реактивні за контрактом Vue, тож
+// зчитане один раз перемикання перестало б відповідати пропу після зміни.
+const switchMode = computed(() => props.switch);
+
+const isChecked = computed(() => {
+  if (Array.isArray(props.modelValue)) {
+    return props.modelValue.includes(props.value as string | number);
+  }
+  return props.modelValue;
+});
 
 function handleChange(event: Event) {
   const target = event.target as HTMLInputElement;
-  if (Array.isArray(props.modelValue)) {
-    const arr = [...(props.modelValue as any[])];
-    if (target.checked) arr.push(props.value);
-    else arr.splice(arr.indexOf(props.value), 1);
-    emit("update:modelValue", arr);
-  } else {
-    emit("update:modelValue", target.checked);
-  }
-}
 
-const isChecked = () => {
-  if (Array.isArray(props.modelValue)) {
-    return (props.modelValue as any[]).includes(props.value);
+  if (!Array.isArray(props.modelValue)) {
+    emit("update:modelValue", target.checked);
+    return;
   }
-  return props.modelValue as boolean;
-};
+
+  // Без `value` у режимі масиву класти в список нема чого: раніше туди їхав
+  // undefined і мовчки псував дані споживача.
+  if (props.value === undefined) {
+    console.warn(
+      "[SkyCheckbox] `modelValue` є масивом, але проп `value` не заданий — класти в список " +
+        "нема чого, зміну проігноровано.",
+    );
+    return;
+  }
+
+  const next = [...props.modelValue];
+  if (target.checked) {
+    if (!next.includes(props.value)) next.push(props.value);
+  } else {
+    const at = next.indexOf(props.value);
+    // splice(-1, 1) зрізав би останній елемент — тобто зняття галочки з
+    // відсутнього значення видаляло б чужий, ні до чого не причетний запис.
+    if (at !== -1) next.splice(at, 1);
+  }
+  emit("update:modelValue", next);
+}
 </script>
 
 <template>
   <label
+    v-bind="rootAttrs"
     class="sky-checkbox"
     :class="{
       'sky-checkbox--switch': switchMode,
@@ -41,9 +82,11 @@ const isChecked = () => {
     }"
   >
     <input
+      v-bind="inputAttrs"
       type="checkbox"
       class="sky-checkbox__input"
-      :checked="isChecked()"
+      :checked="isChecked"
+      :indeterminate.prop="indeterminate"
       :disabled="disabled"
       @change="handleChange"
     />
@@ -64,6 +107,7 @@ const isChecked = () => {
           stroke-linejoin="round"
         />
       </svg>
+      <span class="sky-checkbox__dash" />
     </span>
 
     <span v-if="$slots.default" class="sky-checkbox__label">
@@ -102,6 +146,7 @@ const isChecked = () => {
 
 /* ── Classic checkbox ── */
 .sky-checkbox__box {
+  position: relative; /* якір для .sky-checkbox__dash */
   flex-shrink: 0;
   box-sizing: border-box;
   width: var(--sky-checkbox-size, 16px);
@@ -126,9 +171,30 @@ const isChecked = () => {
   transition: opacity 0.1s ease-in-out;
 }
 
-.sky-checkbox__input:checked ~ .sky-checkbox__box {
+/* Риска для третього стану — «обрано частину». */
+.sky-checkbox__dash {
+  position: absolute;
+  width: calc(var(--sky-checkbox-size, 16px) * 0.5);
+  height: 2px;
+  border-radius: 1px;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.sky-checkbox__input:checked ~ .sky-checkbox__box,
+.sky-checkbox__input:indeterminate ~ .sky-checkbox__box {
   background-color: var(--sky-checkbox-accent, #28a745);
   border-color: var(--sky-checkbox-accent, #28a745);
+}
+
+/* indeterminate б'є checked, як і в DOM: третій стан видно навіть на checked. */
+.sky-checkbox__input:indeterminate ~ .sky-checkbox__box .sky-checkbox__check {
+  opacity: 0;
+}
+
+.sky-checkbox__input:indeterminate ~ .sky-checkbox__box .sky-checkbox__dash {
+  opacity: 1;
 }
 
 .sky-checkbox__input:checked ~ .sky-checkbox__box .sky-checkbox__check {

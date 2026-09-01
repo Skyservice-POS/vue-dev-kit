@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { computed } from 'vue'
 import SkyCheckbox from '@/shared/ui/SkyCheckbox/SkyCheckbox.vue'
 
 const agreed = ref(true)
@@ -10,6 +11,12 @@ const options = [
   { value: 'b', name: 'Їжа' },
   { value: 'c', name: 'Напої' },
 ]
+
+const allSelected = computed(() => selected.value.length === options.length)
+const someSelected = computed(() => selected.value.length > 0)
+function toggleAll() {
+  selected.value = allSelected.value ? [] : options.map((o) => o.value)
+}
 </script>
 
 <template>
@@ -23,6 +30,18 @@ const options = [
       {{ opt.name }}
     </SkyCheckbox>
     <span class="vdk-demo-out">selected: [{{ selected.join(', ') }}]</span>
+  </Demo>
+
+  <Demo title="Третій стан — «обрано частину»" column>
+    <SkyCheckbox :model-value="allSelected" :indeterminate="someSelected && !allSelected" @update:model-value="toggleAll">
+      Обрати всі
+    </SkyCheckbox>
+    <SkyCheckbox v-for="opt in options" :key="opt.value" v-model="selected" :value="opt.value">
+      {{ opt.name }}
+    </SkyCheckbox>
+    <span class="vdk-demo-out">
+      обрано {{ selected.length }} з {{ options.length }} — головний чекбокс з рискою, поки не всі
+    </span>
   </Demo>
 
   <Demo title="Switch + disabled" column>
