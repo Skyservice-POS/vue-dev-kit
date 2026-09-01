@@ -134,7 +134,7 @@ const json = { items, total: items.length }
 ## Залежності й хост-середовище
 
 ::: tip Що треба врахувати перед інтеграцією
-- **`vue-virtual-scroller` — зовнішня залежність.** Її треба встановити в застосунку: `npm i vue-virtual-scroller@^2.0.0-beta.8`.
+- **`@tanstack/vue-virtual` — зовнішня залежність.** Її треба встановити в застосунку: `npm i @tanstack/vue-virtual`. Раніше тут був `vue-virtual-scroller`; рушій замінено, публічний API компонента не змінився.
 - **i18n читається з `window.lang`** (з UA-фолбеками), як у Dashboard.
 - **Частина ассетів — хостові**, за абсолютними шляхами (`/image/dragons/…`, `/svg/arrow_black.svg`). Вони навмисно не бандляться в бібліотеку (`vite.config` → `transformAssetUrls.includeAbsolute: false`), тож поза Skyservice-хостом ці іконки не завантажаться.
 :::

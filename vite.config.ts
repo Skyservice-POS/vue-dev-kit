@@ -12,6 +12,9 @@ export default defineConfig({
     svgLoader({ defaultImport: 'url' }),
     dts({
       include: ['src/**/*.ts', 'src/**/*.vue'],
+      // Tests sit next to the components they cover, so they have to be kept out of
+      // the published types explicitly — otherwise every *.test.ts ships a .d.ts.
+      exclude: ['src/**/*.test.ts'],
       tsconfigPath: resolve(__dirname, 'tsconfig.json'),
       rollupTypes: false,
     }),
@@ -34,22 +37,22 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      // TanStack тримаємо зовнішнім, як і vue-virtual-scroller: він у
-      // dependencies, тож npm поставить його споживачу сам, а в бандл кіта не
-      // потрапить (інакше +100 kB усім, включно з тими, хто гріда не бере,
-      // і другий екземпляр ядра в застосунках, які вже мають свій TanStack).
+      // TanStack тримаємо зовнішнім: він у dependencies, тож npm поставить його
+      // споживачу сам, а в бандл кіта не потрапить (інакше +100 kB усім,
+      // включно з тими, хто гріда не бере, і другий екземпляр ядра в
+      // застосунках, які вже мають свій TanStack). Патерн покриває і
+      // vue-table, і vue-virtual — на ньому працює віртуалізація таблиці.
       external: [
         'vue',
         'ua-parser-js',
-        'vue-virtual-scroller',
         /^@tanstack\//,
       ],
       output: {
         globals: {
           vue: 'Vue',
           'ua-parser-js': 'UAParser',
-          'vue-virtual-scroller': 'VueVirtualScroller',
           '@tanstack/vue-table': 'TanStackVueTable',
+          '@tanstack/vue-virtual': 'TanStackVueVirtual',
         },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'style.css';

@@ -6,6 +6,9 @@ interface SkySelectSearchOption {
   text: string;
 }
 
+/** Нижче цього списку видно цілком, і поле пошуку — зайвий шум. */
+const DEFAULT_SEARCH_THRESHOLD = 6;
+
 const props = withDefaults(
   defineProps<{
     modelValue?: string | number;
@@ -17,6 +20,11 @@ const props = withDefaults(
     hint?: string;
     searchPlaceholder?: string;
     noResultsText?: string;
+    /**
+     * Скільки опцій має бути, щоб з'явилось поле пошуку. На коротких списках воно
+     * лише заважає — усе видно й так. `0` — показувати завжди, `Infinity` — ніколи.
+     */
+    searchThreshold?: number;
   }>(),
   {
     modelValue: undefined,
@@ -27,8 +35,15 @@ const props = withDefaults(
     hint: "",
     searchPlaceholder: "Пошук…",
     noResultsText: "Нічого не знайдено",
+    searchThreshold: DEFAULT_SEARCH_THRESHOLD,
   },
 );
+
+/**
+ * Рахуємо від **усіх** опцій, а не від відфільтрованих: інакше запит, який звузив
+ * список до пари рядків, ховав би поле пошуку прямо під час набору.
+ */
+const hasSearch = computed(() => props.options.length >= props.searchThreshold);
 
 const emit = defineEmits<{
   "update:modelValue": [value: string | number];
@@ -47,6 +62,37 @@ const open = ref(false);
 const query = ref("");
 const highlightedIndex = ref(-1);
 
+const GAP = 4;
+/** Below this the list would be too cramped to be useful — flip it above instead. */
+const MIN_PANEL_HEIGHT = 160;
+const EDGE = 8;
+
+const dropUp = ref(false);
+const panelMaxHeight = ref("");
+
+/**
+ * Picks the side the panel opens to and caps its height to the room on that side.
+ * Only the trigger is measured, so this can run before the panel renders — that way
+ * it opens in the right place instead of flashing downwards first.
+ *
+ * Runs again on every scroll/resize while open: a side chosen at open time goes
+ * stale as soon as anything scrolls, and the panel then hangs off the viewport.
+ */
+function updatePlacement(): void {
+  const trigger = triggerRef.value;
+  if (!trigger) return;
+
+  const rect = trigger.getBoundingClientRect();
+  const vh = window.innerHeight;
+
+  const below = vh - rect.bottom - GAP - EDGE;
+  const above = rect.top - GAP - EDGE;
+  const flip = below < MIN_PANEL_HEIGHT && above > below;
+
+  dropUp.value = flip;
+  panelMaxHeight.value = `${Math.max(MIN_PANEL_HEIGHT, flip ? above : below)}px`;
+}
+
 const selectedText = computed<string>(() => {
   const match = props.options.find((o) => o.value === props.modelValue);
   return match ? match.text : "";
@@ -64,12 +110,15 @@ const activeOptionId = computed<string>(() =>
 
 function openDropdown(): void {
   if (props.disabled || open.value) return;
+  updatePlacement();
   open.value = true;
   query.value = "";
   // Підсвітити вже обрану опцію, інакше першу
   const selIdx = filtered.value.findIndex((o) => o.value === props.modelValue);
   highlightedIndex.value = selIdx !== -1 ? selIdx : filtered.value.length ? 0 : -1;
   nextTick(() => {
+    // Без поля пошуку фокус нікуди не переносимо — він уже на тригері, який тепер
+    // і обробляє стрілки (див. onTriggerKeydown).
     if (inputRef.value) inputRef.value.focus();
     scrollHighlightedIntoView();
   });
@@ -114,13 +163,19 @@ function scrollHighlightedIntoView(): void {
 
 function onTriggerKeydown(e: KeyboardEvent): void {
   if (props.disabled) return;
+  // Без поля пошуку фокус лишається на тригері, тож навігацію по списку веде він —
+  // інакше з прихованим пошуком клавіатура переставала працювати взагалі.
+  if (open.value) {
+    onListKeydown(e);
+    return;
+  }
   if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
     e.preventDefault();
     openDropdown();
   }
 }
 
-function onInputKeydown(e: KeyboardEvent): void {
+function onListKeydown(e: KeyboardEvent): void {
   if (e.key === "ArrowDown") {
     e.preventDefault();
     move(1);
@@ -155,8 +210,24 @@ onMounted(() => {
   document.addEventListener("mousedown", onDocumentMousedown);
 });
 
+// Scroll is captured so that scrolling any ancestor container re-checks the side,
+// not just the window. Both listeners live only while the panel is open.
+watch(open, (isOpen) => {
+  if (isOpen) {
+    window.addEventListener("scroll", updatePlacement, true);
+    window.addEventListener("resize", updatePlacement);
+  } else {
+    window.removeEventListener("scroll", updatePlacement, true);
+    window.removeEventListener("resize", updatePlacement);
+  }
+});
+
 onBeforeUnmount(() => {
   document.removeEventListener("mousedown", onDocumentMousedown);
+  // Detached directly rather than via the watcher: watchers flush async, so an
+  // unmount while open would leave these behind.
+  window.removeEventListener("scroll", updatePlacement, true);
+  window.removeEventListener("resize", updatePlacement);
 });
 </script>
 
@@ -174,6 +245,7 @@ onBeforeUnmount(() => {
         aria-haspopup="listbox"
         :aria-expanded="open ? 'true' : 'false'"
         :aria-controls="`${uid}-list`"
+        :aria-activedescendant="!hasSearch && open ? activeOptionId : undefined"
         @click="toggle"
         @keydown="onTriggerKeydown"
       >
@@ -185,8 +257,13 @@ onBeforeUnmount(() => {
         </span>
       </button>
 
-      <div v-if="open" class="sky-select-search__dropdown">
-        <div class="sky-select-search__search">
+      <div
+        v-if="open"
+        class="sky-select-search__dropdown"
+        :class="{ 'is-drop-up': dropUp }"
+        :style="{ maxHeight: panelMaxHeight }"
+      >
+        <div v-if="hasSearch" class="sky-select-search__search">
           <input
             ref="inputRef"
             v-model="query"
@@ -196,7 +273,7 @@ onBeforeUnmount(() => {
             :aria-controls="`${uid}-list`"
             :aria-activedescendant="activeOptionId"
             autocomplete="off"
-            @keydown="onInputKeydown"
+            @keydown="onListKeydown"
           />
         </div>
 
@@ -310,12 +387,15 @@ onBeforeUnmount(() => {
 }
 
 /* --- Дропдаун --- */
+/* Колонка, щоб max-height з JS з'їдав саме список, а поле пошуку лишалось цілим. */
 .sky-select-search__dropdown {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   right: 0;
   z-index: 1050;
+  display: flex;
+  flex-direction: column;
   background-color: #fff;
   border: 1px solid #ced4da;
   border-radius: 0.375rem;
@@ -323,9 +403,15 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
+/* Знизу немає місця — розкриваємось угору (див. updatePlacement). */
+.sky-select-search__dropdown.is-drop-up {
+  top: auto;
+  bottom: calc(100% + 4px);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .sky-select-search__search {
-  position: sticky;
-  top: 0;
+  flex: 0 0 auto;
   padding: 8px;
   background-color: #fff;
   border-bottom: 1px solid #e9ecef;
@@ -354,7 +440,11 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
 }
 
+/* 220px — звичайна стеля списку; коли панелі тісно, flex стискає її ще сильніше
+   за рахунок max-height, який updatePlacement ставить на сам дропдаун. */
 .sky-select-search__list {
+  flex: 1 1 auto;
+  min-height: 0;
   list-style: none;
   margin: 0;
   padding: 4px;
