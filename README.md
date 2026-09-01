@@ -570,9 +570,14 @@ import {
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
 | `modelValue` | `Boolean\|Array` | — | Стан/масив вибраних значень (v-model) |
-| `value` | `String\|Number` | — | Значення для array-режиму |
+| `value` | `String\|Number` | — | Значення для array-режиму (**обов'язкове** в ньому) |
 | `switch` | `Boolean` | `false` | Режим switch замість чекбоксу |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
+| `indeterminate` | `Boolean` | `false` | Третій стан — «обрано частину»; малює риску, на `checked` не впливає |
+
+Атрибути, які не `class`/`style`, їдуть на сам `<input>` — `name`, `required`,
+`tabindex`, `aria-*` стосуються контрола. `class` і `style` лишаються на корені,
+бо ними позиціонують обгортку.
 
 #### Slots
 

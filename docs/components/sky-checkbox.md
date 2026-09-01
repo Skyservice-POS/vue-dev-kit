@@ -51,9 +51,37 @@ const options = [
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
 | `modelValue` | `Boolean \| Array` | — | Стан / масив вибраних значень (v-model) |
-| `value` | `String \| Number` | — | Значення для array-режиму |
+| `value` | `String \| Number` | — | Значення для array-режиму (**обов'язкове** в ньому) |
 | `switch` | `Boolean` | `false` | Режим switch замість чекбоксу |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
+| `indeterminate` | `Boolean` | `false` | Третій стан — «обрано частину» |
+
+## Атрибути
+
+Усе, що не `class` і не `style`, потрапляє на сам `<input>`: `name`, `required`,
+`tabindex`, `autofocus`, `aria-*` стосуються контрола, і на `<label>` вони нічого
+не роблять. `class` і `style` лишаються на корені — ними позиціонують обгортку.
+
+```vue
+<SkyCheckbox v-model="agreed" name="agree" required class="mt-2">Погоджуюсь</SkyCheckbox>
+<!-- name і required → на <input>, mt-2 → на <label> -->
+```
+
+## Третій стан
+
+`indeterminate` — це «обрано частину», класичний головний чекбокс над списком.
+Як і в DOM, він **не** пов'язаний з `checked`: прапорець лишається таким, яким ви
+його задали, змінюється лише вигляд.
+
+```vue
+<SkyCheckbox
+  :model-value="allSelected"
+  :indeterminate="someSelected && !allSelected"
+  @update:model-value="toggleAll"
+>
+  Обрати всі
+</SkyCheckbox>
+```
 
 ## Slots
 
@@ -81,6 +109,12 @@ const options = [
 <SkyCheckbox v-model="selected" value="b">B</SkyCheckbox>
 <!-- selected: ['a'], ['a','b'], [] ... -->
 ```
+
+::: warning `value` тут обов'язковий
+У режимі масиву без `value` класти в список нема чого — компонент пропускає зміну
+й пише попередження в консоль (у dev). Масив, який ви передали, не мутується:
+завжди приходить новий.
+:::
 
 ## Switch
 
