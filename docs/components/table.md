@@ -52,7 +52,7 @@ const rows = [
 
 | Шар | Що там | Коли підключати |
 |-----|--------|-----------------|
-| **Примітиви** `shared/ui/table` | `SkyTableRoot`, `SkyTableHeader`, `SkyTableHead`, `SkyTableBody`, `SkyTableRow`, `SkyTableCell`, `SkyTableEmpty` | завжди — це сама таблиця |
+| **Примітиви** `shared/ui/table` | `SkyTableRoot`, `SkyTableHeader`, `SkyTableHead`, `SkyTableBody`, `SkyTableVirtualBody`, `SkyTableRow`, `SkyTableCell`, `SkyTableEmpty` | завжди — це сама таблиця |
 | **Композабли** `shared/lib/table` | `useTableSort`, `useTableSelection`, `useColumnVisibility` | коли потрібна відповідна поведінка |
 | **Фічі** `features/table` | `TableMassActions`, `TableColumnSettings`, `TableVirtualBody` | опційно, кожна окремо |
 
@@ -89,10 +89,54 @@ interface SkyTableColumn {
 |-----------|-------|------|
 | `SkyTableHeader` | `sticky` (`true`) | Рядок шапки; липне до верху при скролі |
 | `SkyTableHead` | `column`, `sort` | Комірка шапки; емітить `sort` із полем, якщо колонка сортована |
-| `SkyTableBody` | — | Звичайне тіло зі скролом |
+| `SkyTableBody` | `rows`, `rowKey` | Звичайне тіло зі скролом |
+| `SkyTableVirtualBody` | `rows`, `rowKey`, `estimateSize`, `overscan`, `dynamic` | Те саме, але в DOM лише видиме вікно рядків |
 | `SkyTableRow` | `selected`, `interactive` | Рядок; підсвітка й hover |
 | `SkyTableCell` | `align`, `noTruncate` | Комірка |
 | `SkyTableEmpty` | `text` | Порожній стан + слот `illustration` |
+
+### Тіло: два режими, один контракт
+
+`SkyTableBody` працює у двох режимах. Без `rows` це прозора обгортка — рядки складаєте самі (як у прикладі вище). З `rows` тіло ітерує саме й віддає scoped-слот:
+
+```vue
+<SkyTableBody :rows="rows" :row-key="row => row.id">
+  <template #empty><SkyTableEmpty text="Даних немає" /></template>
+  <template #default="{ row }">
+    <SkyTableRow>
+      <SkyTableCell>{{ row.name }}</SkyTableCell>
+    </SkyTableRow>
+  </template>
+</SkyTableBody>
+```
+
+`SkyTableVirtualBody` приймає **ті самі** `rows` / `rowKey` і віддає **той самий** слот — тож перемикання віртуалізації це заміна одного тега на інший, без переписування розмітки рядка:
+
+```vue
+<component :is="virtual ? SkyTableVirtualBody : SkyTableBody" :rows="rows" :row-key="row => row.id">
+  <template #default="{ row }">…</template>
+</component>
+```
+
+Саме так влаштований проп `virtual` у [`SkyDataTable`](/components/data-table).
+
+### SkyTableVirtualBody
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `rows` | `TRow[]` | — | Рядки (обовʼязково) |
+| `rowKey` | `(row, index) => string \| number` | індекс | Ключ рядка |
+| `estimateSize` | `Number` | `40` | Очікувана висота рядка в px |
+| `overscan` | `Number` | `6` | Скільки рядків тримати понад видиме вікно |
+| `dynamic` | `Boolean` | `false` | Рядки різної висоти — вмикає вимірювання через ResizeObserver |
+
+Подія `reach-end` — коли останній рядок увійшов у вікно; зручно вішати довантаження.
+
+::: warning Потрібна обмежена висота
+Віртуалізація рахує вікно від висоти скрол-контейнера, а ним є саме тіло. Якщо таблиця росте разом з контентом і скролиться сторінка, вікно ніколи не зсувається — у DOM залишаться перші кілька рядків і все. Дайте таблиці `height` або `flex: 1; min-height: 0`.
+:::
+
+`dynamic` вмикайте лише за потреби: з фіксованою висотою геометрія рахується арифметикою, без жодного читання з DOM.
 
 ## Композабли
 
@@ -163,7 +207,7 @@ const { visibility, visibleColumns, toggle, reset } = useColumnVisibility(column
 
 ### TableVirtualBody
 
-Заміна `SkyTableBody` для великих списків — у DOM тримаються лише видимі рядки.
+Сумісна обгортка над [`SkyTableVirtualBody`](#skytablevirtualbody) зі старим контрактом (`items` + слот `{ item, index }`).
 
 ```vue
 <TableVirtualBody :items="rows" key-field="id" @reach-end="loadMore">
@@ -173,8 +217,8 @@ const { visibility, visibleColumns, toggle, reset } = useColumnVisibility(column
 </TableVirtualBody>
 ```
 
-::: warning Єдине місце із зовнішньою залежністю
-Тільки цей компонент імпортує `vue-virtual-scroller` — його треба встановити в застосунку (`npm i vue-virtual-scroller@^2.0.0-beta.8`). Якщо віртуалізація не потрібна, беріть `SkyTableBody`, і залежність не знадобиться взагалі.
+::: tip У новому коді беріть примітив
+`TableVirtualBody` лишається тільки заради тих, хто вже його імпортує. Для нового екрана беріть `SkyTableVirtualBody` (той самий контракт, що й у `SkyTableBody`) або проп `virtual` у [`SkyDataTable`](/components/data-table). Проп `sizeDependencies` більше ні на що не впливає: висоту рядків стежить ResizeObserver.
 :::
 
 ## CSS змінні
@@ -202,6 +246,6 @@ const { visibility, visibleColumns, toggle, reset } = useColumnVisibility(column
 | Розмітка | ваша, з примітивів | фіксована, 1:1 з POS |
 | Конфіг | props компонентів | один обʼєкт `params` |
 | Масові дії, вибір, віртуалізація | опційні | вбудовані |
-| `vue-virtual-scroller` | лише з `TableVirtualBody` | завжди |
+| Віртуалізація | `SkyTableVirtualBody` замість `SkyTableBody` | завжди |
 | Inline-редагування комірок | своїми компонентами в слоті | `customItemComponent` |
 | Коли | новий екран, потрібна частина функціоналу | екран у стилі POS-таблиці товарів |

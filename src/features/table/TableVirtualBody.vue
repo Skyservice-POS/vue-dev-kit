@@ -1,56 +1,47 @@
 <script setup lang="ts">
-// Єдине місце в киті, яке імпортує vue-virtual-scroller. Хто рендерить сотні
-// рядків — бере цей компонент; хто ні — SkyTableBody, і залежність не тягнеться.
-import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
-import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+// Сумісна обгортка над `SkyTableVirtualBody`. Власного рушія не має: вся
+// віртуалізація живе в примітиві shared/ui/table, тут лишився тільки старий
+// публічний контракт (`items` + слот `{ item, index, active }`), щоб не ламати
+// тих, хто вже брав цей компонент напряму.
+//
+// У новому коді беріть `SkyTableVirtualBody` або проп `virtual` у SkyDataTable.
+import SkyTableVirtualBody from '../../shared/ui/table/SkyTableVirtualBody.vue';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     items: any[];
     /** Ключ ідентифікатора рядка. */
     keyField?: string;
     /** Очікувана мінімальна висота рядка — база для розрахунку вікна. */
     minItemSize?: number;
-    /** Поля, зміна яких змінює висоту рядка (розкриті модифікації, теги). */
+    /**
+     * @deprecated Більше ні на що не впливає: висоту рядків тепер стежить
+     * ResizeObserver, тож перелічувати залежності вручну не треба.
+     */
     sizeDependencies?: (row: any) => unknown[];
   }>(),
   { keyField: 'id', minItemSize: 36, sizeDependencies: undefined },
 );
 
 const emit = defineEmits<{ 'reach-end': [] }>();
+
+function rowKey(row: any, index: number): string | number {
+  return row?.[props.keyField] ?? index;
+}
 </script>
 
 <template>
-  <div class="sky-table__virtual" role="rowgroup">
-    <DynamicScroller
-      :items="items"
-      :min-item-size="minItemSize"
-      :key-field="keyField"
-      class="sky-table__scroller"
-      @scroll-end="emit('reach-end')"
-    >
-      <template #default="{ item, index, active }">
-        <DynamicScrollerItem
-          :item="item"
-          :active="active"
-          :size-dependencies="sizeDependencies ? sizeDependencies(item) : []"
-          :data-index="index"
-        >
-          <slot :item="item" :index="index" :active="active" />
-        </DynamicScrollerItem>
-      </template>
-    </DynamicScroller>
-  </div>
+  <SkyTableVirtualBody
+    :rows="items"
+    :row-key="rowKey"
+    :estimate-size="minItemSize"
+    dynamic
+    @reach-end="emit('reach-end')"
+  >
+    <template #default="{ row, index }">
+      <!-- `active` лишаємо в контракті: рендеряться тільки видимі рядки,
+           тож для всіх, хто дійшов до слота, воно завжди true. -->
+      <slot :item="row" :index="index" :active="true" />
+    </template>
+  </SkyTableVirtualBody>
 </template>
-
-<style scoped>
-.sky-table__virtual {
-  flex: 1;
-  min-height: 0;
-}
-
-.sky-table__scroller {
-  height: 100%;
-  overflow-y: auto;
-}
-</style>

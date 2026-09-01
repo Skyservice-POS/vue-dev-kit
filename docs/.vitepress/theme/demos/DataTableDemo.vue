@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, ref } from 'vue'
+import { computed, h, onMounted, ref } from 'vue'
 import SkyDataTable from '@/features/data-table/SkyDataTable.vue'
 import SkyDataTableColumnToggle from '@/features/data-table/SkyDataTableColumnToggle.vue'
 import SkyBadge from '@/shared/ui/SkyBadge/SkyBadge.vue'
@@ -70,6 +70,29 @@ const columns = [
 const tableRef = ref<InstanceType<typeof SkyDataTable> | null>(null)
 const lastAction = ref('—')
 
+// Друга таблиця — та сама конфігурація, тільки без пагінації і з `virtual`.
+// 20 000 рядків: без віртуалізації стільки DOM браузер просто не потягне.
+const bigData: Product[] = Array.from({ length: 20_000 }, (_, i) => ({
+  id: i + 1,
+  name: `Товар ${i + 1}`,
+  category: ['Напої', 'Випічка', 'Кава', 'Десерти'][i % 4],
+  price: 10 + ((i * 37) % 490),
+  status: i % 3 !== 0 ? 'Активний' : 'Прихований',
+}))
+
+const virtualRef = ref<InstanceType<typeof SkyDataTable> | null>(null)
+const domRows = ref(0)
+
+// Рахуємо рядки в DOM, щоб було видно, що їх десятки, а не 20 000.
+function countDomRows(): void {
+  domRows.value = document.querySelectorAll('.vdk-dt-virtual .sky-table__row').length
+}
+
+onMounted(() => {
+  countDomRows()
+  window.setTimeout(countDomRows, 100)
+})
+
 const selectedCount = computed(
   () => tableRef.value?.table.getSelectedRowModel().rows.length ?? 0,
 )
@@ -96,6 +119,26 @@ const selectedCount = computed(
     </div>
     <div class="vdk-demo-out">
       обрано: {{ selectedCount }} · остання дія: {{ lastAction }}
+    </div>
+  </Demo>
+
+  <Demo title="Віртуалізація — 20 000 рядків" column flush>
+    <div class="vdk-dt vdk-dt-virtual">
+      <SkyDataTable
+        ref="virtualRef"
+        :columns="columns"
+        :data="bigData"
+        row-id="id"
+        searchable
+        interactive-rows
+        virtual
+        search-placeholder="Пошук по 20 000 рядках…"
+        @row-click="(row) => (lastAction = `open → ${row.name}`)"
+        @scroll.capture="countDomRows"
+      />
+    </div>
+    <div class="vdk-demo-out">
+      рядків у даних: {{ bigData.length }} · рядків у DOM: {{ domRows }}
     </div>
   </Demo>
 </template>

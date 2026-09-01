@@ -1,15 +1,18 @@
 <template>
-  <DynamicScroller
-    :items="indexedItems"
-    :min-item-size="30"
-    class="scroller"
-    :key-field="keyField"
-  >
-    <template v-slot="{ item, index, active }">
-      <DynamicScrollerItem :item="item" :active="active" :data-index="index">
+  <div ref="scrollEl" class="scroller">
+    <!-- Розпірка тримає повну висоту списку, щоб скролбар відповідав усім рядкам. -->
+    <div class="scroller__sizer" :style="{ height: `${totalSize}px` }">
+      <div
+        v-for="virtualRow in virtualRows"
+        :key="virtualRow.key"
+        :ref="measureRow"
+        :data-index="virtualRow.index"
+        class="scroller__row"
+        :style="{ transform: `translateY(${virtualRow.start}px)` }"
+      >
         <rowTable
-          :index="index"
-          :item="item"
+          :index="virtualRow.index"
+          :item="indexedItems[virtualRow.index]"
           :params="params"
           :selected="selected"
           :selected-columns="selectedColumns"
@@ -31,15 +34,17 @@
             <slot :name="name" v-bind="slotData ?? {}" />
           </template>
         </rowTable>
-      </DynamicScrollerItem>
-    </template>
-  </DynamicScroller>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
+// Віртуалізація на headless `@tanstack/vue-virtual`. Раніше тут був
+// DynamicScroller з vue-virtual-scroller; публічний контракт компонента
+// (props, emits, слоти) не змінився — помінявся лише рушій під ним.
+import { computed, ref } from "vue";
+import { useVirtualizer } from "@tanstack/vue-virtual";
 import rowTable from "./Row.vue";
 
 const props = defineProps({
@@ -79,13 +84,6 @@ const props = defineProps({
 
 const idField = computed(() => props.params?.id || "id");
 
-const keyField = computed(() => {
-  if (props.items.length > 0 && props.items[0][idField.value] != null) {
-    return idField.value;
-  }
-  return "_dsIndex";
-});
-
 const indexedItems = computed(() =>
   props.items.map((item, i) => {
     item._dsIndex = i;
@@ -93,6 +91,31 @@ const indexedItems = computed(() =>
     return item;
   }),
 );
+
+const scrollEl = ref(null);
+
+const virtualizer = useVirtualizer(
+  computed(() => ({
+    count: indexedItems.value.length,
+    getScrollElement: () => scrollEl.value,
+    // Рядки різновисокі (розкриті деталі, теги), тож 30px — лише перша оцінка:
+    // реальну висоту доміряє measureElement.
+    estimateSize: () => 30,
+    overscan: 6,
+    getItemKey: (index) => {
+      const item = indexedItems.value[index];
+      return item?.[idField.value] ?? index;
+    },
+  })),
+);
+
+const virtualRows = computed(() => virtualizer.value.getVirtualItems());
+const totalSize = computed(() => virtualizer.value.getTotalSize());
+
+// measureElement читає індекс з `data-index`, тому атрибут обовʼязковий.
+function measureRow(el) {
+  if (el) virtualizer.value.measureElement(el);
+}
 
 const emit = defineEmits([
   "checkbox",
@@ -111,5 +134,18 @@ const emit = defineEmits([
 .scroller {
   height: 100%;
   overflow: auto;
+}
+
+.scroller__sizer {
+  position: relative;
+  width: 100%;
+}
+
+/* Висоту не задаємо: рядок міряє себе сам через ResizeObserver. */
+.scroller__row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 </style>

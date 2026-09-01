@@ -30,7 +30,8 @@ import {
   SkyTable,
   // грід на TanStack + примітиви таблиці + композабли
   SkyDataTable, createSkyColumnHelper, skyTableFeatures,
-  SkyTableRoot, SkyTableHeader, SkyTableHead, SkyTableBody, SkyTableRow, SkyTableCell,
+  SkyTableRoot, SkyTableHeader, SkyTableHead, SkyTableBody, SkyTableVirtualBody,
+  SkyTableRow, SkyTableCell,
   useTableSort, useTableSelection, useColumnVisibility,
   FunctionalCalendar, SkyDateRangePicker,
   SkyFilterDropdown,
@@ -439,6 +440,8 @@ import {
 
 Панель не вилазить за нижній край вікна: якщо знизу тісно, вона розкривається **вгору**, а висоту обмежує під доступне місце — скролиться список усередині. Сторона переобирається на скрол і ресайз, поки панель відкрита. Teleport-а немає, тож контейнер з `overflow: hidden` (напр. `Modal`) панель усе одно обріже — там беріть `SkyFilterDropdown`.
 
+Поле пошуку з'являється **від 6 опцій** (`searchThreshold`): на коротких списках воно лише шумить. Коли пошуку немає, стрілками й `Enter` керує сам тригер — фокус нікуди не переносимо.
+
 ```vue
 <SkySelectSearch
   v-model="selected"
@@ -465,6 +468,7 @@ import {
 | `hint` | `String` | `''` | Підказка під полем |
 | `searchPlaceholder` | `String` | `'Пошук…'` | Placeholder поля пошуку |
 | `noResultsText` | `String` | `'Нічого не знайдено'` | Текст за відсутності збігів |
+| `searchThreshold` | `Number` | `6` | Від скількох опцій показувати поле пошуку. `0` — завжди, `Infinity` — ніколи |
 
 #### Events
 
@@ -910,8 +914,37 @@ const columns = [
 | `initialSorting` | `SortingState` | — | Початкове сортування |
 | `emptyText` | `String` | `'Даних немає'` | Текст порожнього стану |
 | `interactiveRows` | `Boolean` | `false` | Курсор і hover на рядках |
+| `virtual` | `Boolean \| SkyDataTableVirtualOptions` | `false` | Віртуалізація тіла — у DOM лише видиме вікно рядків |
 
-Слоти: `toolbar`, `actions`, `footer`, `empty` (усі отримують `{ table }`). Подія: `row-click`. Інстанс таблиці доступний через `ref` → `tableRef.table`.
+Слоти: `toolbar`, `actions`, `footer`, `empty` (усі отримують `{ table }`). Події: `row-click`, `reach-end` (тільки у віртуальному режимі). Інстанс таблиці доступний через `ref` → `tableRef.table`.
+
+#### Віртуалізація
+
+На кілька тисяч рядків браузер провисає не на даних, а на DOM. Проп `virtual` лишає в розмітці тільки видиме вікно:
+
+```vue
+<SkyDataTable :columns="columns" :data="rows" row-id="id" virtual />
+
+<SkyDataTable
+  :columns="columns"
+  :data="rows"
+  row-id="id"
+  :virtual="{ estimateSize: 44, overscan: 8 }"
+  @reach-end="loadMore"
+/>
+```
+
+| Опція | Тип | За замовчуванням | Опис |
+|-------|-----|------------------|------|
+| `estimateSize` | `Number` | `40` | Очікувана висота рядка в px |
+| `overscan` | `Number` | `6` | Скільки рядків тримати понад видиме вікно |
+| `dynamic` | `Boolean` | `false` | Рядки різної висоти — вимірювання через ResizeObserver |
+
+Змінюється рівно одне: хто вирішує, які рядки зараз у DOM. Сортування, фільтрація, вибір і `getRowCount()` працюють по всьому набору даних.
+
+> **Потрібна обмежена висота.** Скрол-контейнером є тіло таблиці — дайте таблиці `height` або `flex: 1; min-height: 0`, інакше скролитиметься сторінка й вікно не зсуватиметься.
+
+> **Не поєднуйте з `pageSize`.** На сторінці в кілька десятків рядків віртуалізувати нічого; компонент попередить у консолі. Природна пара до `virtual` — довантаження за `reach-end`.
 
 #### Набір фіч
 
@@ -942,7 +975,7 @@ const features = tableFeatures({
 <script setup>
 import {
   SkyTableRoot, SkyTableHeader, SkyTableHead,
-  SkyTableBody, SkyTableRow, SkyTableCell,
+  SkyTableBody, SkyTableVirtualBody, SkyTableRow, SkyTableCell,
 } from '@skyservice-developers/vue-dev-kit'
 
 const columns = [
@@ -970,7 +1003,7 @@ const columns = [
 
 | Шар | Експорти | Коли підключати |
 |-----|----------|-----------------|
-| Примітиви (`shared/ui/table`) | `SkyTableRoot`, `SkyTableHeader`, `SkyTableHead`, `SkyTableBody`, `SkyTableRow`, `SkyTableCell`, `SkyTableEmpty` | завжди |
+| Примітиви (`shared/ui/table`) | `SkyTableRoot`, `SkyTableHeader`, `SkyTableHead`, `SkyTableBody`, `SkyTableVirtualBody`, `SkyTableRow`, `SkyTableCell`, `SkyTableEmpty` | завжди |
 | Композабли (`shared/lib/table`) | `useTableSort`, `useTableSelection`, `useColumnVisibility` | за потреби |
 | Фічі (`features/table`) | `TableMassActions`, `TableColumnSettings`, `TableVirtualBody` | опційно, кожна окремо |
 
@@ -982,13 +1015,46 @@ const { visibility, visibleColumns } = useColumnVisibility(columns, { storageKey
 
 Композабли не сортують і не фільтрують дані — вони тримають стан, а дані лишаються за застосунком (зазвичай сортує сервер). Колонка вибору описується як звичайна колонка (`{ name: '_select', width: 44 }`), щоб грід шапки й рядків рахувався з одного джерела.
 
-> `vue-virtual-scroller` імпортує лише `TableVirtualBody`. Не потрібна віртуалізація — беріть `SkyTableBody`, і залежність не знадобиться.
+#### Тіло: два режими, один контракт
+
+`SkyTableBody` без пропа `rows` — прозора обгортка (рядки складаєте самі, як вище). З `rows` — ітерує сам і віддає scoped-слот:
+
+```vue
+<SkyTableBody :rows="rows" :row-key="row => row.id">
+  <template #empty><SkyTableEmpty text="Даних немає" /></template>
+  <template #default="{ row }">
+    <SkyTableRow><SkyTableCell>{{ row.name }}</SkyTableCell></SkyTableRow>
+  </template>
+</SkyTableBody>
+```
+
+`SkyTableVirtualBody` приймає ті самі `rows`/`rowKey` і віддає той самий слот, лишаючи в DOM тільки видиме вікно рядків. Тому перемикання віртуалізації — це заміна тега, а не переписування розмітки:
+
+```vue
+<component :is="virtual ? SkyTableVirtualBody : SkyTableBody" :rows="rows" :row-key="row => row.id">
+  <template #default="{ row }">…</template>
+</component>
+```
+
+| Prop `SkyTableVirtualBody` | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `rows` | `TRow[]` | — | Рядки (обовʼязково) |
+| `rowKey` | `(row, index) => string \| number` | індекс | Ключ рядка |
+| `estimateSize` | `Number` | `40` | Очікувана висота рядка в px |
+| `overscan` | `Number` | `6` | Скільки рядків тримати понад видиме вікно |
+| `dynamic` | `Boolean` | `false` | Рядки різної висоти — вимірювання через ResizeObserver |
+
+Подія `reach-end` — коли останній рядок увійшов у вікно.
+
+> **Потрібна обмежена висота.** Скрол-контейнером є саме тіло. Якщо таблиця росте разом з контентом і скролиться сторінка, вікно ніколи не зсувається. Дайте таблиці `height` або `flex: 1; min-height: 0`.
+
+> `TableVirtualBody` з `features/table` лишається як сумісна обгортка зі старим контрактом (`items` + слот `{ item, index }`). У новому коді беріть `SkyTableVirtualBody`.
 
 ---
 
 ### SkyTable
 
-Віртуал-скрол таблиця (на `vue-virtual-scroller`) для великих списків — у DOM тримаються лише видимі рядки. Розмітка й стилі 1:1 з таблицею товарів POS: чекбокси, масові дії, сортування, зміна ширини/видимості колонок, розкриття вкладених рядків (модифікацій), inline-редагування комірок і теги.
+Віртуал-скрол таблиця (на `@tanstack/vue-virtual`) для великих списків — у DOM тримаються лише видимі рядки. Розмітка й стилі 1:1 з таблицею товарів POS: чекбокси, масові дії, сортування, зміна ширини/видимості колонок, розкриття вкладених рядків (модифікацій), inline-редагування комірок і теги.
 
 ```vue
 <SkyTable
@@ -1078,7 +1144,7 @@ const json = { items, total: items.length }
 |------|-------|------|
 | `cell-<name>` | `{ row, value, item }` | Кастомний рендер комірки колонки `<name>` |
 
-> **Примітка:** компонент розрахований на хост-середовище Skyservice POS. Він читає словник i18n з `window.lang` (з UA-фолбеками) і використовує host-assets за абсолютними шляхами (`/image/dragons/…`, `/svg/arrow_black.svg`), які віддає застосунок-хост — тому в бібліотеці вони навмисно не бандляться (`vite.config` → `transformAssetUrls.includeAbsolute: false`). `vue-virtual-scroller` — зовнішня залежність: встанови її в застосунку-хості.
+> **Примітка:** компонент розрахований на хост-середовище Skyservice POS. Він читає словник i18n з `window.lang` (з UA-фолбеками) і використовує host-assets за абсолютними шляхами (`/image/dragons/…`, `/svg/arrow_black.svg`), які віддає застосунок-хост — тому в бібліотеці вони навмисно не бандляться (`vite.config` → `transformAssetUrls.includeAbsolute: false`). `@tanstack/vue-virtual` — зовнішня залежність: встанови її в застосунку-хості.
 
 ---
 
@@ -1359,7 +1425,7 @@ src/
 │       ├── SkyBadge/
 │       ├── SkyCard/ SkyCardHeader/ SkyCardRow/
 │       ├── SkyLoader/
-│       ├── table/       # примітиви композиційної таблиці (Root/Header/Head/Body/Row/Cell/Empty)
+│       ├── table/       # примітиви композиційної таблиці (Root/Header/Head/Body/VirtualBody/Row/Cell/Empty)
 │       ├── SkyTable/     # готова віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)
 │       ├── SkyTileCard/
 │       ├── SkyFilterDropdown/  # оболонка фільтра (тригер + панель) + FilterSearch

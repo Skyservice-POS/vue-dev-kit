@@ -6,12 +6,23 @@ import SkyTableRoot from '../../shared/ui/table/SkyTableRoot.vue';
 import SkyTableHeader from '../../shared/ui/table/SkyTableHeader.vue';
 import SkyTableHead from '../../shared/ui/table/SkyTableHead.vue';
 import SkyTableBody from '../../shared/ui/table/SkyTableBody.vue';
+import SkyTableVirtualBody from '../../shared/ui/table/SkyTableVirtualBody.vue';
 import SkyTableRow from '../../shared/ui/table/SkyTableRow.vue';
 import SkyTableCell from '../../shared/ui/table/SkyTableCell.vue';
 import SkyTableEmpty from '../../shared/ui/table/SkyTableEmpty.vue';
 import SkySearchInput from '../../shared/ui/SkySearchInput/SkySearchInput.vue';
 import { skyTableFeatures } from '../../shared/lib/table/tableFeatures';
 import type { SkyTableColumn } from '../../shared/ui/table/types';
+
+/** Налаштування віртуалізації тіла — те саме, що приймає SkyTableVirtualBody. */
+export interface SkyDataTableVirtualOptions {
+  /** Очікувана висота рядка в px. За замовчуванням 40 — як `--sky-table-row-height`. */
+  estimateSize?: number;
+  /** Скільки рядків тримати в DOM понад видиме вікно. */
+  overscan?: number;
+  /** Рядки різної висоти. Вмикає вимірювання рядків — дорожче, лише за потреби. */
+  dynamic?: boolean;
+}
 
 const props = withDefaults(
   defineProps<{
@@ -34,6 +45,15 @@ const props = withDefaults(
     emptyText?: string;
     /** Курсор-вказівник і hover на рядках. */
     interactiveRows?: boolean;
+    /**
+     * Віртуалізація тіла: в DOM лишається тільки видиме вікно рядків.
+     * `true` — з дефолтами, обʼєкт — з налаштуваннями.
+     *
+     * Вимагає обмеженої висоти таблиці й несумісна з `pageSize`: на сторінці
+     * в кілька десятків рядків віртуалізувати нічого. Природна пара до неї —
+     * не пагінація, а довантаження за подією `reach-end`.
+     */
+    virtual?: boolean | SkyDataTableVirtualOptions;
   }>(),
   {
     features: undefined,
@@ -49,6 +69,8 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'row-click': [row: TData];
+  /** Долистали тіло до кінця. Емітиться лише у віртуальному режимі. */
+  'reach-end': [];
 }>();
 
 const table = useTable({
@@ -92,7 +114,15 @@ const gridColumns = computed<SkyTableColumn[]>(() =>
 );
 
 const headers = computed(() => table.getHeaderGroups());
-const rows = computed(() => table.getRowModel().rows);
+
+// `rowPaginationFeature` у наборі завжди, тож getRowModel() — це вже нарізана
+// сторінка, і без явного pageSize TanStack підставляє свої 10. Виходило, що
+// «pageSize: 0» (задокументоване «без пагінації») мовчки показувало перші 10
+// рядків без жодного пагінатора. Беремо допагінаційну модель — відсортовану
+// й відфільтровану, але не обрізану.
+const rows = computed(() =>
+  props.pageSize > 0 ? table.getRowModel().rows : table.getPrePaginatedRowModel().rows,
+);
 
 const globalFilter = computed({
   get: () => (table.atoms.globalFilter?.get() as string) ?? '',
@@ -104,6 +134,27 @@ const showPagination = computed(() => props.pageSize > 0 && table.getPageCount()
 
 function alignOf(columnId: string): SkyTableColumn['align'] {
   return gridColumns.value.find((c) => c.name === columnId)?.align ?? 'left';
+}
+
+// Ключ рядка беремо з TanStack, а не з індексу: після сортування чи фільтрації
+// індекси зʼїжджають, і Vue перевикористав би DOM не тих рядків.
+function rowKeyOf(row: { id: string }): string {
+  return row.id;
+}
+
+const isVirtual = computed(() => Boolean(props.virtual));
+
+const virtualProps = computed(() =>
+  typeof props.virtual === 'object' && props.virtual !== null ? props.virtual : {},
+);
+
+// Разом вони безглузді: на сторінці в кілька десятків рядків віртуалізувати
+// нічого, а мовчазний пріоритет одного над іншим потім ловиться годинами.
+if (props.virtual && props.pageSize > 0) {
+  console.warn(
+    '[SkyDataTable] `virtual` і `pageSize` разом не мають сенсу: пагінація вже обмежує ' +
+      'кількість рядків у DOM. Лишіть щось одне — pageSize={0} для віртуалізації.',
+  );
 }
 
 defineExpose({ table });
@@ -144,31 +195,39 @@ defineExpose({ table });
         </SkyTableHead>
       </SkyTableHeader>
 
-      <SkyTableBody>
-        <SkyTableEmpty v-if="!rows.length" :text="emptyText">
-          <slot name="empty" />
-        </SkyTableEmpty>
+      <component
+        :is="isVirtual ? SkyTableVirtualBody : SkyTableBody"
+        :rows="rows"
+        :row-key="rowKeyOf"
+        v-bind="isVirtual ? virtualProps : {}"
+        @reach-end="emit('reach-end')"
+      >
+        <template #empty>
+          <SkyTableEmpty :text="emptyText">
+            <slot name="empty" />
+          </SkyTableEmpty>
+        </template>
 
-        <SkyTableRow
-          v-for="row in rows"
-          :key="row.id"
-          :selected="row.getIsSelected()"
-          :interactive="interactiveRows"
-          @click="emit('row-click', row.original)"
-        >
-          <SkyTableCell
-            v-for="cell in row.getVisibleCells()"
-            :key="cell.id"
-            :align="alignOf(cell.column.id)"
-            no-truncate
+        <template #default="{ row }">
+          <SkyTableRow
+            :selected="row.getIsSelected()"
+            :interactive="interactiveRows"
+            @click="emit('row-click', row.original)"
           >
-            <FlexRender
-              :render="cell.column.columnDef.cell"
-              :props="cell.getContext()"
-            />
-          </SkyTableCell>
-        </SkyTableRow>
-      </SkyTableBody>
+            <SkyTableCell
+              v-for="cell in row.getVisibleCells()"
+              :key="cell.id"
+              :align="alignOf(cell.column.id)"
+              no-truncate
+            >
+              <FlexRender
+                :render="cell.column.columnDef.cell"
+                :props="cell.getContext()"
+              />
+            </SkyTableCell>
+          </SkyTableRow>
+        </template>
+      </component>
     </SkyTableRoot>
 
     <slot name="footer" :table="table">
