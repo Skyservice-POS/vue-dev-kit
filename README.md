@@ -184,7 +184,7 @@ import {
 | `dropdownTitle` | `String` | `'Останні відвідані розділи'` | Заголовок дропдауну |
 | `visitLabel` | `String` | `'Останнє відвідування'` | Підпис часу в дропдауні |
 | `trackPageName` | `String` | `''` | Назва сторінки для трекінгу відвідувань |
-| `trackPagePath` | `String` | `''` | Шлях сторінки для трекінгу |
+| `trackPagePath` | `String` | `''` | Шлях сторінки для трекінгу (за замовчуванням `/apps/{trackPageName}`; актуальний дашборд підставляє свій реальний маршрут) |
 | `appId` | `String` | `''` | Ідентифікатор додатку для iframe bridge |
 
 #### Slots
@@ -1209,6 +1209,7 @@ const range = reactive({ start: '', end: '' }) // { start, end } у формат
 | `doneLabel` | `String` | `'Готово'` | Лейбл кнопки "Готово" |
 | `searchPlaceholder` | `String` | `'Пошук'` | Placeholder пошуку |
 | `selectAll` | `Boolean` | `true` | Показувати «Обрати все» |
+| `searchable` | `Boolean` | `true` | Показувати поле пошуку |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
 
 ### SkySelectFilter

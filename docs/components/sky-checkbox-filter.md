@@ -47,6 +47,7 @@ const categoryOptions = [
 | `doneLabel` | `String` | `'Готово'` | Лейбл кнопки «Готово» |
 | `searchPlaceholder` | `String` | `'Пошук'` | Placeholder пошуку |
 | `selectAll` | `Boolean` | `true` | Показувати «Обрати все». Вимикай, коли споживач приймає лише одне значення |
+| `searchable` | `Boolean` | `true` | Показувати поле пошуку |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
 
 ## Формат опцій

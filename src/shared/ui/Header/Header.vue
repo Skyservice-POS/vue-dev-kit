@@ -148,11 +148,14 @@ const isDropdownOpen = ref(false)
 const localStorageItems = ref([])
 const parentLang = ref({})
 
-// Track page visit in parent's componentStats
+// Track page visit in parent's componentStats.
+// Точний шлях знає лише дашборд (iframe не бачить URL батька), тому він і підставляє
+// свій поточний маршрут. Фолбек тут — конвенція монтування міні-застосунків `/apps/:slug`,
+// бо старіші дашборди беруть шлях лише з цього повідомлення.
 if (isInsideIframe() && props.trackPageName) {
   trackVisit(
     props.trackPageName,
-    props.trackPagePath || `/${props.trackPageName}`,
+    props.trackPagePath || `/apps/${props.trackPageName}`,
   )
 }
 
