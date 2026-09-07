@@ -8,6 +8,7 @@ import SkySelect from '@/shared/ui/SkySelect/SkySelect.vue'
 import SkySelectSearch from '@/shared/ui/SkySelectSearch/SkySelectSearch.vue'
 import SkyCheckbox from '@/shared/ui/SkyCheckbox/SkyCheckbox.vue'
 import SkyTabs from '@/shared/ui/SkyTabs/SkyTabs.vue'
+import SkyPagination from '@/shared/ui/SkyPagination/SkyPagination.vue'
 import SkyBadge from '@/shared/ui/SkyBadge/SkyBadge.vue'
 import SkyAlert from '@/shared/ui/SkyAlert/SkyAlert.vue'
 import SkyLoader from '@/shared/ui/SkyLoader/SkyLoader.vue'
@@ -37,6 +38,7 @@ const checked = ref(true)
 const period = ref('week')
 const filter = ref([])
 const selectFilter = ref(null)
+const galleryPage = ref(3)
 const showModal = ref(false)
 const showDialog = ref(false)
 
@@ -173,6 +175,16 @@ const primitiveColumns = [
               { value: 'food', name: 'Їжа' },
             ]"
           />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-pagination">SkyPagination</a>
+          <code>сторінки + кількість</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkyPagination :total="240" :page="galleryPage" :page-size="25" @update:page="galleryPage = $event" />
         </div>
       </article>
 
