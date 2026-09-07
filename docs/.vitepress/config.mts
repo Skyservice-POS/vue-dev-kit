@@ -134,6 +134,7 @@ export default defineConfig({
             { text: 'SkySelectSearch', link: '/components/sky-select-search' },
             { text: 'SkyCheckbox', link: '/components/sky-checkbox' },
             { text: 'SkyTabs', link: '/components/sky-tabs' },
+            { text: 'SkyPagination', link: '/components/sky-pagination' },
           ],
         },
         {

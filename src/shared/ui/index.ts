@@ -16,6 +16,7 @@ export { default as SkyDateRangePicker } from './SkyDateRangePicker';
 export { default as SkyFilterDropdown } from './SkyFilterDropdown';
 export { default as SkyInput } from './SkyInput';
 export { default as SkyLoader } from './SkyLoader';
+export { default as SkyPagination } from './SkyPagination';
 export { default as SkySelect } from './SkySelect';
 export { default as SkySelectSearch } from './SkySelectSearch';
 export { default as SkySearchInput } from './SkySearchInput';

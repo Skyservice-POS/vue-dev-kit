@@ -34,7 +34,7 @@ import {
   SkyTableRow, SkyTableCell,
   useTableSort, useTableSelection, useColumnVisibility,
   FunctionalCalendar, SkyDateRangePicker,
-  SkyFilterDropdown,
+  SkyFilterDropdown, SkyPagination,
   // widgets
   SkyTileCard,
   // features
@@ -1244,6 +1244,42 @@ const range = reactive({ start: '', end: '' }) // { start, end } у формат
 
 ---
 
+## SkyPagination
+
+Посторінкова навігація в стилі таблиць адмінки: селектор кількості на сторінці, далі
+номери зі згортанням у «…». Нічого не завантажує — лише повідомляє, що обрали.
+
+```vue
+<SkyPagination
+  :total="total"
+  :page="page"
+  :page-size="pageSize"
+  :all-label="(n) => `Усі ${n}`"
+  @update:page="page = $event; reload()"
+  @update:page-size="pageSize = $event; page = 1; reload()"
+/>
+```
+
+#### Props
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `total` | `Number` | — | Скільки всього записів у вибірці, не на сторінці |
+| `page` | `Number` | — | Поточна сторінка, з одиниці |
+| `pageSize` | `Number` | — | Записів на сторінці |
+| `pageSizeOptions` | `Number[]` | `[5,10,25,50,100,200,500,750,1000]` | Варіанти селектора; лишаються менші за `total` |
+| `allLabel` | `(total) => String` | — | Підпис пункту «показати все»; без нього пункту немає |
+| `allLimit` | `Number` | `1000` | До якої кількості пропонувати «показати все» |
+| `siblings` | `Number` | `1` | Скільки сусідніх сторінок показувати обабіч поточної |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+Events: `update:page`, `update:pageSize`. CSS-змінні — `--sky-pagination-*`.
+
+**Потрібен `total`.** Для курсорних джерел, де загальна кількість невідома, а вперед ведуть
+лише курсори, номери сторінок неможливі — там потрібна навігація «назад / далі».
+
+---
+
 ## SkyFilterDropdown
 
 Оболонка фільтра: тригер-чіп + панель. Бере на себе тільки спільне — стан відкриття,
@@ -1435,6 +1471,7 @@ src/
 │       ├── SkyTable/     # готова віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)
 │       ├── SkyTileCard/
 │       ├── SkyFilterDropdown/  # оболонка фільтра (тригер + панель) + FilterSearch
+│       ├── SkyPagination/     # посторінкова навігація зі селектором кількості
 │       ├── functional-calendar/ # форк vue-functional-calendar, перенесений зі SkyMarket 1:1
 │       ├── SkyDateRangePicker/  # DatePickerRange зі SkyMarket, store/langs → props/локальний стан
 │       └── <Component>/
