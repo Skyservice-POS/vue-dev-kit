@@ -22,11 +22,14 @@ const props = withDefaults(
     searchPlaceholder?: string;
     /** Сховати «Обрати все» — коли споживач не може прийняти більше одного значення. */
     selectAll?: boolean;
+    /** Сховати пошук — для коротких фіксованих списків він лише шумить. */
+    searchable?: boolean;
     disabled?: boolean;
   }>(),
   {
     modelValue: () => [],
     selectAll: true,
+    searchable: true,
     selectAllLabel: 'Обрати все',
     clearLabel: 'Очистити',
     doneLabel: 'Готово',
@@ -92,7 +95,12 @@ function clearAll(): void {
         </button>
       </div>
 
-      <FilterSearch v-model="searchQuery" :placeholder="searchPlaceholder" :label="title" />
+      <FilterSearch
+        v-if="searchable"
+        v-model="searchQuery"
+        :placeholder="searchPlaceholder"
+        :label="title"
+      />
 
       <div class="sky-checkbox-filter__options">
         <div v-for="opt in filteredOptions" :key="opt.value" class="sky-checkbox-filter__option">

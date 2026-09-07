@@ -53,7 +53,7 @@ function goTo(item) {
 | `dropdownTitle` | `String` | `'Останні відвідані розділи'` | Заголовок дропдауну |
 | `visitLabel` | `String` | `'Останнє відвідування'` | Підпис часу в дропдауні |
 | `trackPageName` | `String` | `''` | Назва сторінки для трекінгу відвідувань |
-| `trackPagePath` | `String` | `''` | Шлях сторінки для трекінгу |
+| `trackPagePath` | `String` | `''` | Шлях сторінки для трекінгу (за замовчуванням `/apps/{trackPageName}`; актуальний дашборд підставляє свій реальний маршрут) |
 | `appId` | `String` | `''` | Ідентифікатор додатку для iframe bridge |
 
 ### Формат `dropdownItems`
