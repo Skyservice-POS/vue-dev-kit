@@ -44,20 +44,33 @@ const emit = defineEmits<{
 
 const pageCount = computed(() => Math.max(1, Math.ceil(props.total / Math.max(1, props.pageSize))));
 
+/** Чи пропонуємо пункт «показати все». */
+const hasAll = computed(
+  () => !!props.allLabel && props.total > 0 && props.total <= props.allLimit,
+);
+
 /**
- * Пункти менші за `total` — показувати «100 на сторінці» для 40 записів немає сенсу.
- * Поточний лишаємо завжди, інакше селектор показував би значення, якого немає в списку.
+ * Коли на сторінці вміщається все, показуємо це як «Усі N», а не як число, яке
+ * більше за саму вибірку: «50» при восьми записах виглядає як помилка.
+ */
+const selectValue = computed(() =>
+  hasAll.value && props.pageSize >= props.total ? props.total : props.pageSize,
+);
+
+/**
+ * Пункти менші за `total` — «100 на сторінці» для 40 записів сенсу не має.
+ * Поточне значення додаємо, лише якщо його інакше не буде в списку: нативний
+ * select із незнайомим value показав би порожньо.
  */
 const sizeOptions = computed(() => {
-  const fitting = props.pageSizeOptions.filter((n) => n < props.total || n === props.pageSize);
-  if (props.allLabel && props.total > 0 && props.total <= props.allLimit && !fitting.includes(props.total)) {
-    fitting.push(props.total);
-  }
+  const fitting = props.pageSizeOptions.filter((n) => n < props.total);
+  if (hasAll.value) fitting.push(props.total);
+  if (!fitting.includes(selectValue.value)) fitting.push(selectValue.value);
   return [...new Set(fitting)].sort((a, b) => a - b);
 });
 
 const sizeLabel = (n: number): string =>
-  props.allLabel && n === props.total ? props.allLabel(props.total) : String(n);
+  hasAll.value && n === props.total ? props.allLabel!(props.total) : String(n);
 
 /** Номери сторінок із «…»: перша, остання, поточна з сусідами. */
 const pages = computed<(number | '…')[]>(() => {
@@ -92,14 +105,14 @@ function onSize(e: Event): void {
     <select
       v-if="sizeOptions.length > 1"
       class="sky-pagination__size"
-      :value="pageSize"
+      :value="selectValue"
       :disabled="disabled"
       @change="onSize"
     >
       <option v-for="n in sizeOptions" :key="n" :value="n">{{ sizeLabel(n) }}</option>
     </select>
 
-    <template v-for="(p, i) in pages">
+    <template v-for="(p, i) in pageCount > 1 ? pages : []">
       <button
         v-if="p !== '…'"
         :key="`p${p}`"
