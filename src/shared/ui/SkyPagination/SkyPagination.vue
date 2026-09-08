@@ -144,8 +144,14 @@ function onSize(e: Event): void {
   line-height: 15px;
 }
 
+/* Рамка й висота — як у `.selectorPageLimit` в адмінці; бордер той самий #a9a9a9,
+   що й у поточної сторінки, тож обидві коробки виглядають однією парою. */
 .sky-pagination__size {
-  border: none;
+  height: var(--sky-pagination-size-height, 38px);
+  margin-left: 5px;
+  padding: 0 8px;
+  border: 1px solid var(--sky-pagination-size-border, #a9a9a9);
+  border-radius: 5px;
   background: transparent;
   font: inherit;
   font-weight: 500;
