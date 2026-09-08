@@ -40,6 +40,10 @@ export type { WebviewType } from './webview';
 export { SkyserviceAPI } from './api';
 export type { SkyserviceAPIConfig } from './api';
 
+// Гроші — значок валюти й форматування суми (без Vue, доступно й з Vue 2)
+export { formatMoney, currencyIcon, CURRENCY_ICONS } from './money';
+export type { FormatMoneyOptions } from './money';
+
 // Types
 export type {
   Tradepoint,
