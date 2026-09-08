@@ -16,7 +16,7 @@ function onSize(n) {
 </script>
 
 <template>
-  <Demo title="Багато сторінок" column>
+  <Demo title="Багато сторінок (клікни по «25», щоб побачити меню)" column>
     <SkyPagination
       :total="total"
       :page="page"
