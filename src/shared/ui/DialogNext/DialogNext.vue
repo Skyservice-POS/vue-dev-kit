@@ -359,20 +359,24 @@ onUnmounted(() => {
   margin-left: 10px;
 }
 
-/* Кнопки в футері: 1 = 100%, 2 = по 50% */
+/* Кнопки в футері: 1 = 100%, 2 = по 50%.
+   Кількість дітей рахуємо позиційними селекторами, а не `:has()`: той є лише з
+   Chromium 105, а застосунки на кіті відкривають і у WebView на 84 — там усе
+   правило просто відкидалось і кнопки не розтягувались. `:only-child` та
+   `:nth-last-child()` є в усіх рушіях, а поведінка та сама (перевірено на 1, 2
+   і 3 кнопках). */
 .sky-dialog-footer > :deep(*) {
   flex: 1;
   min-width: 0;
 }
 
-.sky-dialog-footer:has(> :deep(*:only-child)) > :deep(*) {
+.sky-dialog-footer > :deep(*:only-child) {
   max-width: 100%;
 }
 
-.sky-dialog-footer:has(
-    > :deep(*:nth-child(2)):not(:has(> :deep(*:nth-child(3))))
-  )
-  > :deep(*) {
+/* «Перша дитина, від кінця друга» = їх рівно дві. */
+.sky-dialog-footer > :deep(*:first-child:nth-last-child(2)),
+.sky-dialog-footer > :deep(*:first-child:nth-last-child(2) ~ *) {
   flex: 1 1 50%;
 }
 
