@@ -19,6 +19,19 @@ const props = withDefaults(
     align?: 'start' | 'end';
     /** Panel width in px; the panel never grows past the viewport. */
     width?: number;
+    /** Додатковий клас на тригер — коли потрібен інший вигляд кнопки. */
+    triggerClass?: string;
+    /**
+     * Клас на панель. Панель телепортується в body, тож scoped-стилі викликача
+     * до неї не дістають — правило для цього класу має бути глобальним.
+     */
+    panelClass?: string;
+    /**
+     * CSS-змінні для панелі, інлайном. Потрібні, коли споживач має свій вигляд:
+     * панель у body, тож і scoped-правила викликача, і тема застосунку на :root
+     * інакше перекривали б її — інлайн виграє в обох.
+     */
+    panelVars?: Record<string, string>;
   }>(),
   {
     summary: '',
@@ -26,6 +39,9 @@ const props = withDefaults(
     disabled: false,
     align: 'start',
     width: 280,
+    triggerClass: '',
+    panelClass: '',
+    panelVars: () => ({}),
   },
 );
 
@@ -68,6 +84,7 @@ function updatePosition(): void {
   const flip = below < MIN_PANEL_HEIGHT && above > below;
 
   panelStyle.value = {
+    ...props.panelVars,
     left: `${Math.max(EDGE, Math.min(left, vw - width - EDGE))}px`,
     width: `${width}px`,
     maxHeight: `${Math.max(MIN_PANEL_HEIGHT, flip ? above : below)}px`,
@@ -146,15 +163,18 @@ defineExpose({ open, close, toggle, isOpen });
       ref="triggerRef"
       type="button"
       class="sky-filter-dropdown__trigger"
-      :class="{ 'is-open': isOpen, 'is-disabled': disabled }"
+      :class="[triggerClass, { 'is-open': isOpen, 'is-disabled': disabled }]"
       :disabled="disabled"
       aria-haspopup="dialog"
       :aria-expanded="isOpen"
       @click="toggle"
     >
-      <span class="sky-filter-dropdown__title">{{ label }}</span>
-      <span v-if="hasBadge" class="sky-filter-dropdown__badge">{{ badge }}</span>
+      <slot name="trigger" :is-open="isOpen">
+        <span class="sky-filter-dropdown__title">{{ label }}</span>
+        <span v-if="hasBadge" class="sky-filter-dropdown__badge">{{ badge }}</span>
+      </slot>
       <svg
+        v-if="!$slots.trigger"
         class="sky-filter-dropdown__caret"
         width="18"
         height="18"
@@ -176,6 +196,7 @@ defineExpose({ open, close, toggle, isOpen });
           v-if="isOpen"
           ref="panelRef"
           class="sky-filter-dropdown__panel"
+          :class="panelClass"
           role="dialog"
           :aria-label="title"
           :style="panelStyle"
