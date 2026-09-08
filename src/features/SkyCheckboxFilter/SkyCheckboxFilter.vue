@@ -158,6 +158,7 @@ function clearAll(): void {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  padding-top: 3px;
   padding-left: 3px;
 }
 

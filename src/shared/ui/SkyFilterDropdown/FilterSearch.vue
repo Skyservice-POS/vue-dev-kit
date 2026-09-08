@@ -43,11 +43,11 @@ const emit = defineEmits<{
   position: relative;
   display: flex;
   flex-shrink: 0;
-  margin-bottom: 15px;
+  margin-bottom: 4px;
   border-bottom: 2px solid var(--sky-filter-search-border-color, #d3d3d3);
 }
 
-.sky-filter-search:has(.sky-filter-search__input:focus) {
+.sky-filter-search:focus-within {
   border-bottom-color: var(--sky-filter-accent, #106090);
   transition: border-color 200ms;
 }
