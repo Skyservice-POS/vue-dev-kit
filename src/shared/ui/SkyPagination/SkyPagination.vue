@@ -168,8 +168,12 @@ function pick(size: number, close: () => void): void {
 }
 
 /* Рамка — на обгортці, а кнопка всередині світло-сіра: так само, як
-   `.selectorPageLimit` навколо Bootstrap-івського `.btn-light`. */
+   `.selectorPageLimit` навколо Bootstrap-івського `.btn-light`. Флекс тут не для
+   розкладки: в адмінці обгортка — це `.btn-group`, тобто `inline-flex`, і саме
+   він тягне кнопку рівно під рамку. Без нього кнопка лишалась на власні 38px і
+   вилазила на піксель за нижній бордер. */
 .sky-pagination__size {
+  display: inline-flex;
   width: fit-content;
   height: 38px;
   margin-left: 5px;
@@ -179,7 +183,9 @@ function pick(size: number, close: () => void): void {
 }
 
 .sky-pagination__size :deep(.sky-pagination__size-btn) {
-  height: 38px;
+  /* Не 38px: висоту дає розтягування по флексу — 36px усередині рамки, як в
+     адмінці. Явне `auto` потрібне, щоб перебити висоту з SkyFilterDropdown. */
+  height: auto;
   padding: 6px 12px;
   border: 1px solid var(--sky-pagination-size-bg, #f8f9fa);
   border-radius: 4px;
