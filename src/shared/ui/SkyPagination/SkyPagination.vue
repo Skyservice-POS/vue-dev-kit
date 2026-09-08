@@ -164,7 +164,7 @@ function pick(size: number, close: () => void): void {
   height: var(--sky-pagination-height, 48px);
   overflow: auto;
   font-size: var(--sky-pagination-font-size, 12pt);
-  line-height: 15px;
+  line-height: var(--sky-pagination-line-height, 15px);
 }
 
 /* Рамка — на обгортці, а кнопка всередині світло-сіра: так само, як
@@ -215,8 +215,17 @@ function pick(size: number, close: () => void): void {
   transform: rotate(180deg);
 }
 
+/* Висота задана числом, а не сумою паддингів і рядка. В адмінці номери — це
+   `<a>`, і там 10/11px паддингів навколо 15px рядка дають 36px. Повторювати цю
+   арифметику кнопкою виявилось крихко: `font: inherit` — скорочення, і глобальний
+   `button { line-height: 1.5 !important }` у застосунку-споживачі його перебиває,
+   роздуваючи кнопку до 47px. Тепер типографіка на розмір не впливає взагалі. */
 .sky-pagination__page {
-  padding: 10px 10px 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--sky-pagination-page-height, 36px);
+  padding: 0 10px;
   margin-right: 1px;
   border: none;
   border-radius: 5px;
@@ -242,7 +251,10 @@ function pick(size: number, close: () => void): void {
    піксельним семплом зі скріншота адмінки, де `.pagesBar .pageButton` б'є
    `.pageButton_current` за специфічністю. Падінги не компенсуємо: там кнопка з
    рамкою теж на 2px вища, і центрування по флексу це ховає. */
+/* Рамка додає 2px, тож щоб зовні лишалось 38px як в адмінці, висоту задаємо
+   явно — box-sizing тут border-box. */
 .sky-pagination__page.is-current {
+  height: calc(var(--sky-pagination-page-height, 36px) + 2px);
   border: 1px solid var(--sky-pagination-border, #a9a9a9);
   cursor: default;
 }
