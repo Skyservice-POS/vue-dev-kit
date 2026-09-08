@@ -79,3 +79,5 @@ function reload() { /* запит із page і pageSize */ }
 | `--sky-pagination-accent` | `#106090` | Колір номерів і селектора |
 | `--sky-pagination-current-border` | `#a9a9a9` | Рамка поточної сторінки |
 | `--sky-pagination-current-color` | `#000` | Колір тексту поточної сторінки |
+| `--sky-pagination-size-height` | `38px` | Висота селектора кількості |
+| `--sky-pagination-size-border` | `#a9a9a9` | Рамка селектора кількості |
