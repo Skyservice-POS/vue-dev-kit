@@ -7,7 +7,7 @@ const pageSize = ref(25)
 const total = 1247
 
 const smallPage = ref(1)
-const smallSize = ref(10)
+const smallSize = ref(50)
 
 function onSize(n) {
   pageSize.value = n
@@ -27,15 +27,15 @@ function onSize(n) {
     <span class="vdk-demo-out">сторінка {{ page }} · по {{ pageSize }} · всього {{ total }}</span>
   </Demo>
 
-  <Demo title="Мало записів + пункт «Усі»" column>
+  <Demo title="Мало записів: номерів немає, лишається лише вибір кількості" column>
     <SkyPagination
-      :total="42"
+      :total="8"
       :page="smallPage"
       :page-size="smallSize"
       :all-label="(n) => `Усі ${n}`"
       @update:page="smallPage = $event"
       @update:page-size="smallSize = $event; smallPage = 1"
     />
-    <span class="vdk-demo-out">сторінка {{ smallPage }} · по {{ smallSize }} · всього 42</span>
+    <span class="vdk-demo-out">сторінка {{ smallPage }} · по {{ smallSize }} · всього 8</span>
   </Demo>
 </template>
