@@ -41,7 +41,7 @@ import {
   SkyCheckboxFilter, SkySelectFilter,
   TableMassActions, TableColumnSettings, TableVirtualBody,
   // sdk
-  navigate, SkyserviceAPI, isInsideIframe,
+  navigate, SkyserviceAPI, isInsideIframe, formatMoney, currencyIcon,
   // sky-service-ui-components
   NotificationElement,
   notificationModule, globalStore,
@@ -1318,6 +1318,41 @@ Events: `update:page`, `update:pageSize`. CSS-змінні — `--sky-pagination
 | expose | `open()`, `close()`, `toggle()`, `isOpen` |
 
 CSS-змінні (`--sky-filter-*`) — див. [доки](https://74cfe434-a2b3-4d49-8fa7-db7343e399dc.apps.platform365.online/components/sky-filter-dropdown).
+
+---
+
+## formatMoney — сума зі значком валюти
+
+Живе в **SDK** (`@skyservice-developers/vue-dev-kit/sdk`), а не серед компонентів: там
+немає Vue, тож модуль доступний і адмінці на Vue 2.
+
+```ts
+import { formatMoney, currencyIcon } from '@skyservice-developers/vue-dev-kit/sdk'
+
+formatMoney('110',       { currency: 'UAH' })              // 110.00 ₴
+formatMoney('1250',      { currency: 'UAH' })              // 1 250.00 ₴
+formatMoney('110',       { currency: 'USD', locale: 'en' }) // $110.00
+formatMoney('110',       { currency: null })                // 110.00
+currencyIcon('KZT')                                         // ₸
+```
+
+| Опція | Типово | Опис |
+|---|---|---|
+| `currency` | `null` | ISO валюти. Без нього повертається лише число |
+| `locale` | `'uk'` | Мова інтерфейсу — вирішує, з якого боку значок |
+| `decimals` | `2` | Знаків після коми |
+
+**Де стоїть значок** — за правилами мови, не валюти: українська, польська й німецька
+ставлять його після числа, англійська й турецька перед. Позицію питаємо в `Intl`, а сам
+значок беремо зі свого списку: для більшості наших валют `Intl` віддає ISO-код замість
+символу (перевірено на всіх 55 — `₸`, `₺`, `zł`, `₫` він не знає).
+
+**Формат числа** зведений з адмінкою (`CurrencyFormatted` + `formatNumberWithSpaces`): дві
+копійки, тисячі через пробіл, крапка як десятковий роздільник. Локальні розділювачі
+свідомо не беремо — інакше та сама сума виглядала б по-різному в адмінці й у міні-аппі.
+
+Пробіли всередині — нерозривні, щоб ціна не переносилась на два рядки посеред числа.
+Нечислове значення повертається як є: краще показати сире, ніж `NaN`.
 
 ---
 
