@@ -1,140 +1,162 @@
 <template>
-  <button
-    class="sky-btn"
-    :class="[
-      `sky-btn-${variant}`,
-      {
-        'sky-btn-block': block,
-        'sky-btn-loading': loading,
-        'sky-btn-icon': icon,
-      }
-    ]"
-    :disabled="disabled || loading"
-    v-bind="$attrs"
-  >
-    <span v-if="loading" class="sky-btn-spinner"></span>
+  <button :type="type" :class="classes" :disabled="disabled || loading" v-bind="$attrs">
+    <span v-if="loading" :class="spinnerClasses" aria-hidden="true"></span>
     <slot></slot>
   </button>
 </template>
 
-<script setup>
-defineProps({
-  variant: {
-    type: String,
-    default: 'primary',
-    validator: (v) => ['primary', 'danger', 'secondary', 'outline'].includes(v)
-  },
-  loading: {
-    type: Boolean,
-    default: false
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  block: {
-    type: Boolean,
-    default: false
-  },
-  icon: {
-    type: Boolean,
-    default: false
-  }
-})
+<script setup lang="ts">
+  import { computed } from 'vue';
+  import {
+    buttonClasses,
+    BUTTON_SPINNER_CLASSES,
+    type SkyButtonSize,
+    type SkyButtonVariant,
+  } from '../../lib/button-classes';
+
+  /**
+   * Розмітка навмисно повторює те, що віддає `b-button`: адмінка під час
+   * міграції стилізує кнопки bootstrap-селекторами, тож Vue 3-збірка мусить
+   * давати ті самі класи, інакше у фліп-день верстка поїде.
+   *
+   * Класи дизайн-системи (`sky-btn*`) при цьому лишаються — саме вони дають
+   * вигляд у міні-застосунках, де Bootstrap CSS не підключений.
+   *
+   * Список класів рахує спільний модуль, який використовує і Vue 2-адаптер,
+   * а рівність розмітки закріплена тестом на спільній фікстурі.
+   */
+  const props = withDefaults(
+    defineProps<{
+      variant?: SkyButtonVariant;
+      size?: SkyButtonSize;
+      type?: 'button' | 'submit' | 'reset';
+      loading?: boolean;
+      disabled?: boolean;
+      block?: boolean;
+      icon?: boolean;
+    }>(),
+    {
+      variant: 'primary',
+      size: 'md',
+      type: 'button',
+      loading: false,
+      disabled: false,
+      block: false,
+      icon: false,
+    }
+  );
+
+  const classes = computed(() => buttonClasses(props));
+  const spinnerClasses = BUTTON_SPINNER_CLASSES;
 </script>
 
 <style scoped>
-.sky-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: var(--sky-btn-padding, 16px 20px);
-  border: var(--sky-btn-border, none);
-  border-radius: var(--sky-btn-radius, 6px);
-  font-size: var(--sky-btn-font-size, 14px);
-  font-weight: var(--sky-btn-font-weight, 500);
-  line-height: 1;
-  cursor: pointer;
-  white-space: nowrap;
-  user-select: none;
-}
+  .sky-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--sky-btn-padding, 16px 20px);
+    border: var(--sky-btn-border, none);
+    border-radius: var(--sky-btn-radius, 6px);
+    font-size: var(--sky-btn-font-size, 14px);
+    font-weight: var(--sky-btn-font-weight, 500);
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+  }
 
-.sky-btn-icon {
-  padding: var(--sky-btn-icon-padding, 10px);
-  border-radius: var(--sky-btn-icon-radius, 6px);
-}
+  .sky-btn-icon {
+    padding: var(--sky-btn-icon-padding, 10px);
+    border-radius: var(--sky-btn-icon-radius, 6px);
+  }
 
-.sky-btn-block {
-  width: 100%;
-}
+  .sky-btn-block {
+    width: 100%;
+  }
 
-.sky-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+  /* Розміри. У Bootstrap їх дають btn-sm / btn-lg, але в міні-застосунках
+     його CSS немає, тож потрібні власні. */
+  .sky-btn-sm {
+    padding: var(--sky-btn-sm-padding, 10px 14px);
+    font-size: var(--sky-btn-sm-font-size, 13px);
+  }
 
-/* Primary */
-.sky-btn-primary {
-  background: var(--sky-btn-primary-bg, #00c279);
-  color: var(--sky-btn-primary-color, #fff);
-}
-.sky-btn-primary:hover:not(:disabled) {
-  background: var(--sky-btn-primary-hover-bg, #00a868);
-}
-.sky-btn-primary:active:not(:disabled) {
-  background: var(--sky-btn-primary-active-bg, #008f5a);
-}
+  .sky-btn-lg {
+    padding: var(--sky-btn-lg-padding, 20px 26px);
+    font-size: var(--sky-btn-lg-font-size, 16px);
+  }
 
-/* Danger */
-.sky-btn-danger {
-  background: var(--sky-btn-danger-bg, #dc2626);
-  color: var(--sky-btn-danger-color, #fff);
-}
-.sky-btn-danger:hover:not(:disabled) {
-  background: var(--sky-btn-danger-hover-bg, #b91c1c);
-}
-.sky-btn-danger:active:not(:disabled) {
-  background: var(--sky-btn-danger-active-bg, #991b1b);
-}
+  .sky-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
-/* Secondary */
-.sky-btn-secondary {
-  background: var(--sky-btn-secondary-bg, #f3f4f6);
-  color: var(--sky-btn-secondary-color, #374151);
-}
-.sky-btn-secondary:hover:not(:disabled) {
-  background: var(--sky-btn-secondary-hover-bg, #e5e7eb);
-}
-.sky-btn-secondary:active:not(:disabled) {
-  background: var(--sky-btn-secondary-active-bg, #d1d5db);
-}
+  /* Primary */
+  .sky-btn-primary {
+    background: var(--sky-btn-primary-bg, #00c279);
+    color: var(--sky-btn-primary-color, #fff);
+  }
+  .sky-btn-primary:hover:not(:disabled) {
+    background: var(--sky-btn-primary-hover-bg, #00a868);
+  }
+  .sky-btn-primary:active:not(:disabled) {
+    background: var(--sky-btn-primary-active-bg, #008f5a);
+  }
 
-/* Outline */
-.sky-btn-outline {
-  background: var(--sky-btn-outline-bg, transparent);
-  color: var(--sky-btn-outline-color, #374151);
-  border: var(--sky-btn-border, 1px solid #d1d5db);
-}
-.sky-btn-outline:hover:not(:disabled) {
-  background: var(--sky-btn-outline-hover-bg, #f3f4f6);
-}
-.sky-btn-outline:active:not(:disabled) {
-  background: var(--sky-btn-outline-active-bg, #e5e7eb);
-}
+  /* Danger */
+  .sky-btn-danger {
+    background: var(--sky-btn-danger-bg, #dc2626);
+    color: var(--sky-btn-danger-color, #fff);
+  }
+  .sky-btn-danger:hover:not(:disabled) {
+    background: var(--sky-btn-danger-hover-bg, #b91c1c);
+  }
+  .sky-btn-danger:active:not(:disabled) {
+    background: var(--sky-btn-danger-active-bg, #991b1b);
+  }
 
-/* Loading spinner */
-.sky-btn-spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid currentColor;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: sky-btn-spin 0.6s linear infinite;
-  flex-shrink: 0;
-}
+  /* Secondary */
+  .sky-btn-secondary {
+    background: var(--sky-btn-secondary-bg, #f3f4f6);
+    color: var(--sky-btn-secondary-color, #374151);
+  }
+  .sky-btn-secondary:hover:not(:disabled) {
+    background: var(--sky-btn-secondary-hover-bg, #e5e7eb);
+  }
+  .sky-btn-secondary:active:not(:disabled) {
+    background: var(--sky-btn-secondary-active-bg, #d1d5db);
+  }
 
-@keyframes sky-btn-spin {
-  to { transform: rotate(360deg); }
-}
+  /* Outline */
+  .sky-btn-outline {
+    background: var(--sky-btn-outline-bg, transparent);
+    color: var(--sky-btn-outline-color, #374151);
+    border: var(--sky-btn-border, 1px solid #d1d5db);
+  }
+  .sky-btn-outline:hover:not(:disabled) {
+    background: var(--sky-btn-outline-hover-bg, #f3f4f6);
+  }
+  .sky-btn-outline:active:not(:disabled) {
+    background: var(--sky-btn-outline-active-bg, #e5e7eb);
+  }
+
+  /* Спінер. Класи spinner-border* приходять з Bootstrap і в міні-застосунках
+     нічого не означають — вигляд там дають правила нижче. */
+  .sky-btn-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: sky-btn-spin 0.6s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes sky-btn-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 </style>

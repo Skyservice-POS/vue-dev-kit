@@ -5,21 +5,35 @@
     :type="type"
     :block="block"
     :disabled="disabled || loading"
+    :class="skyClasses"
     v-bind="$attrs"
     v-on="$listeners"
   >
-    <b-spinner v-if="loading" small class="sky-btn-spinner" />
+    <span v-if="loading" :class="spinnerClasses" aria-hidden="true"></span>
     <slot />
   </b-button>
 </template>
 
 <script>
-  import { BButton, BSpinner } from 'bootstrap-vue';
+  // Точковий шлях, а не `from 'bootstrap-vue'`: кореневий індекс тягне всю
+  // бібліотеку разом із тост-плагіном і portal-vue, які кнопці не потрібні.
+  import { BButton } from 'bootstrap-vue/esm/components/button';
+  import { skyButtonClasses, BUTTON_SPINNER_CLASSES } from '../../shared/lib/button-classes';
   import { toBsButtonVariant, toBsSize } from '../lib/map';
 
+  /**
+   * Класи `sky-btn*` віддаємо самі, bootstrap-івські додає `b-button`.
+   * Vue 2 ставить клас із зовнішнього `:class` попереду власних класів
+   * компонента, тож на виході виходить рівно той порядок, який рахує
+   * `buttonClasses()` — і рівно той, що й у Vue 3-збірці.
+   *
+   * Спінер малюємо вручну, а не через `<b-spinner>`: так розмітка й набір
+   * класів збігаються з Vue 3-версією без залежності від внутрішніх
+   * деталей BootstrapVue.
+   */
   export default {
     name: 'SkyButton',
-    components: { BButton, BSpinner },
+    components: { BButton },
     inheritAttrs: false,
     props: {
       variant: {
@@ -44,6 +58,12 @@
       },
       bsSize() {
         return toBsSize(this.size);
+      },
+      skyClasses() {
+        return skyButtonClasses(this.$props);
+      },
+      spinnerClasses() {
+        return BUTTON_SPINNER_CLASSES;
       },
     },
   };
