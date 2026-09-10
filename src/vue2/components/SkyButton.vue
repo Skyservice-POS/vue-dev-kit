@@ -15,9 +15,11 @@
 </template>
 
 <script>
-  // Точковий шлях, а не `from 'bootstrap-vue'`: кореневий індекс тягне всю
-  // бібліотеку разом із тост-плагіном і portal-vue, які кнопці не потрібні.
-  import { BButton } from 'bootstrap-vue/esm/components/button';
+  // Саме кореневий імпорт. Точкові шляхи в `bootstrap-vue/esm/**` виглядають
+  // привабливіше, але всередині вони посилаються один на одного без розширень
+  // і в нативному Node ESM не резолвляться. Споживач нашої Vue 2-збірки —
+  // адмінка, яка й так реєструє BootstrapVue глобально, тож економити тут нічого.
+  import { BButton } from 'bootstrap-vue';
   import { skyButtonClasses, BUTTON_SPINNER_CLASSES } from '../../shared/lib/button-classes';
   import { toBsButtonVariant, toBsSize } from '../lib/map';
 

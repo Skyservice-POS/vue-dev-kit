@@ -29,9 +29,7 @@ export default defineConfig({
       // `vue` і `bootstrap-vue` дає споживач. Для bootstrap-vue це принципово:
       // адмінка вже має його у своїх залежностях, і другий екземпляр у бандлі
       // означав би два незалежні реєстри компонентів і зламані модалки.
-      // Регулярка, а не рядок: частина адаптерів імпортує компоненти точковими
-      // шляхами (`bootstrap-vue/esm/components/...`), щоб не тягнути всю бібліотеку.
-      external: ['vue', /^bootstrap-vue(\/|$)/],
+      external: ['vue', 'bootstrap-vue'],
       output: {
         globals: {
           vue: 'Vue',

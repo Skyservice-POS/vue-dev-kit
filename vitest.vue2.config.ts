@@ -22,6 +22,15 @@ export default defineConfig({
     alias: [
       // Точний збіг, щоб не зачепити `vue2/compiler-sfc` і `vue-template-compiler`.
       { find: /^vue$/, replacement: resolve(root, 'node_modules/vue2/dist/vue.runtime.common.js') },
+      // За замовчуванням і BootstrapVue, і його portal-vue беруться CJS/UMD-збірками.
+      // Вони читають `vue` через require, отримують ESM-неймспейс замість самого Vue
+      // і падають на `Vue.extend is not a function`. ESM-збірки цієї проблеми не мають.
+      // Стосується лише тестів: у самому коді імпорт лишається звичайним `'bootstrap-vue'`.
+      {
+        find: /^bootstrap-vue$/,
+        replacement: resolve(root, 'node_modules/bootstrap-vue/dist/bootstrap-vue.esm.js'),
+      },
+      { find: /^portal-vue$/, replacement: resolve(root, 'node_modules/portal-vue/dist/portal-vue.esm.js') },
       { find: '@', replacement: resolve(root, 'src') },
     ],
   },
