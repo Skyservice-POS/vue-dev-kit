@@ -1,0 +1,6 @@
+{
+  "//": "Proxy-каталог для збирачів без підтримки поля exports (webpack 4, з якого зібрана адмінка на Vue CLI 4.5). Сучасні резолвери беруть підшлях ./vue2 з exports у кореневому package.json і сюди не заглядають. Видаляється разом із src/vue2 — див. src/vue2/README.md.",
+  "main": "../dist/vue2/vue-dev-kit.cjs",
+  "module": "../dist/vue2/vue-dev-kit.js",
+  "sideEffects": false
+}
