@@ -26,13 +26,18 @@
       "import": "./dist/vue2/vue-dev-kit.js",
       "require": "./dist/vue2/vue-dev-kit.cjs"
     },
+    "./compat": {
+      "import": "./dist/vue2/compat.js",
+      "require": "./dist/vue2/compat.cjs"
+    },
     "./style.css": "./dist/style.css",
     "./vue3/style.css": "./dist/style.css",
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
-    "vue2"
+    "vue2",
+    "compat"
   ],
   "scripts": {
     "dev": "vite",

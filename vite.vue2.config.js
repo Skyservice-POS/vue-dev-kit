@@ -20,10 +20,14 @@ export default defineConfig({
     // цілком, тож у `build` вона мусить іти першою — інакше знесе цей каталог.
     emptyOutDir: true,
     lib: {
-      entry: resolve(__dirname, 'src/vue2/index.js'),
-      name: 'VueDevKitVue2',
+      // Два входи. `compat` тримаємо окремо, бо він навмисно не залежить від
+      // bootstrap-vue: споживач, якому потрібен лише шар сумісності, не має
+      // тягнути разом із ним адаптери й саму бібліотеку.
+      entry: {
+        'vue-dev-kit': resolve(__dirname, 'src/vue2/index.js'),
+        compat: resolve(__dirname, 'src/compat/index.js'),
+      },
       formats: ['es', 'cjs'],
-      fileName: 'vue-dev-kit',
     },
     rollupOptions: {
       // `vue` і `bootstrap-vue` дає споживач. Для bootstrap-vue це принципово:

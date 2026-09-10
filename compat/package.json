@@ -1,0 +1,6 @@
+{
+  "//": "Proxy-каталог для збирачів без підтримки поля exports (webpack 4, з якого зібрана адмінка). Сучасні резолвери беруть підшлях ./compat з exports у кореневому package.json і сюди не заглядають.",
+  "main": "../dist/vue2/compat.cjs",
+  "module": "../dist/vue2/compat.js",
+  "sideEffects": false
+}

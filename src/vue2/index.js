@@ -1,6 +1,10 @@
 export * from './components';
 export * from './directives';
 
+// Шар сумісності з BootstrapVue — див. src/compat/index.js.
+// Саме він, а не адаптери вище, знімає залежність від bootstrap-vue.
+export { BootstrapCompat, BButton } from '../compat';
+
 /**
  * Плагін-хелпер: реєструє всі компоненти й директиви глобально —
  * зручно, коли адмінка переїжджає з глобально зареєстрованого BootstrapVue.

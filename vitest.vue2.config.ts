@@ -36,7 +36,7 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
-    include: ['src/vue2/**/*.test.ts'],
+    include: ['src/vue2/**/*.test.ts', 'src/compat/**/*.test.ts'],
     server: {
       deps: {
         // BootstrapVue і його portal-vue постачаються як UMD/CJS і читають
