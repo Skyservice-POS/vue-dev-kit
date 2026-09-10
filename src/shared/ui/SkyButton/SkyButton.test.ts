@@ -1,33 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import SkyButton from './SkyButton.vue';
-import { BUTTON_DOM_CASES, BUTTON_SLOT_TEXT, normalizeDom } from './button-dom-contract';
 
 /**
- * Дві групи перевірок з різними задачами.
- *
- * «Розмітка» звіряє вихід зі спільним еталоном — тим самим, який у своєму
- * прогоні звіряє Vue 2-адаптер. Це і є доказ, що збірки дають однакову
- * верстку, і саме через нього адмінка переживе фліп-день без правок CSS.
- *
- * «Поведінка» перевіряє обіцянки, які еталон розмітки не ловить: події,
- * блокування кліку, прокидання атрибутів.
+ * Обіцянки, які компонент має тримати, щоб його можна було ставити замість
+ * нативного `<button>`, не перевіряючи щоразу поведінку заново.
  */
 
-describe('SkyButton — розмітка збігається з контрактом', () => {
-  for (const testCase of BUTTON_DOM_CASES) {
-    it(testCase.name, () => {
-      const wrapper = mount(SkyButton, {
-        props: testCase.props,
-        slots: { default: BUTTON_SLOT_TEXT },
-      });
-
-      expect(normalizeDom(wrapper.element)).toBe(testCase.html);
-    });
-  }
-});
-
-describe('SkyButton — поведінка', () => {
+describe('SkyButton', () => {
   it('віддає клік назовні', async () => {
     const wrapper = mount(SkyButton);
     await wrapper.trigger('click');
@@ -71,12 +51,18 @@ describe('SkyButton — поведінка', () => {
     expect(wrapper.attributes('data-test')).toBe('save');
   });
 
-  it('перераховує класи при зміні пропів', async () => {
+  it('перемальовує клас варіанта при зміні пропа', async () => {
     const wrapper = mount(SkyButton, { props: { variant: 'primary' } });
-    expect(wrapper.classes()).toContain('btn-primary');
+    expect(wrapper.classes()).toContain('sky-btn-primary');
 
     await wrapper.setProps({ variant: 'danger' });
-    expect(wrapper.classes()).toContain('btn-danger');
-    expect(wrapper.classes()).not.toContain('btn-primary');
+    expect(wrapper.classes()).toContain('sky-btn-danger');
+    expect(wrapper.classes()).not.toContain('sky-btn-primary');
+  });
+
+  it('модифікатори block і icon дають свої класи', () => {
+    const wrapper = mount(SkyButton, { props: { block: true, icon: true } });
+
+    expect(wrapper.classes()).toEqual(expect.arrayContaining(['sky-btn-block', 'sky-btn-icon']));
   });
 });

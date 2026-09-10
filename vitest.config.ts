@@ -18,8 +18,5 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     include: ['src/**/*.test.ts'],
-    // Vue 2-шари мають власний прогін (vitest.vue2.config.ts) з іншим рантаймом
-    // Vue: тут їхні тести просто не зберуться.
-    exclude: ['src/vue2/**', 'src/compat/**'],
   },
 });

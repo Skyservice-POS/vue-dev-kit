@@ -22,43 +22,28 @@
       "import": "./dist/vue-dev-kit.js",
       "require": "./dist/vue-dev-kit.cjs"
     },
-    "./vue2": {
-      "import": "./dist/vue2/vue-dev-kit.js",
-      "require": "./dist/vue2/vue-dev-kit.cjs"
-    },
-    "./compat": {
-      "import": "./dist/vue2/compat.js",
-      "require": "./dist/vue2/compat.cjs"
-    },
     "./style.css": "./dist/style.css",
     "./vue3/style.css": "./dist/style.css",
     "./package.json": "./package.json"
   },
   "files": [
-    "dist",
-    "vue2",
-    "compat"
+    "dist"
   ],
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:vue3 && npm run build:vue2",
+    "build": "vite build",
     "preview": "vite preview",
-    "test": "npm run test:vue3 && npm run test:vue2",
-    "test:vue3": "vitest run",
-    "test:vue2": "vitest run -c vitest.vue2.config.ts",
+    "test": "vitest run",
     "test:watch": "vitest",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "typecheck": "vue-tsc --noEmit -p tsconfig.typecheck.json",
     "prepublishOnly": "npm run build",
-    "release": "npm publish --access public",
-    "build:vue3": "vite build",
-    "build:vue2": "vite build -c vite.vue2.config.js"
+    "release": "npm publish --access public"
   },
   "peerDependencies": {
-    "bootstrap-vue": "^2.21.0",
-    "vue": "^2.7.0 || ^3.4.0"
+    "vue": "^3.4.0"
   },
   "dependencies": {
     "@tanstack/vue-table": "^9.1.2",
@@ -69,9 +54,7 @@
   "devDependencies": {
     "@types/ua-parser-js": "^0.7.39",
     "@vitejs/plugin-vue": "^5.0.4",
-    "@vitejs/plugin-vue2": "^2.3.3",
     "@vue/test-utils": "^2.5.0",
-    "bootstrap-vue": "github:vladkvlchk/bootstrap-vue-fork#master",
     "happy-dom": "^20.12.0",
     "sass": "^1.77.0",
     "typescript": "^5.4.5",
@@ -81,9 +64,7 @@
     "vitepress": "^1.6.4",
     "vitest": "^4.1.11",
     "vue": "^3.4.21",
-    "vue-template-compiler": "^2.7.16",
-    "vue-tsc": "^3.0.0",
-    "vue2": "npm:vue@^2.7.16"
+    "vue-tsc": "^3.0.0"
   },
   "keywords": [
     "vue",
@@ -105,10 +86,5 @@
   "bugs": {
     "url": "https://github.com/Skyservice-POS/vue-dev-kit/issues"
   },
-  "homepage": "https://github.com/Skyservice-POS/vue-dev-kit#readme",
-  "peerDependenciesMeta": {
-    "bootstrap-vue": {
-      "optional": true
-    }
-  }
+  "homepage": "https://github.com/Skyservice-POS/vue-dev-kit#readme"
 }
