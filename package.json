@@ -102,5 +102,10 @@
     "bootstrap-vue": {
       "optional": true
     }
+  },
+  "overrides": {
+    "@vitejs/plugin-vue2": {
+      "vue": "2.7.16"
+    }
   }
 }
