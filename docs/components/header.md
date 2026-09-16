@@ -91,9 +91,13 @@ interface DropdownItem {
    <Header title="Профіль" :back-event="() => router.push('/settings')" />
    ```
 
-2. **`backEvent` не задано, ми в iframe** → викликається [`exit()`](/sdk/bridge#exit-getback) — вихід із mini-app.
+2. **`backEvent` не задано, ми в iframe** → викликається [`goBack()`](/sdk/bridge#goback) — Dashboard робить крок назад по своїй історії переходів. Якщо Dashboard старий і про `back` не знає, спрацьовує [`exit()`](/sdk/bridge#exit-getback) — вихід на головну.
 
 3. **`showBackButton: false`** → кнопки немає взагалі.
+
+::: tip Чому крок назад робить Dashboard
+Mini-app в iframe не бачить URL батька, тож не може знати, куди веде «назад». До 3.1.0 хедер вгадував це сам — брав найсвіжіший розділ зі списку «останніх відвіданих» (`componentStats`). Той список відсортований за часом останнього візиту, а не за порядком переходів, тому кнопка кидала користувача між двома останніми сторінками замість руху вглиб історії.
+:::
 
 ## Дропдаун нещодавніх розділів
 
@@ -104,5 +108,6 @@ interface DropdownItem {
 ## Пов'язане
 
 - [SDK / Bridge → setRocketMode](/sdk/bridge#setrocketmode-value)
+- [SDK / Bridge → goBack](/sdk/bridge#goback)
 - [SDK / Bridge → exit](/sdk/bridge#exit-getback)
 - [Анатомія mini-app → Rocket mode](/guide/mini-app#rocket-mode)
