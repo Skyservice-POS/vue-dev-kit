@@ -1,5 +1,8 @@
 const BRIDGE_ID = 'DASHBOARD';
 const DEFAULT_TIMEOUT = 5000;
+// Скільки чекаємо підтвердження на `back`, перш ніж вважати дашборд застарілим і вийти на головну.
+// Помітно менше за DEFAULT_TIMEOUT: це реакція на клік, її користувач чекає з пальцем на екрані.
+const BACK_ACK_TIMEOUT = 700;
 
 let requestCounter = 0;
 let _senderId: string | null = null;
@@ -36,17 +39,11 @@ function send(message: Record<string, unknown>): void {
   );
 }
 
-function request<T = unknown>(
-  source: 'localStorage' | 'store' | 'window',
-  key: string,
-  timeout = DEFAULT_TIMEOUT,
-): Promise<T | null> {
-  if (!isInsideIframe()) return Promise.resolve(null);
+/** Wait for the Dashboard's answer to one request. Resolves to null on timeout. */
+function awaitResponse<T = unknown>(requestId: string, timeout: number): Promise<T | null> {
+  const mySenderId = getSenderId();
 
   return new Promise((resolve) => {
-    const requestId = generateRequestId();
-    const mySenderId = getSenderId();
-
     const timer = setTimeout(() => {
       window.removeEventListener('message', handler);
       resolve(null);
@@ -66,8 +63,20 @@ function request<T = unknown>(
     }
 
     window.addEventListener('message', handler);
-    send({ type: 'DATA_REQUEST', requestId, source, key });
   });
+}
+
+function request<T = unknown>(
+  source: 'localStorage' | 'store' | 'window',
+  key: string,
+  timeout = DEFAULT_TIMEOUT,
+): Promise<T | null> {
+  if (!isInsideIframe()) return Promise.resolve(null);
+
+  const requestId = generateRequestId();
+  const response = awaitResponse<T>(requestId, timeout);
+  send({ type: 'DATA_REQUEST', requestId, source, key });
+  return response;
 }
 
 // ─── Navigation ───
@@ -84,6 +93,22 @@ export function exit(): void {
 
 /** Alias for exit(). */
 export const getBack = exit;
+
+/**
+ * Ask Dashboard to step one page back through its own navigation history.
+ *
+ * The app cannot see the host's URL, so it cannot know where "back" leads — the Dashboard can.
+ * Resolves to `true` once the host confirms it handled the step, `false` when it did not:
+ * not in an iframe, or a Dashboard too old to know the message. Fall back to `exit()` on `false`.
+ */
+export function goBack(timeout = BACK_ACK_TIMEOUT): Promise<boolean> {
+  if (!isInsideIframe()) return Promise.resolve(false);
+
+  const requestId = generateRequestId();
+  const ack = awaitResponse<{ ok?: boolean }>(requestId, timeout);
+  send({ type: 'back', requestId });
+  return ack.then((data) => data?.ok === true);
+}
 
 // ─── Data requests ───
 

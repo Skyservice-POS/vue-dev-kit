@@ -86,6 +86,7 @@ import {
   trackVisit,
   navigate as navigateParent,
   exit as exitParent,
+  goBack as goBackParent,
   setSenderId,
   getSenderId,
 } from '../../../sdk'
@@ -256,30 +257,19 @@ const shouldShowBackButton = computed(() => {
   return props.backEvent || (props.showBackButton && isInsideIframe());
 });
 
-const findPreviousPage = () => {
-  return sortedItems.value.find(item => item.name !== props.trackPageName && item.path)
-}
-
+// Куди веде «назад», вирішує дашборд — історію переходів знає лише він.
+// Раніше це робив сам хедер: брав верхівку `componentStats`, тобто списку «останніх відвіданих
+// розділів». Той список відсортований за часом останнього візиту, а не за порядком переходів,
+// тому «назад» вело в розділ, з якого користувач щойно прийшов — і кидало між двома
+// останніми сторінками замість руху вглиб історії.
 const handleBack = async () => {
   if (props.backEvent) {
     return props.backEvent()
   }
 
-  let previousPage = findPreviousPage()
-
-  if (!previousPage && isInsideIframe()) {
-    const data = await getLocalStorageData('componentStats')
-    if (data) {
-      loadComponentStats(data)
-      previousPage = findPreviousPage()
-    }
-  }
-
-  if (previousPage) {
-    navigateParent(previousPage.path)
-  } else {
-    exitParent()
-  }
+  // false — дашборд старий і про `back` не знає; тоді поводимось як раніше: на головну.
+  if (await goBackParent()) return
+  exitParent()
 }
 </script>
 

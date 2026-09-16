@@ -4,7 +4,7 @@ Mini-app працює в `<iframe>` усередині Dashboard. **Bridge** о�
 
 ```ts
 import {
-  navigate, exit, getBack,
+  navigate, goBack, exit, getBack,
   getStoreData, getLocalStorageData, getWindowData,
   getCompany, getUser, getToken, getLang, getProductCategories,
   setLocalStorage, setRocketMode,
@@ -39,6 +39,26 @@ navigate('/products/42')
 |----------|-----|------|
 | `path` | `string` | Шлях, на який перейде Dashboard |
 
+### `goBack()`
+
+Попросити Dashboard зробити крок назад по **його** історії переходів — туди, звідки користувач прийшов.
+
+Mini-app в iframe не бачить URL батька, тому не може обчислити це сам: історію веде Dashboard (`src/navHistory.js`), він же й виконує перехід. Саме це викликає кнопка «Назад» у [`Header`](/components/header), коли їй не передали `backEvent`.
+
+```ts
+if (!(await goBack())) exit() // старий Dashboard про `back` не знає — виходимо на головну
+```
+
+| Параметр | Тип | За замовчуванням | Опис |
+|----------|-----|------------------|------|
+| `timeout` | `number` | `700` | Скільки мс чекати підтвердження від Dashboard |
+
+Резолвиться в `true`, коли Dashboard підтвердив крок назад, і в `false` — коли додаток відкритий поза iframe або хост не відповів за `timeout`.
+
+::: tip Потрібен Dashboard із підтримкою `back`
+Старіші збірки хоста це повідомлення ігнорують — тоді `goBack()` віддає `false` через `timeout`, і треба самому вирішити, що робити далі (зазвичай `exit()`).
+:::
+
 ### `exit()` / `getBack()`
 
 Вийти з поточного mini-app на головну Dashboard. `getBack` — alias для `exit`.
@@ -46,6 +66,8 @@ navigate('/products/42')
 ```ts
 exit()
 ```
+
+Це не «назад», а саме «закрити застосунок»: веде на головну незалежно від того, звідки користувач зайшов. Для кроку назад — [`goBack()`](#goback).
 
 ## Читання даних хоста
 

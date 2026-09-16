@@ -3,6 +3,7 @@ export {
   navigate,
   exit,
   getBack,
+  goBack,
   getStoreData,
   getLocalStorageData,
   getWindowData,

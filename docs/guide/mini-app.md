@@ -93,11 +93,14 @@ notifyError('Щось зламалось') // тост-помилка Dashboard
 ### 5. Навігація та вихід
 
 ```ts
-import { navigate, exit } from '@skyservice-developers/vue-dev-kit/sdk'
+import { navigate, goBack, exit } from '@skyservice-developers/vue-dev-kit/sdk'
 
 navigate('/products/42') // Dashboard змінює роут
+await goBack()            // крок назад по історії Dashboard (туди, звідки прийшли)
 exit()                    // вийти з mini-app на головну Dashboard
 ```
+
+Кнопка «Назад» у [`Header`](/components/header) уже робить це сама — окремо викликати `goBack()` треба лише для власної кнопки.
 
 ## Rocket mode
 
@@ -112,7 +115,7 @@ exit()                    // вийти з mini-app на головну Dashboar
 
 - `isInsideIframe()` → `false`;
 - усі гетери bridge миттєво резолвляться в `null` (без 5-секундного очікування);
-- `navigate`/`exit`/`notify` — просто no-op (повідомлення нікому слухати);
+- `navigate`/`exit`/`notify` — просто no-op (повідомлення нікому слухати), а `goBack()` одразу віддає `false`;
 - **компоненти й `SkyserviceAPI` працюють як завжди** — вони не залежать від iframe.
 
 Тобто mini-app лишається повністю функціональним для розробки UI та роботи з API; специфічна для Dashboard поведінка просто «мовчить».
