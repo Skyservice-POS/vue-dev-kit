@@ -63,6 +63,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', moveIndicator));
       :class="{ 'sky-tabs__btn--active': modelValue === option.value }"
       :aria-selected="modelValue === option.value"
       :disabled="disabled"
+      @mousedown.prevent
       @click="select(option.value)"
     >
       {{ option.text }}
