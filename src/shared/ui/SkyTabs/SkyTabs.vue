@@ -105,6 +105,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', moveIndicator));
   z-index: 1;
   padding: 6px 14px;
   border: none;
+  outline: none;
   background: transparent;
   color: #6c757d;
   font-size: 13px;
@@ -114,6 +115,16 @@ onBeforeUnmount(() => window.removeEventListener('resize', moveIndicator));
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Старі Chromium (Android/Windows WebView, ~v86) малюють дефолтний outline
+   на кнопці навіть при тапі, а не лише при клавіатурному фокусі — звідси
+   візуальний "бордер" на табі. Прибираємо outline завжди і повертаємо його
+   тільки для :focus-visible, щоб не ламати доступність з клавіатури. */
+.sky-tabs__btn:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-tabs__btn--active {
