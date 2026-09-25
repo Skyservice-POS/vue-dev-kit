@@ -1,6 +1,6 @@
 # SkyButton
 
-Кнопка з чотирма варіантами, станами loading/disabled та режимами `block` і `icon`.
+Кнопка з варіантами, станами loading/disabled та режимами `block` і `icon`.
 
 ## Демо
 
@@ -34,19 +34,27 @@ const deleting = ref(false)
 | `danger` | Деструктивна дія (червоний) |
 | `secondary` | Другорядна дія (сірий) |
 | `outline` | Мінімальний акцент (прозорий фон + рамка) |
+| `accent` | Bootstrap Primary (синій) |
+| `warning` | Bootstrap Warning (жовтий) |
+| `info` | Bootstrap Info (блакитний) |
+| `dark` | Bootstrap Dark (темний) |
 
 ```vue
 <SkyButton variant="primary">Primary</SkyButton>
 <SkyButton variant="danger">Danger</SkyButton>
 <SkyButton variant="secondary">Secondary</SkyButton>
 <SkyButton variant="outline">Outline</SkyButton>
+<SkyButton variant="accent">Accent</SkyButton>
+<SkyButton variant="warning">Warning</SkyButton>
+<SkyButton variant="info">Info</SkyButton>
+<SkyButton variant="dark">Dark</SkyButton>
 ```
 
 ## Props
 
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
-| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` |
+| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` \| `'accent'` \| `'warning'` \| `'info'` \| `'dark'` |
 | `loading` | `Boolean` | `false` | Показує спінер, блокує клік |
 | `disabled` | `Boolean` | `false` | Вимкнена кнопка |
 | `block` | `Boolean` | `false` | Повна ширина |
@@ -104,6 +112,10 @@ const deleting = ref(false)
 --sky-btn-danger-bg: #dc2626;
 --sky-btn-secondary-bg: #f3f4f6;
 --sky-btn-outline-bg: transparent;
+--sky-btn-accent-bg: #0d6efd;
+--sky-btn-warning-bg: #ffc107;
+--sky-btn-info-bg: #0dcaf0;
+--sky-btn-dark-bg: #212529;
 ```
 
 Приклад перебрендування — див. [Теми → перебрендувати кнопки](/guide/theming#приклад-перебрендувати-кнопки-у-фіолетовий).

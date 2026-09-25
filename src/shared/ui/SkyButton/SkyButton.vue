@@ -22,7 +22,7 @@ defineProps({
   variant: {
     type: String,
     default: 'primary',
-    validator: (v) => ['primary', 'danger', 'secondary', 'outline'].includes(v)
+    validator: (v) => ['primary', 'danger', 'secondary', 'outline', 'accent', 'warning', 'info', 'dark'].includes(v)
   },
   loading: {
     type: Boolean,
@@ -121,6 +121,54 @@ defineProps({
 }
 .sky-btn-outline:active:not(:disabled) {
   background: var(--sky-btn-outline-active-bg, #e5e7eb);
+}
+
+/* Accent (bootstrap Primary) */
+.sky-btn-accent {
+  background: var(--sky-btn-accent-bg, #0d6efd);
+  color: var(--sky-btn-accent-color, #fff);
+}
+.sky-btn-accent:hover:not(:disabled) {
+  background: var(--sky-btn-accent-hover-bg, #0b5ed7);
+}
+.sky-btn-accent:active:not(:disabled) {
+  background: var(--sky-btn-accent-active-bg, #0a58ca);
+}
+
+/* Warning (bootstrap Warning) */
+.sky-btn-warning {
+  background: var(--sky-btn-warning-bg, #ffc107);
+  color: var(--sky-btn-warning-color, #000);
+}
+.sky-btn-warning:hover:not(:disabled) {
+  background: var(--sky-btn-warning-hover-bg, #ffca2c);
+}
+.sky-btn-warning:active:not(:disabled) {
+  background: var(--sky-btn-warning-active-bg, #ffcd39);
+}
+
+/* Info (bootstrap Info) */
+.sky-btn-info {
+  background: var(--sky-btn-info-bg, #0dcaf0);
+  color: var(--sky-btn-info-color, #000);
+}
+.sky-btn-info:hover:not(:disabled) {
+  background: var(--sky-btn-info-hover-bg, #31d2f2);
+}
+.sky-btn-info:active:not(:disabled) {
+  background: var(--sky-btn-info-active-bg, #3dd5f6);
+}
+
+/* Dark (bootstrap Dark) */
+.sky-btn-dark {
+  background: var(--sky-btn-dark-bg, #212529);
+  color: var(--sky-btn-dark-color, #fff);
+}
+.sky-btn-dark:hover:not(:disabled) {
+  background: var(--sky-btn-dark-hover-bg, #1c1f23);
+}
+.sky-btn-dark:active:not(:disabled) {
+  background: var(--sky-btn-dark-active-bg, #1a1e21);
 }
 
 /* Loading spinner */

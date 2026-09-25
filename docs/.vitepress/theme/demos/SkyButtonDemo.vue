@@ -15,6 +15,10 @@ function toggleLoading() {
     <SkyButton variant="danger">Danger</SkyButton>
     <SkyButton variant="secondary">Secondary</SkyButton>
     <SkyButton variant="outline">Outline</SkyButton>
+    <SkyButton variant="accent">Accent</SkyButton>
+    <SkyButton variant="warning">Warning</SkyButton>
+    <SkyButton variant="info">Info</SkyButton>
+    <SkyButton variant="dark">Dark</SkyButton>
   </Demo>
 
   <Demo title="Стани">

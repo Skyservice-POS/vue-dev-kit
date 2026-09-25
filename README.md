@@ -348,7 +348,7 @@ import {
 
 ### SkyButton
 
-Кнопка з чотирма варіантами, станами loading/disabled, режимами block та icon.
+Кнопка з варіантами, станами loading/disabled, режимами block та icon.
 
 ```vue
 <SkyButton variant="primary" @click="save">Зберегти</SkyButton>
@@ -368,7 +368,7 @@ import {
 
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
-| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` |
+| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` \| `'accent'` \| `'warning'` \| `'info'` \| `'dark'` |
 | `loading` | `Boolean` | `false` | Показує спінер, блокує клік |
 | `disabled` | `Boolean` | `false` | Вимкнена кнопка |
 | `block` | `Boolean` | `false` | Повна ширина |
@@ -386,6 +386,10 @@ import {
 --sky-btn-danger-bg: #dc2626
 --sky-btn-secondary-bg: #f3f4f6
 --sky-btn-outline-bg: transparent
+--sky-btn-accent-bg: #0d6efd
+--sky-btn-warning-bg: #ffc107
+--sky-btn-info-bg: #0dcaf0
+--sky-btn-dark-bg: #212529
 ```
 
 ---
