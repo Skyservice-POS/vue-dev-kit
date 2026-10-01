@@ -38,6 +38,7 @@ const deleting = ref(false)
 | `warning` | Bootstrap Warning (жовтий) |
 | `info` | Bootstrap Info (блакитний) |
 | `dark` | Bootstrap Dark (темний) |
+| `outline-primary` \| `outline-danger` \| `outline-secondary` \| `outline-accent` \| `outline-warning` \| `outline-info` \| `outline-dark` | Те саме, але прозорий фон; рамка й текст — основний колір варіанта, на hover заливається |
 
 ```vue
 <SkyButton variant="primary">Primary</SkyButton>
@@ -48,13 +49,18 @@ const deleting = ref(false)
 <SkyButton variant="warning">Warning</SkyButton>
 <SkyButton variant="info">Info</SkyButton>
 <SkyButton variant="dark">Dark</SkyButton>
+
+<SkyButton variant="outline-primary">Primary</SkyButton>
+<SkyButton variant="outline-danger">Danger</SkyButton>
+<SkyButton variant="outline-accent">Accent</SkyButton>
+<!-- …outline-secondary, outline-warning, outline-info, outline-dark -->
 ```
 
 ## Props
 
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
-| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` \| `'accent'` \| `'warning'` \| `'info'` \| `'dark'` |
+| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` \| `'accent'` \| `'warning'` \| `'info'` \| `'dark'` \| `'outline-primary'` \| `'outline-danger'` \| `'outline-secondary'` \| `'outline-accent'` \| `'outline-warning'` \| `'outline-info'` \| `'outline-dark'` |
 | `loading` | `Boolean` | `false` | Показує спінер, блокує клік |
 | `disabled` | `Boolean` | `false` | Вимкнена кнопка |
 | `block` | `Boolean` | `false` | Повна ширина |
@@ -116,6 +122,9 @@ const deleting = ref(false)
 --sky-btn-warning-bg: #ffc107;
 --sky-btn-info-bg: #0dcaf0;
 --sky-btn-dark-bg: #212529;
+/* outline-*: колір рамки й тексту (за замовчуванням — bg відповідного варіанта) */
+--sky-btn-outline-primary-color: #00c279;
+--sky-btn-outline-primary-hover-color: #fff; /* текст на hover */
 ```
 
 Приклад перебрендування — див. [Теми → перебрендувати кнопки](/guide/theming#приклад-перебрендувати-кнопки-у-фіолетовий).

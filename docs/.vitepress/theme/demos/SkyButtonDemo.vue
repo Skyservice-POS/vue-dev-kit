@@ -21,6 +21,16 @@ function toggleLoading() {
     <SkyButton variant="dark">Dark</SkyButton>
   </Demo>
 
+  <Demo title="Outline варіанти">
+    <SkyButton variant="outline-primary">Primary</SkyButton>
+    <SkyButton variant="outline-danger">Danger</SkyButton>
+    <SkyButton variant="outline-secondary">Secondary</SkyButton>
+    <SkyButton variant="outline-accent">Accent</SkyButton>
+    <SkyButton variant="outline-warning">Warning</SkyButton>
+    <SkyButton variant="outline-info">Info</SkyButton>
+    <SkyButton variant="outline-dark">Dark</SkyButton>
+  </Demo>
+
   <Demo title="Стани">
     <SkyButton variant="primary" :loading="loading" @click="toggleLoading">
       {{ loading ? 'Зачекайте…' : 'Клік → loading' }}

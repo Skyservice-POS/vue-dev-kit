@@ -22,7 +22,7 @@ defineProps({
   variant: {
     type: String,
     default: 'primary',
-    validator: (v) => ['primary', 'danger', 'secondary', 'outline', 'accent', 'warning', 'info', 'dark'].includes(v)
+    validator: (v) => ['primary', 'danger', 'secondary', 'outline', 'accent', 'warning', 'info', 'dark', 'outline-primary', 'outline-danger', 'outline-secondary', 'outline-accent', 'outline-warning', 'outline-info', 'outline-dark'].includes(v)
   },
   loading: {
     type: Boolean,
@@ -169,6 +169,84 @@ defineProps({
 }
 .sky-btn-dark:active:not(:disabled) {
   background: var(--sky-btn-dark-active-bg, #1a1e21);
+}
+
+/* Outline variants: прозорий фон, рамка й текст кольору варіанта; на hover заливаються */
+.sky-btn-outline-primary {
+  background: transparent;
+  color: var(--sky-btn-outline-primary-color, var(--sky-btn-primary-bg, #00c279));
+  border: 1px solid var(--sky-btn-outline-primary-color, var(--sky-btn-primary-bg, #00c279));
+}
+.sky-btn-outline-primary:hover:not(:disabled),
+.sky-btn-outline-primary:active:not(:disabled) {
+  background: var(--sky-btn-outline-primary-color, var(--sky-btn-primary-bg, #00c279));
+  color: var(--sky-btn-outline-primary-hover-color, #fff);
+}
+
+.sky-btn-outline-danger {
+  background: transparent;
+  color: var(--sky-btn-outline-danger-color, var(--sky-btn-danger-bg, #dc2626));
+  border: 1px solid var(--sky-btn-outline-danger-color, var(--sky-btn-danger-bg, #dc2626));
+}
+.sky-btn-outline-danger:hover:not(:disabled),
+.sky-btn-outline-danger:active:not(:disabled) {
+  background: var(--sky-btn-outline-danger-color, var(--sky-btn-danger-bg, #dc2626));
+  color: var(--sky-btn-outline-danger-hover-color, #fff);
+}
+
+.sky-btn-outline-secondary {
+  background: transparent;
+  color: var(--sky-btn-outline-secondary-color, #6b7280);
+  border: 1px solid var(--sky-btn-outline-secondary-color, #6b7280);
+}
+.sky-btn-outline-secondary:hover:not(:disabled),
+.sky-btn-outline-secondary:active:not(:disabled) {
+  background: var(--sky-btn-outline-secondary-color, #6b7280);
+  color: var(--sky-btn-outline-secondary-hover-color, #fff);
+}
+
+.sky-btn-outline-accent {
+  background: transparent;
+  color: var(--sky-btn-outline-accent-color, var(--sky-btn-accent-bg, #0d6efd));
+  border: 1px solid var(--sky-btn-outline-accent-color, var(--sky-btn-accent-bg, #0d6efd));
+}
+.sky-btn-outline-accent:hover:not(:disabled),
+.sky-btn-outline-accent:active:not(:disabled) {
+  background: var(--sky-btn-outline-accent-color, var(--sky-btn-accent-bg, #0d6efd));
+  color: var(--sky-btn-outline-accent-hover-color, #fff);
+}
+
+.sky-btn-outline-warning {
+  background: transparent;
+  color: var(--sky-btn-outline-warning-color, var(--sky-btn-warning-bg, #ffc107));
+  border: 1px solid var(--sky-btn-outline-warning-color, var(--sky-btn-warning-bg, #ffc107));
+}
+.sky-btn-outline-warning:hover:not(:disabled),
+.sky-btn-outline-warning:active:not(:disabled) {
+  background: var(--sky-btn-outline-warning-color, var(--sky-btn-warning-bg, #ffc107));
+  color: var(--sky-btn-outline-warning-hover-color, #000);
+}
+
+.sky-btn-outline-info {
+  background: transparent;
+  color: var(--sky-btn-outline-info-color, var(--sky-btn-info-bg, #0dcaf0));
+  border: 1px solid var(--sky-btn-outline-info-color, var(--sky-btn-info-bg, #0dcaf0));
+}
+.sky-btn-outline-info:hover:not(:disabled),
+.sky-btn-outline-info:active:not(:disabled) {
+  background: var(--sky-btn-outline-info-color, var(--sky-btn-info-bg, #0dcaf0));
+  color: var(--sky-btn-outline-info-hover-color, #000);
+}
+
+.sky-btn-outline-dark {
+  background: transparent;
+  color: var(--sky-btn-outline-dark-color, var(--sky-btn-dark-bg, #212529));
+  border: 1px solid var(--sky-btn-outline-dark-color, var(--sky-btn-dark-bg, #212529));
+}
+.sky-btn-outline-dark:hover:not(:disabled),
+.sky-btn-outline-dark:active:not(:disabled) {
+  background: var(--sky-btn-outline-dark-color, var(--sky-btn-dark-bg, #212529));
+  color: var(--sky-btn-outline-dark-hover-color, #fff);
 }
 
 /* Loading spinner */

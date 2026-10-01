@@ -368,7 +368,7 @@ import {
 
 | Prop | Тип | За замовчуванням | Опис |
 |------|-----|------------------|------|
-| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` \| `'accent'` \| `'warning'` \| `'info'` \| `'dark'` |
+| `variant` | `String` | `'primary'` | `'primary'` \| `'danger'` \| `'secondary'` \| `'outline'` \| `'accent'` \| `'warning'` \| `'info'` \| `'dark'` \| `'outline-primary'` \| `'outline-danger'` \| `'outline-secondary'` \| `'outline-accent'` \| `'outline-warning'` \| `'outline-info'` \| `'outline-dark'` |
 | `loading` | `Boolean` | `false` | Показує спінер, блокує клік |
 | `disabled` | `Boolean` | `false` | Вимкнена кнопка |
 | `block` | `Boolean` | `false` | Повна ширина |
@@ -390,6 +390,7 @@ import {
 --sky-btn-warning-bg: #ffc107
 --sky-btn-info-bg: #0dcaf0
 --sky-btn-dark-bg: #212529
+--sky-btn-outline-primary-color: #00c279   /* аналогічно для outline-danger, outline-accent … */
 ```
 
 ---

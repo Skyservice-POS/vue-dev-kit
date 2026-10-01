@@ -7,7 +7,8 @@ import SkyButton from '@/shared/ui/SkyButton/SkyButton.vue'
 const notify = ref(null)
 
 onMounted(async () => {
-  await import('sky-service-ui-components') // реєструє <sky-toast-notification>
+  const { NotificationElement } = await import('sky-service-ui-components')
+  NotificationElement.register() // реєструє <sky-toast-notification> (autoRegister: false за замовчуванням)
   const mod = await import('sky-service-ui-components/modules')
   notify.value = mod.notificationModule.notify
 })
