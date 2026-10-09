@@ -87,10 +87,10 @@ function clearAll(): void {
   >
     <template #default="{ close }">
       <div class="sky-checkbox-filter__actions">
-        <button v-if="selectAll" type="button" class="sky-checkbox-filter__link" @click="selectAllOptions">
+        <button v-if="selectAll" type="button" class="sky-checkbox-filter__link" @mousedown.prevent @click="selectAllOptions">
           {{ selectAllLabel }}
         </button>
-        <button type="button" class="sky-checkbox-filter__link" @click="clearAll">
+        <button type="button" class="sky-checkbox-filter__link" @mousedown.prevent @click="clearAll">
           {{ clearLabel }}
         </button>
       </div>
@@ -110,7 +110,7 @@ function clearAll(): void {
 
       <hr class="sky-checkbox-filter__sep" />
       <div class="sky-checkbox-filter__actions sky-checkbox-filter__actions--footer">
-        <button type="button" class="sky-checkbox-filter__link" @click="close">
+        <button type="button" class="sky-checkbox-filter__link" @mousedown.prevent @click="close">
           {{ doneLabel }}
         </button>
       </div>
@@ -147,6 +147,13 @@ function clearAll(): void {
   font: inherit;
   color: var(--sky-filter-accent, #106090);
   cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-checkbox-filter__link:focus-visible {
+  outline: 2px solid var(--sky-filter-accent, #106090);
+  outline-offset: 2px;
 }
 
 .sky-checkbox-filter__link:hover {

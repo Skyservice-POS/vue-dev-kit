@@ -5,6 +5,7 @@
         <button
           v-if="shouldShowBackButton"
           class="btn-back"
+          @mousedown.prevent
           @click="handleBack"
           :title="backButtonTitle"
         >
@@ -24,6 +25,7 @@
           <button
             class="title-dropdown-toggle"
             :class="{ 'title-dropdown-toggle-active': sortedItems.length }"
+            @mousedown.prevent
             @click="toggleDropdown"
           >
             <slot name="title">
@@ -337,6 +339,17 @@ const handleBack = async () => {
   text-align: left;
   font: inherit;
   color: inherit;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Старі Chromium (Windows WebView, ~v84-86) малюють дефолтний outline на кнопці
+   і при кліку/тапі. Прибираємо його, лишаючи рамку тільки для :focus-visible
+   (клавіатура). Див. SkyTabs. */
+.title-dropdown-toggle:focus-visible,
+.btn-back:focus-visible {
+  outline: 2px solid var(--sky-header-focus-color, #0d6efd);
+  outline-offset: 2px;
 }
 
 .title-dropdown-toggle-active {
@@ -438,6 +451,8 @@ const handleBack = async () => {
   border-radius: 6px;
   transition: background-color 0.2s;
   color: var(--sky-header-back-btn-color, #374151);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-back img,

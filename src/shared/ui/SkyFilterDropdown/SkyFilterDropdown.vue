@@ -167,6 +167,7 @@ defineExpose({ open, close, toggle, isOpen });
       :disabled="disabled"
       aria-haspopup="dialog"
       :aria-expanded="isOpen"
+      @mousedown.prevent
       @click="toggle"
     >
       <slot name="trigger" :is-open="isOpen">
@@ -227,6 +228,8 @@ defineExpose({ open, close, toggle, isOpen });
   font: inherit;
   white-space: nowrap;
   cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .sky-filter-dropdown__trigger:focus-visible {
