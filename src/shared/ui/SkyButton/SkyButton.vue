@@ -11,6 +11,7 @@
     ]"
     :disabled="disabled || loading"
     v-bind="$attrs"
+    @mousedown.prevent
   >
     <span v-if="loading" class="sky-btn-spinner"></span>
     <slot></slot>
@@ -58,6 +59,16 @@ defineProps({
   cursor: pointer;
   white-space: nowrap;
   user-select: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Старі Chromium малюють дефолтний outline і на тапі/кліку, а не лише
+   при клавіатурному фокусі. Прибираємо його завжди й повертаємо тільки
+   для :focus-visible, щоб не ламати доступність з клавіатури. */
+.sky-btn:focus-visible {
+  outline: 2px solid var(--sky-btn-focus-color, #0d6efd);
+  outline-offset: 2px;
 }
 
 .sky-btn-icon {
