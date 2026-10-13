@@ -39,6 +39,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
       class="sky-table-columns__trigger"
       :aria-expanded="open"
       :title="title ?? 'Колонки'"
+      @mousedown.prevent
       @click="open = !open"
     >
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
@@ -67,6 +68,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
       <button
         type="button"
         class="sky-table-columns__reset"
+        @mousedown.prevent
         @click="emit('reset')"
       >
         {{ resetLabel ?? 'Скинути' }}
@@ -93,6 +95,16 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
   color: var(--sky-table-head-color, #6c757d);
   cursor: pointer;
   transition: background-color 0.15s ease;
+}
+
+.sky-table-columns__trigger {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-table-columns__trigger:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-table-columns__trigger:hover {
@@ -143,6 +155,16 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
   font-size: 13px;
   text-align: left;
   cursor: pointer;
+}
+
+.sky-table-columns__reset {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-table-columns__reset:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-table-columns__reset:hover {

@@ -986,6 +986,16 @@ export default {
   color: inherit;
 }
 
+.calendarLabel {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendarLabel:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
 .overlay .icon {
   display: flex;
   align-items: center;

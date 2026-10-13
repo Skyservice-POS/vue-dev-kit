@@ -76,6 +76,7 @@
       <button
         type="button"
         class="btn btn-danger"
+        @mousedown.prevent
         @click="emit('deleteRow', item)"
       >
         ×
@@ -331,6 +332,16 @@ function handleTouchEnd() {
 </script>
 
 <style scoped>
+.btn.btn-danger {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn.btn-danger:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
 .item-string {
   width: 100%;
   min-height: 40px;

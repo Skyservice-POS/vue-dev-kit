@@ -11,7 +11,7 @@
         :style="modalStyle"
       >
         <div class="sky-modal-header" ref="modalHeaderRef">
-          <button class="sky-modal-back" @click="close" :title="closeTitle">
+          <button class="sky-modal-back" @mousedown.prevent @click="close" :title="closeTitle">
             <svg
               width="15"
               height="15"
@@ -253,6 +253,16 @@ onUnmounted(() => {
   transition: background-color 0.2s;
   color: var(--sky-modal-back-color, #374151);
   margin-right: 12px;
+}
+
+.sky-modal-back {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-modal-back:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-modal-back svg {

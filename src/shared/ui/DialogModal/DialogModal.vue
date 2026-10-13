@@ -25,7 +25,7 @@
               </slot>
             </div>
 
-            <button class="sky-dialog-close" :title="closeText" @click="close">
+            <button class="sky-dialog-close" :title="closeText" @mousedown.prevent @click="close">
               <svg viewBox="0 0 16 16" width="16" height="16">
                 <line
                   x1="1"
@@ -318,6 +318,16 @@ onUnmounted(() => {
   justify-content: center;
   color: var(--sky-dialog-close-color, #333);
   transition: background-color 0.2s;
+}
+
+.sky-dialog-close {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-dialog-close:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-dialog-close:hover {

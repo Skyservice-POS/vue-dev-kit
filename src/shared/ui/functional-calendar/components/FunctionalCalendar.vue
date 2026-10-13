@@ -1699,6 +1699,13 @@ export default {
 
 <style lang="scss">
 @import '../assets/scss/calendar.scss';
+.vfc-popover-container {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.vfc-popover-container .vfc-tags-input-remove {
+  outline: none;
+}
 .rangeCleaner {
   padding: 5px 0 10px;
   display: flex;

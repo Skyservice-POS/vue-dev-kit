@@ -89,6 +89,7 @@ function pick(value: OptionValue | null, close: () => void): void {
           class="sky-select-filter__option"
           :class="{ 'is-selected': modelValue == null }"
           :aria-selected="modelValue == null"
+          @mousedown.prevent
           @click="pick(null, close)"
         >
           {{ allLabel }}
@@ -103,6 +104,7 @@ function pick(value: OptionValue | null, close: () => void): void {
           :class="{ 'is-selected': opt.value === modelValue }"
           :aria-selected="opt.value === modelValue"
           :style="{ paddingLeft: `${8 + (opt.depth ?? 0) * 14}px` }"
+          @mousedown.prevent
           @click="pick(opt.value, close)"
         >
           {{ opt.name }}
@@ -138,6 +140,16 @@ function pick(value: OptionValue | null, close: () => void): void {
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+}
+
+.sky-select-filter__option {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-select-filter__option:focus-visible {
+  outline: 2px solid var(--sky-filter-accent, #106090);
+  outline-offset: 2px;
 }
 
 .sky-select-filter__option:hover {

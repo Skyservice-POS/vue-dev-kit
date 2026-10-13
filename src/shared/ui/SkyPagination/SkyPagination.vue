@@ -127,7 +127,7 @@ function pick(size: number, close: () => void): void {
       <template #default="{ close }">
         <ul class="sky-pagination__list">
           <li v-for="n in sizeOptions" :key="n" class="sky-pagination__item">
-            <button type="button" class="sky-pagination__item-btn" @click="pick(n, close)">
+            <button type="button" class="sky-pagination__item-btn" @mousedown.prevent @click="pick(n, close)">
               {{ sizeLabel(n) }}
             </button>
           </li>
@@ -145,6 +145,7 @@ function pick(size: number, close: () => void): void {
         :style="i === 0 && sizeOptions.length > 1 ? { marginLeft: '5px' } : undefined"
         :disabled="disabled"
         :aria-current="p === page ? 'page' : undefined"
+        @mousedown.prevent
         @click="goTo(p)"
       >
         {{ p }}
@@ -236,6 +237,16 @@ function pick(size: number, close: () => void): void {
   cursor: pointer;
 }
 
+.sky-pagination__page {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-pagination__page:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
 /* Єдиний ефект наведення в адмінці — підкреслення: номери там `<a>`, і Bootstrap
    лишає їм рівно його. Ані фону, ані зміни кольору. */
 .sky-pagination__page:hover:not(:disabled):not(.is-current) {
@@ -293,6 +304,16 @@ function pick(size: number, close: () => void): void {
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.sky-pagination__menu .sky-pagination__item-btn {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-pagination__menu .sky-pagination__item-btn:focus-visible {
+  outline: 2px solid var(--sky-filter-accent, #106090);
+  outline-offset: 2px;
 }
 
 .sky-pagination__menu .sky-pagination__item:hover {

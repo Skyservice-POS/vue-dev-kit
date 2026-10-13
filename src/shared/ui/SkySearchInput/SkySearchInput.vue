@@ -119,6 +119,7 @@ onBeforeUnmount(() => {
       class="sky-search__clear"
       :aria-label="clearAriaLabel"
       :disabled="disabled"
+      @mousedown.prevent
       @click.stop="onClear"
     >
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

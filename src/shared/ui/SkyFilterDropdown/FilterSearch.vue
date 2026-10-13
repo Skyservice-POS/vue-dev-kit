@@ -31,6 +31,7 @@ const emit = defineEmits<{
       type="button"
       class="sky-filter-search__clear"
       :aria-label="`${label || placeholder} ✕`"
+      @mousedown.prevent
       @click="emit('update:modelValue', '')"
     >
       ×
@@ -78,5 +79,15 @@ const emit = defineEmits<{
   line-height: 1;
   color: var(--sky-filter-muted-color, #adb5bd);
   cursor: pointer;
+}
+
+.sky-filter-search__clear {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-filter-search__clear:focus-visible {
+  outline: 2px solid var(--sky-filter-accent, #106090);
+  outline-offset: 2px;
 }
 </style>

@@ -39,6 +39,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
       class="sky-dt-columns__trigger"
       :title="title"
       :aria-expanded="open"
+      @mousedown.prevent
       @click="open = !open"
     >
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
@@ -65,6 +66,7 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
       <button
         type="button"
         class="sky-dt-columns__reset"
+        @mousedown.prevent
         @click="table.resetColumnVisibility()"
       >
         {{ resetLabel }}
@@ -90,6 +92,16 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
   background: #fff;
   color: var(--sky-table-head-color, #106090);
   cursor: pointer;
+}
+
+.sky-dt-columns__trigger {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-dt-columns__trigger:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-dt-columns__trigger:hover {
@@ -140,6 +152,16 @@ onBeforeUnmount(() => document.removeEventListener('mousedown', onOutside));
   font-size: 13px;
   text-align: left;
   cursor: pointer;
+}
+
+.sky-dt-columns__reset {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-dt-columns__reset:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-dt-columns__reset:hover {

@@ -11,7 +11,7 @@
           <div ref="dialogContent" class="sky-dialog-content">
             <!-- Header -->
             <div class="sky-dialog-header">
-              <button class="sky-dialog-back" :title="closeText" @click="close">
+              <button class="sky-dialog-back" :title="closeText" @mousedown.prevent @click="close">
                 <svg
                   width="15"
                   height="15"
@@ -286,6 +286,16 @@ onUnmounted(() => {
   transition: background-color 0.2s;
   margin-right: 12px;
   flex-shrink: 0;
+}
+
+.sky-dialog-back {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-dialog-back:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-dialog-back svg {

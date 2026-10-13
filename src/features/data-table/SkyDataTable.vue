@@ -241,6 +241,7 @@ defineExpose({ table });
             type="button"
             class="sky-data-table__page-btn"
             :disabled="!table.getCanPreviousPage()"
+            @mousedown.prevent
             @click="table.previousPage()"
           >
             ‹
@@ -252,6 +253,7 @@ defineExpose({ table });
             type="button"
             class="sky-data-table__page-btn"
             :disabled="!table.getCanNextPage()"
+            @mousedown.prevent
             @click="table.nextPage()"
           >
             ›
@@ -315,6 +317,16 @@ defineExpose({ table });
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
+}
+
+.sky-data-table__page-btn {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-data-table__page-btn:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .sky-data-table__page-btn:disabled {
