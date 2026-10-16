@@ -43,7 +43,7 @@ function onClick(event) {
   gap: 15px;
   min-width: 0;
   box-sizing: border-box;
-  padding: 20px 10px 20px 20px;
+  padding: 20px;
   border: 1px solid var(--sky-stat-card-border, #ededed);
   background: var(--sky-stat-card-bg, #fff);
   border-radius: 12px;
