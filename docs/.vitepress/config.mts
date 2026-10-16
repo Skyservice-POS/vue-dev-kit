@@ -145,6 +145,8 @@ export default defineConfig({
             { text: 'Таблиця — примітиви', link: '/components/table' },
             { text: 'SkyTable', link: '/components/sky-table' },
             { text: 'SkyCard', link: '/components/sky-card' },
+            { text: 'SkyPageHeader', link: '/components/sky-page-header' },
+            { text: 'SkyStatCard', link: '/components/sky-stat-card' },
             { text: 'SkyTileCard', link: '/components/sky-tile-card' },
             { text: 'SkyAlert', link: '/components/sky-alert' },
             { text: 'SkyBadge', link: '/components/sky-badge' },

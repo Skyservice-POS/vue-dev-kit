@@ -16,11 +16,13 @@ export { default as SkyDateRangePicker } from './SkyDateRangePicker';
 export { default as SkyFilterDropdown } from './SkyFilterDropdown';
 export { default as SkyInput } from './SkyInput';
 export { default as SkyLoader } from './SkyLoader';
+export { default as SkyPageHeader } from './SkyPageHeader';
 export { default as SkyPagination } from './SkyPagination';
 export { default as SkySelect } from './SkySelect';
 export { default as SkySelectSearch } from './SkySelectSearch';
 export { default as SkySearchInput } from './SkySearchInput';
 export { default as SkyTable } from './SkyTable';
+export { default as SkyStatCard } from './SkyStatCard';
 export { default as SkyTabs } from './SkyTabs';
 export { default as SkyTileCard } from './SkyTileCard';
 

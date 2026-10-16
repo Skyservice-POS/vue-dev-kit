@@ -27,6 +27,7 @@ import {
   SkyButton, SkySelect, SkySelectSearch, SkyInput, SkySearchInput, SkyCheckbox, SkyTabs,
   SkyAlert, SkyBadge, SkyLoader,
   SkyCard, SkyCardHeader, SkyCardRow,
+  SkyPageHeader, SkyStatCard,
   SkyTable,
   // грід на TanStack + примітиви таблиці + композабли
   SkyDataTable, createSkyColumnHelper, skyTableFeatures,
@@ -726,6 +727,48 @@ Shell-контейнер для карток: ribbon / header / body / footer �
 --sky-card-padding-body: 10px 24px 15px
 --sky-card-padding-footer: 0 24px 24px
 ```
+
+---
+
+### SkyPageHeader
+
+Шапка сторінки: заголовок + опис, під ними slot `header` (кнопки, фільтри, таби).
+
+```vue
+<SkyPageHeader title="Замовлення" description="Усі замовлення за період">
+  <template #header>
+    <SkyButton>Новий</SkyButton>
+  </template>
+</SkyPageHeader>
+```
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | `''` | Заголовок |
+| `description` | `String` | `''` | Опис під заголовком |
+| `position` | `String` | `'bottom'` | Slot `header`: `'bottom'` — під описом, `'side'` — збоку в одному рядку |
+
+Slot: `header` — вміст під заголовком. CSS-змінні: `--sky-page-header-title-color`, `--sky-page-header-description-color`.
+
+---
+
+### SkyStatCard
+
+Картка зі статистикою: іконка (необов'язкова) + заголовок + значення. Може бути статичною або клікабельною.
+
+```vue
+<SkyStatCard title="Всього чеків" value="128 шт" icon-src="/img/statistic-moneys.svg" clickable @click="openChecks" />
+<SkyStatCard title="Виручка" value="12 400 ₴" />
+```
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | `''` | Підпис (сірий, зверху) |
+| `value` | `String\|Number` | `''` | Значення (жирним) |
+| `iconSrc` | `String` | `''` | Шлях до іконки; без нього і без slot `icon` блок іконки не рендериться |
+| `clickable` | `Boolean` | `false` | Hover-тінь, `role="button"`, Enter/Space, емітить `click` |
+
+Slots: `icon` (замість `iconSrc`), `default` (замість `value`). Event: `click`. CSS-змінні: `--sky-stat-card-bg`, `--sky-stat-card-border`, `--sky-stat-card-title-color`, `--sky-stat-card-value-color`, `--sky-stat-card-icon-bg`, `--sky-stat-card-icon-border`, `--sky-stat-card-focus`.
 
 ---
 
@@ -1506,6 +1549,8 @@ src/
 │       ├── SkyAlert/
 │       ├── SkyBadge/
 │       ├── SkyCard/ SkyCardHeader/ SkyCardRow/
+│       ├── SkyStatCard/     # інфо-картка зі статистикою (іконка + заголовок + значення, може бути клікабельною)
+│       ├── SkyPageHeader/   # заголовок сторінки: title + description + slot
 │       ├── SkyLoader/
 │       ├── table/       # примітиви композиційної таблиці (Root/Header/Head/Body/VirtualBody/Row/Cell/Empty)
 │       ├── SkyTable/     # готова віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)

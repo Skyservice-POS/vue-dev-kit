@@ -14,6 +14,8 @@ import SkyAlert from '@/shared/ui/SkyAlert/SkyAlert.vue'
 import SkyLoader from '@/shared/ui/SkyLoader/SkyLoader.vue'
 import SkyCard from '@/shared/ui/SkyCard/SkyCard.vue'
 import SkyCardHeader from '@/shared/ui/SkyCardHeader/SkyCardHeader.vue'
+import SkyPageHeader from '@/shared/ui/SkyPageHeader/SkyPageHeader.vue'
+import SkyStatCard from '@/shared/ui/SkyStatCard/SkyStatCard.vue'
 import SkyCardRow from '@/shared/ui/SkyCardRow/SkyCardRow.vue'
 import SkyTileCard from '@/shared/ui/SkyTileCard/SkyTileCard.vue'
 import Modal from '@/shared/ui/Modal/Modal.vue'
@@ -211,6 +213,26 @@ const primitiveColumns = [
     <!-- Статуси -->
     <h3 class="vdk-gallery__group">Статуси й зворотний зв'язок</h3>
     <div class="vdk-gallery__grid">
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-stat-card">SkyStatCard</a>
+          <code>clickable</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkyStatCard title="Всього чеків" value="128 шт" clickable />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-page-header">SkyPageHeader</a>
+          <code>title · description</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkyPageHeader title="Замовлення" description="Усі замовлення за період" />
+        </div>
+      </article>
+
       <article class="vdk-card">
         <header class="vdk-card__head">
           <a href="/components/sky-badge">SkyBadge</a>
