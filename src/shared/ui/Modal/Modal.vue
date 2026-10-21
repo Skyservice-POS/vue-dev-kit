@@ -7,7 +7,10 @@
     >
       <div
         class="sky-modal"
-        :class="{ 'sky-modal--fullscreen': isFullscreen }"
+        :class="{
+          'sky-modal--fullscreen': isFullscreen,
+          'sky-modal--flat': isNarrowViewport,
+        }"
         :style="modalStyle"
       >
         <div class="sky-modal-header" ref="modalHeaderRef">
@@ -112,19 +115,20 @@ const updateViewportWidth = () => {
 };
 const isNarrowViewport = computed(() => viewportWidth.value <= MOBILE_BREAKPOINT);
 
-// На вузькому viewport модалка через max-width: 100% і так виглядає
-// fullscreen незалежно від пропсів width/height — тож і safe-area padding,
-// і border-radius:0 мають діяти в цьому випадку теж.
+// Fullscreen — лише коли модалка реально займає весь екран (пропси). Тільки
+// тоді вона впирається в статус-бар/вирізи, і safe-area padding доречний.
+// На вузькому viewport без fullscreen-пропсів модалка висить по центру:
+// їй потрібен лише плоский border-radius, а не safe-area відступи.
 const isFullscreen = computed(
-  () =>
-    (props.width === "100%" && props.height === "100%") ||
-    isNarrowViewport.value,
+  () => props.width === "100%" && props.height === "100%",
 );
 
 const modalStyle = computed(() => ({
   width: props.width,
   height: props.height,
-  ...(isFullscreen.value ? {} : { borderRadius: props.borderRadius }),
+  ...(isFullscreen.value || isNarrowViewport.value
+    ? {}
+    : { borderRadius: props.borderRadius }),
 }));
 
 const modalHeaderRef = ref(null);
@@ -203,10 +207,11 @@ onUnmounted(() => {
 <style scoped>
 .sky-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
+  /* 100% fixed-елемента на iOS у landscape може рахуватись без safe-area
+     смуги — 100vw/100vh беруть повний layout viewport. */
+  min-width: 100vw;
+  min-height: 100vh;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(2px);
   z-index: var(--sky-modal-z-index, 9998);
@@ -227,7 +232,8 @@ onUnmounted(() => {
   max-height: 100%;
 }
 
-.sky-modal--fullscreen {
+.sky-modal--fullscreen,
+.sky-modal--flat {
   border-radius: 0;
 }
 
@@ -333,6 +339,11 @@ onUnmounted(() => {
 
 /* iOS safe area — only when modal occupies the full viewport */
 @supports (padding-top: env(safe-area-inset-top)) {
+  .sky-modal--fullscreen {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    box-sizing: border-box;
+  }
   .sky-modal--fullscreen .sky-modal-header {
     padding-top: calc(16px + env(safe-area-inset-top));
   }
