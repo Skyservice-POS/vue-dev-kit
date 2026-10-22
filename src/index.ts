@@ -1,4 +1,5 @@
 import './styles/scrollbar.css';
+import './styles/safe-area.css';
 
 export * from './shared/ui';
 export * from './shared/lib/table';
