@@ -3,6 +3,7 @@
     <div
       v-if="modelValue"
       class="sky-modal-overlay"
+      :class="{ 'sky-modal-overlay--inset': !isFullscreen }"
       @mousedown.self="handleOverlayClick"
     >
       <div
@@ -218,6 +219,15 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Не-fullscreen модалка не має заходити під виріз екрана (камеру), а фон
+   оверлея лишається на весь екран — тому відступ іде padding-ом оверлея.
+   Fullscreen-модалка відступає сама (див. safe area нижче). */
+.sky-modal-overlay--inset {
+  box-sizing: border-box;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .sky-modal {
