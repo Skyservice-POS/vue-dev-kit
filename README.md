@@ -39,7 +39,10 @@ import {
   // widgets
   SkyTileCard,
   // features
-  SkyCheckboxFilter, SkySelectFilter,
+  SkyCheckboxFilter, SkySelectFilter, SkyRadioFilter, SkyRangeFilter, SkySearchFilter,
+  SkyDateFilter, SkyFilters, registerFilterType,
+  // хелпери дат
+  today, diffDays, datePresets, defaultDatePresets, quarterPresets,
   TableMassActions, TableColumnSettings, TableVirtualBody,
   // sdk
   navigate, SkyserviceAPI, isInsideIframe, formatMoney, currencyIcon,
@@ -1265,6 +1268,129 @@ const range = reactive({ start: '', end: '' }) // { start, end } у формат
 | `searchable` | `Boolean` | `true` | Показувати поле пошуку |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
 
+### SkyRadioFilter
+
+Фільтр-чіп з одиничним вибором радіо-кнопками: вибір не закриває панель, є «Очистити»/«Готово». Пунктам з `inputFor` додається числовий інпут — тоді значення `{ value, input }`, і без числа фільтр не активний.
+
+```vue
+<SkyRadioFilter v-model="payment" title="Спосіб оплати" :options="paymentOptions" />
+<SkyRadioFilter v-model="motion" title="Рух клієнтів" :options="motionOptions" :input-for="['come', 'remove']" input-hint="клієнтів" />
+```
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | — | Заголовок |
+| `options` | `Array<{ value, name }>` | — | Варіанти |
+| `modelValue` | `value \| { value, input } \| null` | `null` | v-model |
+| `inputFor` | `Array` | `[]` | Пункти з числовим інпутом |
+| `inputHint` | `String` | `''` | Підпис біля інпуту |
+| `clearable` | `Boolean` | `true` | «Очистити» |
+| `searchable` | `Boolean` | `false` | Пошук по списку |
+| `clearLabel` / `doneLabel` / `searchPlaceholder` / `emptyLabel` | `String` | укр. | Тексти |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+Подія: `update:modelValue`. Детально — у [документації](/components/sky-radio-filter).
+
+### SkyRangeFilter
+
+Фільтр-чіп для числового діапазону: поля «від — до» + слайдер з двома повзунками. Повний діапазон емітиться як `{ from: null, to: null }` (фільтр вимкнено).
+
+```vue
+<SkyRangeFilter v-model="avgCheck" title="Середній чек" :min="0" :max="5000" :step="10" />
+```
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | — | Заголовок |
+| `modelValue` | `{ from, to }` | `{ from: null, to: null }` | v-model |
+| `min` / `max` / `step` | `Number` | `0` / `100` / `1` | Межі й крок |
+| `doneLabel` | `String` | `'Готово'` | |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+Подія: `update:modelValue`. CSS-змінна: `--sky-filter-range-accent`. Детально — у [документації](/components/sky-range-filter).
+
+### SkySearchFilter
+
+Фільтр-чіп з мульти-вибором і серверним пошуком для великих списків (клієнти, зміни). `fetch({ page, search })` повертає `{ items, hasMore }`; значення — масив `{ value, name }`, щоб назва лишалась у тригері, навіть коли рядка вже нема у списку.
+
+```vue
+<SkySearchFilter v-model="clients" title="Клієнти" :fetch="fetchClients" />
+```
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | — | Заголовок |
+| `fetch` | `({ page, search }) => Promise<{ items, hasMore }>` | — | Сторінка результатів |
+| `modelValue` | `Array<{ value, name }>` | `[]` | v-model |
+| `debounce` | `Number` | `400` | Затримка пошуку, мс |
+| `width` | `Number` | `320` | Ширина панелі |
+| `clearLabel` / `doneLabel` / `searchPlaceholder` / `emptyLabel` / `loadingLabel` / `loadMoreLabel` | `String` | укр. | Тексти |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+Подія: `update:modelValue`. Детально — у [документації](/components/sky-search-filter).
+
+### SkyDateFilter
+
+Фільтр-чіп для періоду дат: календар (перший клік — початок, другий — кінець), кнопки швидкого вибору і футер «Очистити» / «Готово». Значення — `{ start, end }` у `YYYY-MM-DD`; назовні йде лише завершений період.
+
+```vue
+<SkyDateFilter v-model="period" title="Період" :max="today()" />
+<SkyDateFilter v-model="period" title="Період" :disabled-date="(d, { start, end }) => !!start && !end && Math.abs(diffDays(start, d)) > 31" />
+<SkyDateFilter v-model="period" title="Квартал" :presets="quarterPresets(2025)" />
+```
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `title` | `String` | — | Заголовок |
+| `modelValue` | `{ start, end }` | `{ start: null, end: null }` | v-model |
+| `min` / `max` | `String` | — | Межі дат (`today()` — без майбутнього) |
+| `maxDays` | `Number` | — | Найдовший період у днях |
+| `disabledDate` | `(date, ctx) => boolean` | — | Своє правило; `ctx.start` без `ctx.end` — обирається кінець |
+| `presets` | `DatePreset[]` | `defaultDatePresets()` | Кнопки швидкого вибору; `[]` — без них |
+| `firstDayOfWeek` | `0 \| 1` | `1` | Перший день тижня |
+| `monthNames` / `weekdayNames` | `String[]` | укр. | Локалізація |
+| `formatLabel` | `(range) => string` | `dd.mm.yyyy – dd.mm.yyyy` | Підпис у тригері |
+| `clearLabel` / `doneLabel` | `String` | `'Очистити'` / `'Готово'` | Футер |
+| `width` | `Number` | `320` | Ширина панелі |
+| `disabled` | `Boolean` | `false` | Вимкнений стан |
+
+Слот `presets` (`{ presets, select, isActive, isDisabled, value }`) повністю замінює кнопки швидкого вибору; «Очистити» й «Готово» лишаються. Хелпери: `today`, `addDays`, `diffDays`, `formatDate`, `formatDateRange`, `datePresets.*`, `defaultDatePresets`, `quarterPresets`. CSS-змінні: `--sky-date-accent`, `--sky-date-range-bg`, `--sky-date-color`, `--sky-date-clear-color`, `--sky-date-done-color`. Детально — у [документації](/components/sky-date-filter).
+
+### SkyFilters
+
+Рядок фільтрів з одним `v-model`: що не влазить по ширині — ховається в «Усі фільтри», яка відкриває штору `SkyFiltersCurtain` зі всіма фільтрами (як `HeaderFilters` в адмінці). Типи: `checkbox`, `radio` (з опційним числовим інпутом), `range`, `search` (серверний пошук), `date` (період) і свої — через `component` у конфігу або `registerFilterType`.
+
+```vue
+<SkyFilters
+  v-model="values"
+  :filters="[
+    { key: 'tradepoints', title: 'Торгова точка', options: tradepoints },
+    { key: 'payment', title: 'Оплата', type: 'radio', options: payments },
+    { key: 'avgCheck', title: 'Середній чек', type: 'range', min: 0, max: 5000 },
+    { key: 'clients', title: 'Клієнти', type: 'search', fetch: fetchClients },
+  ]"
+  style="flex: 1; min-width: 0"
+  @change="load"
+/>
+```
+
+| Prop | Тип | За замовчуванням | Опис |
+|------|-----|------------------|------|
+| `filters` | `SkyFilterConfig[]` | — | Конфіг фільтрів |
+| `modelValue` | `Record<string, unknown>` | `{}` | Значення за ключами |
+| `disabled` | `Boolean` | `false` | Вимикає всі |
+| `labels` | `Partial<SkyFiltersLabels>` | укр. | Тексти кнопок/штори |
+| `curtainAnchor` | `string \| HTMLElement` | — | До чого прилипає штора (напр. `'#content'`) |
+| `curtainWidth` | `Number` | `320` | Ширина штори |
+
+| Подія | Payload |
+|-------|---------|
+| `update:modelValue` | `values` |
+| `change` | `{ key, value, values }` |
+| `reset` | `values` |
+
+CSS-змінні: `--sky-filters-gap`, `--sky-filters-reset-color`, `--sky-filters-curtain-z-index`, `--sky-filters-curtain-bg`, `--sky-filter-range-accent`, `--sky-filter-list-max-height`. Повний опис конфігу, формати значень і свої типи — у [документації](/components/sky-filters).
+
 ### SkySelectFilter
 
 Той самий фільтр-чіп, але з **одиничним** вибором — для випадків, коли бекенд приймає рівно
@@ -1572,7 +1698,7 @@ src/
 │       ├── table/       # примітиви композиційної таблиці (Root/Header/Head/Body/VirtualBody/Row/Cell/Empty)
 │       ├── SkyTable/     # готова віртуал-скрол таблиця (Header/Row/Footer/DynamicScroller/items/*)
 │       ├── SkyTileCard/
-│       ├── SkyFilterDropdown/  # оболонка фільтра (тригер + панель) + FilterSearch
+│       ├── SkyFilterDropdown/  # оболонка фільтра (тригер + панель) + FilterSearch + panels/ (вміст checkbox/radio/range/search)
 │       ├── SkyPagination/     # посторінкова навігація зі селектором кількості
 │       ├── functional-calendar/ # форк vue-functional-calendar, перенесений зі SkyMarket 1:1
 │       ├── SkyDateRangePicker/  # DatePickerRange зі SkyMarket, store/langs → props/локальний стан
@@ -1580,11 +1706,17 @@ src/
 │           ├── <Component>.vue
 │           └── index.ts
 │   └── lib/
+│       ├── date/    # дати YYYY-MM-DD: today / addDays / diffDays / formatDateRange + datePresets
 │       └── table/   # skyTableFeatures + useTableSort / useTableSelection / useColumnVisibility
 ├── features/          # фічові блоки (orchestration shared/ui)
 │   ├── index.ts
 │   ├── SkyCheckboxFilter/  # мульти-вибір на SkyFilterDropdown
 │   ├── SkySelectFilter/    # одиничний вибір на SkyFilterDropdown
+│   ├── SkyRadioFilter/     # радіо + «Очистити», опційно з числовим інпутом
+│   ├── SkyRangeFilter/     # діапазон «від — до» зі слайдером
+│   ├── SkySearchFilter/    # мульти-вибір із серверним пошуком і довантаженням
+│   ├── SkyDateFilter/      # період дат: календар, виключення дат, пресети (слот)
+│   ├── SkyFilters/         # рядок фільтрів + «Усі фільтри» + штора, реєстр типів
 │   ├── table/         # TableMassActions / TableColumnSettings / TableVirtualBody
 │   └── data-table/    # SkyDataTable на TanStack v9 + перемикач колонок
 ├── sdk/               # TypeScript SDK (без Vue залежностей)

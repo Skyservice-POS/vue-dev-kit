@@ -169,6 +169,26 @@ export default defineConfig({
               text: 'SkySelectFilter',
               link: '/components/sky-select-filter',
             },
+            {
+              text: 'SkyRadioFilter',
+              link: '/components/sky-radio-filter',
+            },
+            {
+              text: 'SkyRangeFilter',
+              link: '/components/sky-range-filter',
+            },
+            {
+              text: 'SkySearchFilter',
+              link: '/components/sky-search-filter',
+            },
+            {
+              text: 'SkyDateFilter',
+              link: '/components/sky-date-filter',
+            },
+            {
+              text: 'SkyFilters',
+              link: '/components/sky-filters',
+            },
           ],
         },
         {
