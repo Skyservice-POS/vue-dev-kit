@@ -93,6 +93,15 @@ onMounted(() => {
   window.setTimeout(countDomRows, 100)
 })
 
+// Третя таблиця — fitRows: скільки рядків вміщається у висоту, стільки й
+// просили б у бека. Висоту контейнера крутить повзунок.
+const fitHeight = ref(420)
+const fitCount = ref(0)
+const fitPage = ref(1)
+const fitRequest = computed(() =>
+  fitCount.value ? `limit=${fitCount.value}&offset=${(fitPage.value - 1) * fitCount.value}` : '—',
+)
+
 const selectedCount = computed(
   () => tableRef.value?.table.getSelectedRowModel().rows.length ?? 0,
 )
@@ -106,6 +115,7 @@ const selectedCount = computed(
         :columns="columns"
         :data="data"
         :page-size="10"
+        :page-all-label="(n) => `Усі ${n}`"
         row-id="id"
         searchable
         interactive-rows
@@ -141,6 +151,25 @@ const selectedCount = computed(
       рядків у даних: {{ bigData.length }} · рядків у DOM: {{ domRows }}
     </div>
   </Demo>
+
+  <Demo title="fitRows — стільки рядків, скільки вміщається" column flush>
+    <label class="vdk-fit-control">
+      висота контейнера: {{ fitHeight }}px
+      <input v-model.number="fitHeight" type="range" min="220" max="720" step="10" />
+    </label>
+    <div class="vdk-dt vdk-dt-fit" :style="{ height: `${fitHeight}px` }">
+      <SkyDataTable
+        :columns="columns"
+        :data="data"
+        :page-size="25"
+        fit-rows
+        row-id="id"
+        @fit-rows="(n) => { fitCount = n; fitPage = 1 }"
+        @update:page="(p) => (fitPage = p)"
+      />
+    </div>
+    <div class="vdk-demo-out">вміщається: {{ fitCount }} · запит на бек: {{ fitRequest }}</div>
+  </Demo>
 </template>
 
 <style scoped>
@@ -151,5 +180,13 @@ const selectedCount = computed(
   border-radius: 8px;
   background: #fff;
   overflow: hidden;
+}
+
+.vdk-fit-control {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 12px 0;
+  font-size: 13px;
 }
 </style>
