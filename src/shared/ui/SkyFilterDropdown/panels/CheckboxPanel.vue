@@ -1,0 +1,186 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import SkyCheckbox from '@/shared/ui/SkyCheckbox/SkyCheckbox.vue';
+import FilterSearch from '../FilterSearch.vue';
+
+type OptionValue = string | number;
+
+interface Option {
+  value: OptionValue;
+  name: string;
+}
+
+/**
+ * Вміст панелі мульти-вибору: «Обрати все / Очистити», пошук, список.
+ * Без оболонки — її дає або SkyFilterDropdown (SkyCheckboxFilter, рядок SkyFilters),
+ * або секція штори SkyFiltersCurtain. Пошук скидається сам: панель монтується
+ * заново щоразу, коли дропдаун відкривається.
+ */
+const props = withDefaults(
+  defineProps<{
+    options: Option[];
+    modelValue?: OptionValue[];
+    /** Доступна назва для поля пошуку. */
+    title?: string;
+    selectAllLabel?: string;
+    clearLabel?: string;
+    searchPlaceholder?: string;
+    selectAll?: boolean;
+    searchable?: boolean;
+    disabled?: boolean;
+  }>(),
+  {
+    modelValue: () => [],
+    title: '',
+    selectAll: true,
+    searchable: true,
+    selectAllLabel: 'Обрати все',
+    clearLabel: 'Очистити',
+    searchPlaceholder: 'Пошук',
+    disabled: false,
+  },
+);
+
+const emit = defineEmits<{
+  'update:modelValue': [OptionValue[]];
+}>();
+
+const searchQuery = ref('');
+
+const filteredOptions = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
+  if (!q) return props.options;
+  return props.options.filter((o) => o.name.toLowerCase().includes(q));
+});
+
+const selected = computed({
+  get: () => props.modelValue,
+  set: (v) => emit('update:modelValue', v),
+});
+
+function selectAllOptions(): void {
+  selected.value = props.options.map((o) => o.value);
+}
+
+function clearAll(): void {
+  selected.value = [];
+}
+</script>
+
+<template>
+  <div class="sky-checkbox-filter__panel">
+    <div class="sky-checkbox-filter__actions">
+      <button v-if="selectAll" type="button" class="sky-checkbox-filter__link" :disabled="disabled" @mousedown.prevent @click="selectAllOptions">
+        {{ selectAllLabel }}
+      </button>
+      <button type="button" class="sky-checkbox-filter__link" :disabled="disabled" @mousedown.prevent @click="clearAll">
+        {{ clearLabel }}
+      </button>
+    </div>
+
+    <FilterSearch
+      v-if="searchable"
+      v-model="searchQuery"
+      :placeholder="searchPlaceholder"
+      :label="title"
+    />
+
+    <div class="sky-checkbox-filter__options">
+      <div v-for="opt in filteredOptions" :key="opt.value" class="sky-checkbox-filter__option">
+        <SkyCheckbox v-model="selected" :value="opt.value" :disabled="disabled">{{ opt.name }}</SkyCheckbox>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+/* Метрики зняті з адмінки (Bootstrap 4.6 .custom-control + правила
+   headerFiltersNew/Dashboard) і відтворені 1:1:
+   .dialog-buttons  → 16px / 500 / #106090, знизу 10px у шапці, зверху 10px у футері
+   .dialogHF        → padding-left: 3px
+   рядок            → бокс 16px зі зсувом 4px, текст із 24px, крок між рядками 34.98px
+   label            → 10pt / line-height 20px / padding-top 2px */
+/* Колонка, що стискається: у панелі дропдауна з обмеженою висотою скролиться
+   список, а не все разом. */
+.sky-checkbox-filter__panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sky-checkbox-filter__actions {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 0 10px;
+  font-size: var(--sky-filter-action-font-size, 1rem);
+  font-weight: var(--sky-filter-action-font-weight, 500);
+  white-space: nowrap;
+}
+
+.sky-checkbox-filter__link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: var(--sky-filter-accent, #106090);
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sky-checkbox-filter__link:focus-visible {
+  outline: 2px solid var(--sky-filter-accent, #106090);
+  outline-offset: 2px;
+}
+
+.sky-checkbox-filter__link:disabled {
+  opacity: 0.5;
+  cursor: default;
+  text-decoration: none;
+}
+
+.sky-checkbox-filter__link:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* Панель сама обмежує висоту, тож скролиться список, а не сторінка. */
+.sky-checkbox-filter__options {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: var(--sky-filter-list-max-height, none);
+  overflow-y: auto;
+  padding-top: 3px;
+  padding-left: 3px;
+}
+
+.sky-checkbox-filter__option {
+  /* flex, а не block: інлайновий SkyCheckbox інакше тягне за собою strut
+     від line-height хоста, і крок рядків їде. */
+  display: flex;
+  /* Бокс 20px, не Bootstrap-івський дефолт 16: Dashboard.vue глобально перебиває
+     .custom-checkbox > .custom-control-label::before на 20px !important. Текст при
+     цьому лишається на 24px від краю рядка, тож зазор виходить 4px, а не 8. */
+  --sky-checkbox-size: 20px;
+  --sky-checkbox-gap: 4px;
+  --sky-checkbox-font-size: var(--sky-filter-option-font-size, 10pt);
+  --sky-checkbox-line-height: 20px;
+  --sky-checkbox-label-margin: 0;
+  /* Текст центрується по боксу, а не як в адмінці. Там Bootstrap ставить ::before на
+     top: 4px під розмір 16px, а Dashboard.vue роздуває бокс до 20px, не чіпаючи top —
+     через це текст виявляється на 3px вище центру. Це баг, а не рішення, тож не
+     копіюємо: у нас обидва по 20px і align-items: center дає рівно 0.
+     Крок рядків лишається 35px (рядок 20 + 15). */
+  margin-bottom: 15px;
+}
+
+/* Єдине свідоме відхилення від адмінки, і воно невидиме: там лейбл завширшки з
+   текст, тож клік праворуч від напису нікуди не потрапляє. Розтягуємо його на
+   весь рядок — позиція тексту та сама, ціль для кліка нормальна. */
+.sky-checkbox-filter__option :deep(.sky-checkbox) {
+  flex: 1;
+  min-width: 0;
+}
+</style>

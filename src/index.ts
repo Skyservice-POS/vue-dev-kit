@@ -3,6 +3,7 @@ import './styles/safe-area.css';
 
 export * from './shared/ui';
 export * from './shared/lib/table';
+export * from './shared/lib/date';
 export * from './features';
 export * from './sdk';
 export * from 'sky-service-ui-components';

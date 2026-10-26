@@ -22,6 +22,11 @@ import Modal from '@/shared/ui/Modal/Modal.vue'
 import Dialog from '@/shared/ui/Dialog/Dialog.vue'
 import Header from '@/shared/ui/Header/Header.vue'
 import SkyCheckboxFilter from '@/features/SkyCheckboxFilter/SkyCheckboxFilter.vue'
+import SkyFilters from '@/features/SkyFilters/SkyFilters.vue'
+import SkyRadioFilter from '@/features/SkyRadioFilter/SkyRadioFilter.vue'
+import SkyRangeFilter from '@/features/SkyRangeFilter/SkyRangeFilter.vue'
+import SkySearchFilter from '@/features/SkySearchFilter/SkySearchFilter.vue'
+import SkyDateFilter from '@/features/SkyDateFilter/SkyDateFilter.vue'
 import SkySelectFilter from '@/features/SkySelectFilter/SkySelectFilter.vue'
 import SkyDataTable from '@/features/data-table/SkyDataTable.vue'
 import SkyTableRoot from '@/shared/ui/table/SkyTableRoot.vue'
@@ -40,6 +45,16 @@ const checked = ref(true)
 const period = ref('week')
 const filter = ref([])
 const selectFilter = ref(null)
+const filtersValue = ref({})
+const radioFilter = ref(null)
+const rangeFilter = ref({ from: null, to: null })
+const searchFilter = ref([])
+const dateFilter = ref({ start: null, end: null })
+const galleryClients = Array.from({ length: 50 }, (_, i) => ({ value: i + 1, name: `Клієнт ${i + 1}` }))
+function fetchGalleryClients({ page, search }) {
+  const found = galleryClients.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
+  return Promise.resolve({ items: found.slice((page - 1) * 20, page * 20), hasMore: page * 20 < found.length })
+}
 const galleryPage = ref(3)
 const showModal = ref(false)
 const showDialog = ref(false)
@@ -175,6 +190,70 @@ const primitiveColumns = [
             :options="[
               { value: 'drinks', name: 'Напої' },
               { value: 'food', name: 'Їжа' },
+            ]"
+          />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-radio-filter">SkyRadioFilter</a>
+          <code>радіо + «Очистити»</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkyRadioFilter
+            v-model="radioFilter"
+            title="Оплата"
+            :options="[
+              { value: 'cash', name: 'Готівка' },
+              { value: 'card', name: 'Картка' },
+            ]"
+          />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-range-filter">SkyRangeFilter</a>
+          <code>діапазон «від — до»</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkyRangeFilter v-model="rangeFilter" title="Середній чек" :min="0" :max="5000" :step="10" />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-search-filter">SkySearchFilter</a>
+          <code>серверний пошук</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkySearchFilter v-model="searchFilter" title="Клієнти" :fetch="fetchGalleryClients" />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-date-filter">SkyDateFilter</a>
+          <code>період + пресети</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkyDateFilter v-model="dateFilter" title="Період" />
+        </div>
+      </article>
+
+      <article class="vdk-card">
+        <header class="vdk-card__head">
+          <a href="/components/sky-filters">SkyFilters</a>
+          <code>набір фільтрів</code>
+        </header>
+        <div class="vdk-card__stage">
+          <SkyFilters
+            v-model="filtersValue"
+            :filters="[
+              { key: 'cat', title: 'Категорії', options: [{ value: 'drinks', name: 'Напої' }, { value: 'food', name: 'Їжа' }] },
+              { key: 'st', type: 'radio', title: 'Статус', options: [{ value: 'on', name: 'Активний' }, { value: 'off', name: 'Архів' }] },
+              { key: 'sum', type: 'range', title: 'Сума', min: 0, max: 1000 },
             ]"
           />
         </div>
