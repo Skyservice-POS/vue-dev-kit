@@ -974,6 +974,8 @@ const columns = [
 
 Слоти: `toolbar`, `actions`, `footer`, `empty` (усі отримують `{ table }`). Події: `row-click`, `reach-end` (тільки у віртуальному режимі), `update:page`, `update:pageSize`, `fit-rows` (скільки рядків вміщається — лише з `fitRows`). Пагінація у футері — `SkyPagination`; нова кількість на сторінці повертає на першу сторінку. Інстанс таблиці доступний через `ref` → `tableRef.table`.
 
+Налаштування колонок — `SkyDataTableColumnToggle :table="table"` у слоті `actions`: кнопка з іконкою-сіткою, список колонок (рядковий `header` або `meta.label`; `enableHiding: false` — обовʼязкова, чекбокс вимкнений), «Готово» і «За замовчуванням». Пропи: `table`, `title`, `doneLabel`, `resetLabel`.
+
 #### Віртуалізація
 
 На кілька тисяч рядків браузер провисає не на даних, а на DOM. Проп `virtual` лишає в розмітці тільки видиме вікно:

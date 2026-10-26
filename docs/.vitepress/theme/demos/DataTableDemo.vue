@@ -46,6 +46,8 @@ const columns = [
     header: 'Назва',
     meta: { widthFr: 2 },
     sortFn: 'alphanumeric',
+    // Обовʼязкова: у налаштуваннях колонок видно, але вимкнути не можна.
+    enableHiding: false,
   }),
   column.accessor('category', { header: 'Категорія', size: 150 }),
   column.accessor('price', {
