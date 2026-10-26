@@ -16,7 +16,11 @@ export default defineConfig({
       // the published types explicitly — otherwise every *.test.ts ships a .d.ts.
       exclude: ['src/**/*.test.ts'],
       tsconfigPath: resolve(__dirname, 'tsconfig.json'),
-      rollupTypes: false,
+      // Той самий @vue/language-core, що й у vue-tsc (`npm run typecheck`): старий
+      // 1.x з vite-plugin-dts@3 не розумів generic-компонентів і віддавав для
+      // SkyTableBody `.d.ts` з `boolean` замість компонента.
+      processor: 'vue',
+      bundleTypes: false,
     }),
   ],
   resolve: {
