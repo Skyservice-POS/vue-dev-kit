@@ -965,14 +965,19 @@ const columns = [
 | `data` | `TData[]` | — | Дані |
 | `features` | `TableFeatures` | `skyTableFeatures` | Власний набір фіч |
 | `rowId` | `String \| (row) => string` | — | Ключ рядка |
-| `pageSize` | `Number` | `0` | Розмір сторінки; `0` — без пагінації |
+| `pageSize` | `Number` | `0` | Розмір сторінки; `0` — без пагінації. Підтримує `v-model:page-size` |
+| `pageSizeOptions` | `Number[]` | як у `SkyPagination` | Варіанти селектора кількості |
+| `pageAllLabel` | `(total) => String` | — | Підпис «показати все» в селекторі |
+| `fitRows` | `Boolean \| { rowHeight?, min? }` | `false` | Рахувати, скільки рядків вміщається в тіло (подія `fit-rows`); з пагінацією — ще й розмір сторінки. Потрібна обмежена висота таблиці |
 | `searchable` | `Boolean` | `false` | Поле глобального пошуку в тулбарі |
 | `initialSorting` | `SortingState` | — | Початкове сортування |
 | `emptyText` | `String` | `'Даних немає'` | Текст порожнього стану |
 | `interactiveRows` | `Boolean` | `false` | Курсор і hover на рядках |
 | `virtual` | `Boolean \| SkyDataTableVirtualOptions` | `false` | Віртуалізація тіла — у DOM лише видиме вікно рядків |
 
-Слоти: `toolbar`, `actions`, `footer`, `empty` (усі отримують `{ table }`). Події: `row-click`, `reach-end` (тільки у віртуальному режимі). Інстанс таблиці доступний через `ref` → `tableRef.table`.
+Слоти: `toolbar`, `actions`, `footer`, `empty` (усі отримують `{ table }`). Події: `row-click`, `reach-end` (тільки у віртуальному режимі), `update:page`, `update:pageSize`, `fit-rows` (скільки рядків вміщається — лише з `fitRows`). Пагінація у футері — `SkyPagination`; нова кількість на сторінці повертає на першу сторінку. Інстанс таблиці доступний через `ref` → `tableRef.table`.
+
+Налаштування колонок — `SkyDataTableColumnToggle :table="table"` у слоті `actions`: кнопка з іконкою-сіткою, список колонок (рядковий `header` або `meta.label`; `enableHiding: false` — обовʼязкова, чекбокс вимкнений), «Готово» і «За замовчуванням». Пропи: `table`, `title`, `doneLabel`, `resetLabel`.
 
 #### Віртуалізація
 

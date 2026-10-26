@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TData extends Record<string, any>">
-import { computed } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { FlexRender, useTable } from '@tanstack/vue-table';
 import type { ColumnDef, SortingState, TableFeatures } from '@tanstack/vue-table';
 import SkyTableRoot from '../../shared/ui/table/SkyTableRoot.vue';
@@ -11,8 +11,17 @@ import SkyTableRow from '../../shared/ui/table/SkyTableRow.vue';
 import SkyTableCell from '../../shared/ui/table/SkyTableCell.vue';
 import SkyTableEmpty from '../../shared/ui/table/SkyTableEmpty.vue';
 import SkySearchInput from '../../shared/ui/SkySearchInput/SkySearchInput.vue';
+import SkyPagination from '../../shared/ui/SkyPagination/SkyPagination.vue';
 import { skyTableFeatures } from '../../shared/lib/table/tableFeatures';
 import type { SkyTableColumn } from '../../shared/ui/table/types';
+
+/** Налаштування підбору кількості рядків під висоту тіла (`fitRows`). */
+export interface SkyDataTableFitOptions {
+  /** Висота рядка в px. Без неї міряємо перший рядок, а без рядків — `--sky-table-row-height` + рамка. */
+  rowHeight?: number;
+  /** Не менше стількох рядків, навіть якщо місця менше. За замовчуванням 1. */
+  min?: number;
+}
 
 /** Налаштування віртуалізації тіла — те саме, що приймає SkyTableVirtualBody. */
 export interface SkyDataTableVirtualOptions {
@@ -36,8 +45,15 @@ const props = withDefaults(
     features?: TableFeatures;
     /** Ключ рядка. Без нього TanStack бере індекс, і вибір «поїде» після сортування. */
     rowId?: string | ((row: TData) => string);
-    /** Розмір сторінки. `0` вимикає пагінацію — рендеряться всі рядки. */
+    /**
+     * Розмір сторінки. `0` вимикає пагінацію — рендеряться всі рядки.
+     * Підтримує `v-model:page-size`: вибір у селекторі пагінатора їде назовні.
+     */
     pageSize?: number;
+    /** Варіанти селектора кількості в пагінаторі (див. SkyPagination). */
+    pageSizeOptions?: number[];
+    /** Підпис пункту «показати все» в селекторі: `(n) => \`Усі ${n}\``. Без нього пункту немає. */
+    pageAllLabel?: (total: number) => string;
     /** Показати поле глобального пошуку в тулбарі. */
     searchable?: boolean;
     searchPlaceholder?: string;
@@ -54,11 +70,24 @@ const props = withDefaults(
      * не пагінація, а довантаження за подією `reach-end`.
      */
     virtual?: boolean | SkyDataTableVirtualOptions;
+    /**
+     * Рахувати, скільки рядків вміщається в тіло, і віддавати це подією
+     * `fit-rows` — під неї зручно вішати запит на бек з таким `limit`.
+     * З пагінацією (`pageSize > 0`) таблиця ще й сама ставить такий розмір
+     * сторінки, а селектор кількості ховає.
+     *
+     * Працює лише з обмеженою висотою таблиці (батько з `height` або
+     * `flex` + `min-height: 0`): інакше тіло росте разом з рядками, і міряти
+     * нема чого.
+     */
+    fitRows?: boolean | SkyDataTableFitOptions;
   }>(),
   {
     features: undefined,
     rowId: undefined,
     pageSize: 0,
+    pageSizeOptions: undefined,
+    pageAllLabel: undefined,
     searchable: false,
     searchPlaceholder: 'Пошук…',
     initialSorting: undefined,
@@ -71,6 +100,12 @@ const emit = defineEmits<{
   'row-click': [row: TData];
   /** Долистали тіло до кінця. Емітиться лише у віртуальному режимі. */
   'reach-end': [];
+  /** Перейшли на іншу сторінку (з одиниці). */
+  'update:page': [page: number];
+  /** Обрали іншу кількість рядків на сторінці. */
+  'update:pageSize': [pageSize: number];
+  /** Скільки рядків вміщається в тіло. Лише з `fitRows`; емітиться, коли число змінилось. */
+  'fit-rows': [count: number];
 }>();
 
 const table = useTable({
@@ -130,7 +165,38 @@ const globalFilter = computed({
 });
 
 const pagination = computed(() => table.atoms.pagination?.get());
-const showPagination = computed(() => props.pageSize > 0 && table.getPageCount() > 1);
+const currentPage = computed(() => (pagination.value?.pageIndex ?? 0) + 1);
+const currentPageSize = computed(() => pagination.value?.pageSize ?? props.pageSize);
+// Пагінатор сам ховається, коли вибирати нічого (одна сторінка й один варіант
+// розміру), тож тут лише вмикач режиму і порожня вибірка.
+const showPagination = computed(() => props.pageSize > 0 && table.getRowCount() > 0);
+
+function goToPage(page: number): void {
+  table.setPageIndex(page - 1);
+  emit('update:page', page);
+}
+
+// Нова кількість — завжди з першої сторінки: інакше поточна може опинитись за
+// межами нового числа сторінок. SkyPagination свідомо цього не робить сам.
+function changePageSize(size: number): void {
+  table.setPageSize(size);
+  table.setPageIndex(0);
+  emit('update:pageSize', size);
+}
+
+// pageSize потрапляє в initialState лише на старті — зміну пропа (v-model або
+// просто нове значення) доносимо до таблиці окремо.
+watch(
+  () => props.pageSize,
+  (size) => {
+    // Під fitRows розмір сторінки визначає висота, а не проп.
+    if (props.fitRows) return;
+    if (size > 0 && size !== currentPageSize.value) {
+      table.setPageSize(size);
+      table.setPageIndex(0);
+    }
+  },
+);
 
 function alignOf(columnId: string): SkyTableColumn['align'] {
   return gridColumns.value.find((c) => c.name === columnId)?.align ?? 'left';
@@ -157,7 +223,104 @@ if (props.virtual && props.pageSize > 0) {
   );
 }
 
-defineExpose({ table });
+// ── fitRows ────────────────────────────────────────────────────────────────
+const tableRootRef = ref<{ $el: HTMLElement } | null>(null);
+const fittedRows = ref(0);
+
+const fitOptions = computed<SkyDataTableFitOptions>(() =>
+  typeof props.fitRows === 'object' && props.fitRows !== null ? props.fitRows : {},
+);
+
+/** Висота рядка: явна, або виміряна з першого рядка, або з CSS-змінної. */
+function rowHeightOf(body: HTMLElement): number {
+  if (fitOptions.value.rowHeight) return fitOptions.value.rowHeight;
+  const first = body.querySelector<HTMLElement>('.sky-table__row');
+  if (first?.offsetHeight) return first.offsetHeight;
+  // min-height рядка + його нижня рамка в 1px.
+  const fromCss = parseFloat(getComputedStyle(body).getPropertyValue('--sky-table-row-height'));
+  return (Number.isFinite(fromCss) && fromCss > 0 ? fromCss : 40) + 1;
+}
+
+function bodyEl(): HTMLElement | null {
+  return tableRootRef.value?.$el?.querySelector<HTMLElement>('.sky-table__body') ?? null;
+}
+
+function recalcFit(): void {
+  if (!props.fitRows) return;
+  const body = bodyEl();
+  if (!body) return;
+  const count = Math.max(fitOptions.value.min ?? 1, Math.floor(body.clientHeight / rowHeightOf(body)));
+  if (count === fittedRows.value) return;
+  fittedRows.value = count;
+
+  if (props.pageSize > 0) {
+    // Лишаємось біля того самого першого рядка, а не стрибаємо на першу сторінку
+    // на кожен ресайз вікна.
+    const firstRow = (pagination.value?.pageIndex ?? 0) * currentPageSize.value;
+    table.setPageSize(count);
+    table.setPageIndex(Math.floor(firstRow / count));
+  }
+  emit('fit-rows', count);
+}
+
+let fitObserver: ResizeObserver | null = null;
+let fitFrame = 0;
+
+function scheduleFit(): void {
+  cancelAnimationFrame(fitFrame);
+  fitFrame = requestAnimationFrame(recalcFit);
+}
+
+function startFit(): void {
+  stopFit();
+  const body = bodyEl();
+  if (!body) return;
+  recalcFit();
+  if (typeof ResizeObserver !== 'undefined') {
+    fitObserver = new ResizeObserver(scheduleFit);
+    fitObserver.observe(body);
+  }
+}
+
+function stopFit(): void {
+  fitObserver?.disconnect();
+  fitObserver = null;
+  cancelAnimationFrame(fitFrame);
+}
+
+onMounted(() => {
+  if (props.fitRows) startFit();
+});
+onBeforeUnmount(stopFit);
+
+watch(
+  () => Boolean(props.fitRows),
+  (on) => {
+    if (on) void nextTick(startFit);
+    else {
+      stopFit();
+      fittedRows.value = 0;
+    }
+  },
+);
+
+// Висоту рядка можна виміряти лише коли рядки є, тож після нових даних
+// перевіряємо ще раз — число могло уточнитись.
+watch(
+  () => props.data,
+  () => {
+    if (props.fitRows) void nextTick(recalcFit);
+  },
+);
+
+if (props.fitRows && props.virtual) {
+  console.warn(
+    '[SkyDataTable] `fitRows` і `virtual` разом не мають сенсу: віртуальне тіло й так ' +
+      'тримає в DOM лише те, що видно. Лишіть щось одне.',
+  );
+}
+
+defineExpose({ table, recalcFit, fittedRows });
 </script>
 
 <template>
@@ -167,11 +330,14 @@ defineExpose({ table });
         <div v-if="searchable" class="sky-data-table__search">
           <SkySearchInput v-model="globalFilter" :placeholder="searchPlaceholder" />
         </div>
-        <slot name="actions" :table="table" />
+        <!-- Дії (налаштування колонок тощо) — завжди праворуч, хоч би якої ширини був пошук. -->
+        <div v-if="$slots.actions" class="sky-data-table__actions">
+          <slot name="actions" :table="table" />
+        </div>
       </div>
     </slot>
 
-    <SkyTableRoot :columns="gridColumns" class="sky-data-table__table">
+    <SkyTableRoot ref="tableRootRef" :columns="gridColumns" class="sky-data-table__table">
       <SkyTableHeader v-for="group in headers" :key="group.id">
         <SkyTableHead
           v-for="header in group.headers"
@@ -232,33 +398,16 @@ defineExpose({ table });
 
     <slot name="footer" :table="table">
       <div v-if="showPagination" class="sky-data-table__pagination">
-        <span class="sky-data-table__count">
-          Знайдено {{ table.getRowCount() }}
-        </span>
-
-        <div class="sky-data-table__pager">
-          <button
-            type="button"
-            class="sky-data-table__page-btn"
-            :disabled="!table.getCanPreviousPage()"
-            @mousedown.prevent
-            @click="table.previousPage()"
-          >
-            ‹
-          </button>
-          <span class="sky-data-table__page">
-            {{ (pagination?.pageIndex ?? 0) + 1 }} / {{ table.getPageCount() }}
-          </span>
-          <button
-            type="button"
-            class="sky-data-table__page-btn"
-            :disabled="!table.getCanNextPage()"
-            @mousedown.prevent
-            @click="table.nextPage()"
-          >
-            ›
-          </button>
-        </div>
+        <SkyPagination
+          :total="table.getRowCount()"
+          :page="currentPage"
+          :page-size="currentPageSize"
+          :page-size-options="fitRows ? [] : pageSizeOptions"
+          :all-label="pageAllLabel"
+          @update:page="goToPage"
+          @update:page-size="changePageSize"
+        />
+        <span class="sky-data-table__count">Знайдено {{ table.getRowCount() }}</span>
       </div>
     </slot>
   </div>
@@ -284,6 +433,13 @@ defineExpose({ table });
   max-width: 320px;
 }
 
+.sky-data-table__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
 .sky-data-table__table {
   flex: 1;
   min-height: 0;
@@ -294,47 +450,15 @@ defineExpose({ table });
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: var(--sky-table-footer-padding, 6px 10px);
+  padding: var(--sky-table-footer-padding, 0 10px);
   border-top: 1px solid var(--sky-table-border-color, #dee2e6);
-  font-size: 13px;
-  color: var(--sky-table-head-color, #106090);
   flex-shrink: 0;
 }
 
-.sky-data-table__pager {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sky-data-table__page-btn {
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--sky-table-border-color, #dee2e6);
-  border-radius: 6px;
-  background: #fff;
-  color: inherit;
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.sky-data-table__page-btn {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.sky-data-table__page-btn:focus-visible {
-  outline: 2px solid #0d6efd;
-  outline-offset: 2px;
-}
-
-.sky-data-table__page-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.sky-data-table__page-btn:not(:disabled):hover {
-  background: var(--sky-table-row-hover-bg, #def9ff);
+.sky-data-table__count {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--sky-table-head-color, #106090);
+  white-space: nowrap;
 }
 </style>
