@@ -82,6 +82,7 @@ import {
   notify, notifyError, notifyWarn,
   isInsideIframe, onMessage,
   setSenderId, getSenderId,
+  openModal, getModals,
 } from '@skyservice-developers/vue-dev-kit/sdk'
 
 const token = await getToken()            // → string | null
@@ -92,6 +93,21 @@ navigate('/products/42')
 ```
 
 Всі гетери повертають `Promise<T | null>` — `null` при таймауті або якщо додаток відкритий поза iframe. `null` не ламає `await` — просто треба перевірити результат.
+
+#### Модалки Dashboard поверх iframe
+
+`openModal(key, context, params)` просить Dashboard відкрити свою модалку документа (надходження тощо) поверх iframe, уже заповнену, і резолвиться, коли її закрили: `done` / `cancelled` / `error` / `refused`. Промис не відхиляється. `getModals()` — які ключі є і чи дозволені користувачу (`null` — Dashboard старий).
+
+```ts
+const result = await openModal(
+  'coming.create',
+  { tradepointId },
+  { warehouseId, supplierOrderId },   // товари, ціни й постачальник — із замовлення
+)
+if (result.status === 'done') reload()
+```
+
+Каталог ключів — тип `DashboardModals`, докладно — `docs/sdk/bridge.md`.
 
 ### SkyserviceAPI — HTTP клієнт
 

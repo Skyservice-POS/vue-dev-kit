@@ -25,6 +25,8 @@ export {
   onMessage,
   setSenderId,
   getSenderId,
+  openModal,
+  getModals,
 } from './bridge';
 
 // Webview detection
@@ -55,4 +57,10 @@ export type {
   RawProduct,
   AppIntegration,
   PermsMap,
+  DashboardModals,
+  DashboardModalKey,
+  DashboardModalTradepointContext,
+  DashboardModalRefusal,
+  DashboardModalResult,
+  DashboardModalsAvailability,
 } from './types';

@@ -1,8 +1,17 @@
+import type {
+  DashboardModalKey,
+  DashboardModalResult,
+  DashboardModals,
+  DashboardModalsAvailability,
+} from './types';
+
 const BRIDGE_ID = 'DASHBOARD';
 const DEFAULT_TIMEOUT = 5000;
 // Скільки чекаємо підтвердження на `back`, перш ніж вважати дашборд застарілим і вийти на головну.
 // Помітно менше за DEFAULT_TIMEOUT: це реакція на клік, її користувач чекає з пальцем на екрані.
 const BACK_ACK_TIMEOUT = 700;
+// Скільки openModal чекає підтвердження. Без нього вважаємо, що дашборд про модалки не знає.
+const MODAL_ACK_TIMEOUT = 1500;
 
 let requestCounter = 0;
 let _senderId: string | null = null;
@@ -108,6 +117,96 @@ export function goBack(timeout = BACK_ACK_TIMEOUT): Promise<boolean> {
   const ack = awaitResponse<{ ok?: boolean }>(requestId, timeout);
   send({ type: 'back', requestId });
   return ack.then((data) => data?.ok === true);
+}
+
+// ─── Dashboard modals ───
+
+/**
+ * Open a Dashboard modal (receipt, inventory, …) over the iframe and wait until it is closed.
+ *
+ * Two answers from the host: an immediate ack (`{ ok: true }` or `{ ok: false, reason }`), then
+ * `modalClosed` with the result. Never rejects — a refusal resolves as `status: 'refused'`:
+ * `not_in_iframe`, `no_response` (a Dashboard too old to know modals), or the host's reason.
+ *
+ * @example
+ * const result = await openModal('coming.create', { tradepointId }, { warehouseId, supplierOrderId })
+ * if (result.status === 'done') reload()
+ */
+export function openModal<K extends DashboardModalKey>(
+  key: K,
+  context: DashboardModals[K]['context'],
+  params: DashboardModals[K]['params'],
+  options: { ackTimeout?: number } = {},
+): Promise<DashboardModalResult<K>> {
+  if (!isInsideIframe()) return Promise.resolve({ status: 'refused', reason: 'not_in_iframe' });
+
+  const requestId = generateRequestId();
+  const mySenderId = getSenderId();
+
+  return new Promise((resolve) => {
+    let acknowledged = false;
+
+    const timer = setTimeout(() => {
+      if (!acknowledged) finish({ status: 'refused', reason: 'no_response' });
+    }, options.ackTimeout ?? MODAL_ACK_TIMEOUT);
+
+    function finish(result: DashboardModalResult<K>) {
+      clearTimeout(timer);
+      window.removeEventListener('message', handler);
+      resolve(result);
+    }
+
+    function handler(event: MessageEvent) {
+      // Лише батьківське вікно (подію без source — напр. у тестах — не відкидаємо) і лише наш запит
+      if (event.source && event.source !== window.parent) return;
+
+      const d = event.data;
+      if (d?.requestId !== requestId || (d.target && d.target !== mySenderId)) return;
+
+      if (d.type === 'DATA_RESPONSE') {
+        const ack = d.data ?? {};
+        if (ack.ok === true) {
+          acknowledged = true;
+          clearTimeout(timer);
+          return;
+        }
+        finish({
+          status: 'refused',
+          reason: String(ack.reason ?? 'unknown_modal'),
+          field: typeof ack.field === 'string' ? ack.field : undefined,
+        });
+        return;
+      }
+
+      if (d.type === 'modalClosed') {
+        const data = d.data ?? {};
+        if (d.status === 'done') {
+          finish({ status: 'done', data: data as DashboardModals[K]['data'] });
+        } else if (d.status === 'error') {
+          finish({ status: 'error', reason: String(data.reason ?? 'unknown') });
+        } else {
+          finish({ status: 'cancelled' });
+        }
+      }
+    }
+
+    window.addEventListener('message', handler);
+    send({ type: 'openModal', requestId, key, context, params });
+  });
+}
+
+/**
+ * Which modals this Dashboard knows and whether the current user may open them —
+ * to decide whether to show a button. Resolves to `null` outside an iframe or when the
+ * host did not answer (too old to know modals).
+ */
+export function getModals(timeout = MODAL_ACK_TIMEOUT): Promise<DashboardModalsAvailability | null> {
+  if (!isInsideIframe()) return Promise.resolve(null);
+
+  const requestId = generateRequestId();
+  const response = awaitResponse<DashboardModalsAvailability>(requestId, timeout);
+  send({ type: 'getModals', requestId });
+  return response;
 }
 
 // ─── Data requests ───

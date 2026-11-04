@@ -108,3 +108,63 @@ export interface RawProduct {
   activeProductAppearance: 0 | 1;
   [key: string]: unknown;
 }
+
+// ─── Модалки Dashboard (openModal) ───
+
+/** Контекст модалки документа: Dashboard ставить цю точку поточною на час модалки */
+export interface DashboardModalTradepointContext {
+  tradepointId: number;
+}
+
+/**
+ * Каталог модалок, які Dashboard відкриває поверх iframe (`openModal`).
+ * Ключ — `документ.дія`; для кожного — контекст, параметри й дані успішного результату.
+ *
+ * Новий ключ з'являється тут разом із його адаптером у реєстрі Dashboard (`src/modals/registry.js`).
+ * Правило версіонування: параметри лише додаються; зміна змісту — новий ключ.
+ */
+export interface DashboardModals {
+  /** Нове надходження. З `supplierOrderId` товари (решта до отримання), ціни й постачальник — із замовлення */
+  'coming.create': {
+    context: DashboardModalTradepointContext;
+    params: {
+      warehouseId: number;
+      /** Замовлення постачальнику — підстава надходження */
+      supplierOrderId?: number;
+      /** Постачальник (counterpartyId), коли замовлення немає */
+      supplierId?: number;
+      comment?: string;
+    };
+    data: {
+      /** `null`, якщо Dashboard не повернув id нового документа */
+      documentId: number | null;
+    };
+  };
+}
+
+export type DashboardModalKey = keyof DashboardModals;
+
+/**
+ * Чому модалку не відкрито.
+ * `not_in_iframe`, `no_response` (Dashboard не підтвердив — старий) — визначає SDK; решту повертає Dashboard.
+ */
+export type DashboardModalRefusal =
+  | 'not_in_iframe'
+  | 'no_response'
+  | 'unknown_modal'
+  | 'no_permissions'
+  | 'invalid_params'
+  | 'busy';
+
+export type DashboardModalResult<K extends DashboardModalKey = DashboardModalKey> =
+  /** Документ створено / змінено */
+  | { status: 'done'; data: DashboardModals[K]['data'] }
+  /** Модалку закрили без результату */
+  | { status: 'cancelled' }
+  /** Модалка відкрилась, але дія неможлива, напр. `order_unavailable` */
+  | { status: 'error'; reason: string }
+  /** Модалку не відкрито. `field` — яке поле не пройшло для `invalid_params` */
+  | { status: 'refused'; reason: DashboardModalRefusal | (string & {}); field?: string };
+
+/** Відповідь `getModals`: які ключі є в цьому Dashboard і чи дозволені користувачу */
+export type DashboardModalsAvailability = Partial<Record<DashboardModalKey | (string & {}), { allowed: boolean }>>;

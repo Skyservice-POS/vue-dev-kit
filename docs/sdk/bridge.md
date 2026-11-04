@@ -12,6 +12,7 @@ import {
   notify, notifyError, notifyWarn,
   isInsideIframe, isInIframe, onMessage,
   setSenderId, getSenderId,
+  openModal, getModals,
 } from '@skyservice-developers/vue-dev-kit/sdk'
 ```
 
@@ -68,6 +69,74 @@ exit()
 ```
 
 Це не «назад», а саме «закрити застосунок»: веде на головну незалежно від того, звідки користувач зайшов. Для кроку назад — [`goBack()`](#goback).
+
+## Модалки Dashboard
+
+Документи — надходження, інвентаризацію, переміщення — проводять форми Dashboard. Mini-app не
+копіює їх у себе, а просить Dashboard відкрити свою модалку **поверх iframe**, одразу заповнену:
+точка, склад, документ-підстава. Iframe при цьому не вивантажується — стан застосунку лишається.
+
+Ззовні відкривається лише ключ із реєстру Dashboard (`src/modals/registry.js`). Каталог ключів і
+їхніх параметрів — тип `DashboardModals`.
+
+### `openModal(key, context, params, options?)`
+
+```ts
+const result = await openModal(
+  'coming.create',
+  { tradepointId: order.tradepointId },
+  { warehouseId: order.warehouseId, supplierOrderId: order.orderId },
+)
+
+if (result.status === 'done') reloadOrder()   // result.data.documentId — новий документ
+```
+
+| Параметр | Тип | Опис |
+|----------|-----|------|
+| `key` | `DashboardModalKey` | Ключ модалки, напр. `'coming.create'` |
+| `context` | `DashboardModals[K]['context']` | Контекст; `tradepointId` Dashboard ставить поточною точкою на час модалки й потім повертає попередню |
+| `params` | `DashboardModals[K]['params']` | Параметри модалки. Передавайте **ідентифікатори, а не знімки даних**: товари й ціни модалка підтягує сама |
+| `options.ackTimeout` | `number` | Скільки мс чекати підтвердження, типово `1500` |
+
+Промис **не відхиляється** і резолвиться, коли модалку закрили:
+
+| `status` | Коли | Поля |
+|----------|------|------|
+| `done` | Документ створено / змінено | `data` — дані ключа, для `coming.create` — `{ documentId }` |
+| `cancelled` | Закрили без результату | — |
+| `error` | Модалка відкрилась, але дія неможлива | `reason`, напр. `order_unavailable` |
+| `refused` | Модалку не відкрито | `reason`, `field?` |
+
+Причини `refused`: `not_in_iframe`, `no_response` (Dashboard не підтвердив — старий), `unknown_modal`,
+`no_permissions`, `invalid_params` (з `field`, напр. `params.warehouseId`), `busy` (уже відкрита інша модалка).
+
+Протокол: `openModal` → одразу `DATA_RESPONSE` з `{ ok: true }` або `{ ok: false, reason, field? }` →
+після закриття `modalClosed { requestId, status, data }`.
+
+### Каталог
+
+| Ключ | `context` | `params` | `data` при `done` |
+|------|-----------|----------|-------------------|
+| `coming.create` | `{ tradepointId }` | `warehouseId`, `supplierOrderId?`, `supplierId?`, `comment?` | `{ documentId: number \| null }` |
+
+`coming.create` із `supplierOrderId` заповнює надходження із замовлення постачальнику: решта до
+отримання, ціни, постачальник; точка, склад і замовлення заблоковані.
+
+### `getModals(timeout?)`
+
+Які ключі є в цьому Dashboard і чи дозволені користувачу — щоб вирішити, чи показувати кнопку.
+
+```ts
+const modals = await getModals()
+const canCreateReceipt = !!modals?.['coming.create']?.allowed
+```
+
+Резолвиться в `null` поза iframe або коли Dashboard не відповів (старий, про модалки не знає).
+
+::: tip Потрібен Dashboard із реєстром модалок
+Старіші збірки хоста `openModal` ігнорують — тоді `openModal` віддає `refused` / `no_response`, а
+`getModals` — `null`.
+:::
 
 ## Читання даних хоста
 
