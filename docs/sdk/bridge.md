@@ -104,8 +104,12 @@ if (result.status === 'done') reloadOrder()   // result.data.documentId — но
 |----------|------|------|
 | `done` | Документ створено / змінено | `data` — дані ключа, для `coming.create` — `{ documentId }` |
 | `cancelled` | Закрили без результату | — |
-| `error` | Модалка відкрилась, але дія неможлива | `reason`, напр. `order_unavailable` |
+| `error` | Модалка відкрилась, але дія неможлива | `reason`; для `create_failed` ще `error?` (код бека) і `message?` (текст Dashboard) |
 | `refused` | Модалку не відкрито | `reason`, `field?` |
+
+Причини `error`: `order_unavailable` (замовлення закрили чи скасували, поки форма була відкрита),
+`create_failed` (бек не провів документ — модалка закривається, `error` і `message` кажуть чому).
+Покажіть `message`, а без нього — свій загальний текст; `error` — для логів чи власних текстів за кодом.
 
 Причини `refused`: `not_in_iframe`, `no_response` (Dashboard не підтвердив — старий), `unknown_modal`,
 `no_permissions`, `invalid_params` (з `field`, напр. `params.warehouseId`), `busy` (уже відкрита інша модалка).
