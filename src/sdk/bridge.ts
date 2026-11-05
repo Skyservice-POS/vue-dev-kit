@@ -183,7 +183,12 @@ export function openModal<K extends DashboardModalKey>(
         if (d.status === 'done') {
           finish({ status: 'done', data: data as DashboardModals[K]['data'] });
         } else if (d.status === 'error') {
-          finish({ status: 'error', reason: String(data.reason ?? 'unknown') });
+          finish({
+            status: 'error',
+            reason: String(data.reason ?? 'unknown'),
+            ...(typeof data.error === 'string' ? { error: data.error } : {}),
+            ...(typeof data.message === 'string' ? { message: data.message } : {}),
+          });
         } else {
           finish({ status: 'cancelled' });
         }

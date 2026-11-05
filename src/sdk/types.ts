@@ -161,8 +161,11 @@ export type DashboardModalResult<K extends DashboardModalKey = DashboardModalKey
   | { status: 'done'; data: DashboardModals[K]['data'] }
   /** Модалку закрили без результату */
   | { status: 'cancelled' }
-  /** Модалка відкрилась, але дія неможлива, напр. `order_unavailable` */
-  | { status: 'error'; reason: string }
+  /**
+   * Модалка відкрилась, але дія неможлива: `order_unavailable` чи `create_failed` (бек не провів документ).
+   * `error` — сирий код помилки бека, `message` — текст, який показав би Dashboard (мовою користувача)
+   */
+  | { status: 'error'; reason: string; error?: string; message?: string }
   /** Модалку не відкрито. `field` — яке поле не пройшло для `invalid_params` */
   | { status: 'refused'; reason: DashboardModalRefusal | (string & {}); field?: string };
 

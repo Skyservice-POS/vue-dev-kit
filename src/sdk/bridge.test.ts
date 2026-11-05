@@ -133,6 +133,35 @@ describe('openModal', () => {
     await expect(result).resolves.toEqual({ status: 'error', reason: 'order_unavailable' });
   });
 
+  it('віддає error з кодом і текстом помилки бека', async () => {
+    const posted = mockIframe();
+
+    const result = open();
+    respondTo(posted[0].requestId, { ok: true });
+    closeModal(posted[0].requestId, 'error', {
+      reason: 'create_failed',
+      error: 'invalid quantity',
+      message: 'Невірна кількість',
+    });
+
+    await expect(result).resolves.toEqual({
+      status: 'error',
+      reason: 'create_failed',
+      error: 'invalid quantity',
+      message: 'Невірна кількість',
+    });
+  });
+
+  it('відкидає нерядкові error і message', async () => {
+    const posted = mockIframe();
+
+    const result = open();
+    respondTo(posted[0].requestId, { ok: true });
+    closeModal(posted[0].requestId, 'error', { reason: 'create_failed', error: ['x'], message: 42 });
+
+    await expect(result).resolves.toEqual({ status: 'error', reason: 'create_failed' });
+  });
+
   it('віддає refused із причиною й полем, коли дашборд відмовив', async () => {
     const posted = mockIframe();
 
