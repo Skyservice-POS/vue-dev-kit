@@ -30,6 +30,11 @@ const props = withDefaults(
     /** Куди прилипає штора — див. SkyFiltersCurtain `anchor`. */
     curtainAnchor?: string | HTMLElement | null;
     curtainWidth?: number;
+    /**
+     * Ширина рядка, px, нижче якої фільтри з іконкою (`date` — календар) показують іконку
+     * замість назви, як DatePickerRange у Dashboard. `0` — завжди назва.
+     */
+    compactWidth?: number;
   }>(),
   {
     modelValue: () => ({}),
@@ -37,6 +42,7 @@ const props = withDefaults(
     labels: () => ({}),
     curtainAnchor: null,
     curtainWidth: 320,
+    compactWidth: 450,
   },
 );
 
@@ -63,16 +69,46 @@ const items = computed(() =>
     .filter(({ f, def }) => f.keepEmpty || !def.hasItems || def.hasItems(f))
     .map(({ f, def }) => {
       const value = props.modelValue[f.key] ?? def.emptyValue(f);
-      return { f, def, value, display: def.display(value, f) };
+      // `icon: null` у фільтрі — без іконки, навіть якщо тип її має.
+      const icon = f.icon === undefined ? def.icon : f.icon;
+      // Закріплений (`date` — за замовчуванням) завжди в рядку й не йде в штору.
+      const pinned = f.pinned ?? def.pinned ?? false;
+      return { f, def, value, icon: icon ?? null, pinned, display: def.display(value, f) };
     }),
 );
 
 const activeCount = computed(() => items.value.filter((i) => i.display.count > 0).length);
 const hasOverflow = computed(() => hiddenFrom.value !== null);
 
-function isHidden(index: number): boolean {
-  return hiddenFrom.value !== null && index >= hiddenFrom.value;
+// Вузький рядок — іконки замість назв. 0 — ще не зверстано (або happy-dom): лишаємо назви.
+const isCompact = ref(false);
+function updateCompact(): void {
+  const width = rootRef.value?.clientWidth ?? 0;
+  isCompact.value = props.compactWidth > 0 && width > 0 && width < props.compactWidth;
 }
+
+function onResize(): void {
+  updateCompact();
+  scheduleRecalc();
+}
+
+/**
+ * Номер фільтра серед тих, що можуть сховатись (-1 — закріплений). `hiddenFrom` рахується
+ * саме по них: закріплені стоять на своїх місцях і в розрахунок не входять.
+ */
+const hideableRank = computed(() => {
+  let rank = 0;
+  return items.value.map((i) => (i.pinned ? -1 : rank++));
+});
+
+function isHidden(index: number): boolean {
+  // Закріплений має -1 — меншого за будь-який hiddenFrom, тож не ховається ніколи.
+  const rank = hideableRank.value[index] ?? -1;
+  return hiddenFrom.value !== null && rank >= hiddenFrom.value;
+}
+
+/** У шторі — лише те, що може сховатись: закріплених (дати) там нема. */
+const curtainFilters = computed(() => items.value.filter((i) => !i.pinned).map((i) => i.f));
 
 function setItemEl(key: string, el: unknown): void {
   if (el instanceof HTMLElement) itemEls.set(key, el);
@@ -81,9 +117,9 @@ function setItemEl(key: string, el: unknown): void {
 
 /**
  * Скільки фільтрів влазить у рядок. Спершу пробуємо всі разом (плюс «Скинути
- * фільтри», якщо є що скидати); не влізли — резервуємо місце під «Усі фільтри»
- * і набираємо зліва направо, доки є місце. Порядок не перемішується: після
- * першого, що не вліз, ховаються й усі наступні.
+ * фільтри», якщо є що скидати); не влізли — резервуємо місце під закріплені
+ * фільтри й «Усі фільтри» і набираємо решту зліва направо, доки є місце.
+ * Порядок не перемішується: після першого, що не вліз, ховаються й усі наступні.
  */
 function recalc(): void {
   const row = rowRef.value;
@@ -99,17 +135,22 @@ function recalc(): void {
     return;
   }
 
+  const pinnedWidths = widths.filter((_, i) => items.value[i].pinned);
+  // Без них (лише закріплені) цикл нічого не набере й `hiddenFrom` лишиться null.
+  const hideable = widths.filter((_, i) => !items.value[i].pinned);
+
   const moreWidth = (measureMoreRef.value?.offsetWidth ?? 0) + gap;
-  let used = 0;
+  let used = pinnedWidths.reduce((sum, w, i) => sum + w + (i ? gap : 0), 0);
   let fit = 0;
-  for (const w of widths) {
-    const add = w + (fit ? gap : 0);
-    // Перший фільтр лишається завжди: рядок з однієї кнопки «Усі фільтри» гірший.
-    if (fit > 0 && used + add + moreWidth > available) break;
+  for (const w of hideable) {
+    const add = w + (used ? gap : 0);
+    // Навіть перший не влазить — у рядку лише закріплені й «Усі фільтри»: фільтр, що
+    // вилазить за край, налазить на сусідні кнопки.
+    if (used + add + moreWidth > available) break;
     used += add;
     fit++;
   }
-  hiddenFrom.value = fit < widths.length ? fit : null;
+  hiddenFrom.value = fit < hideable.length ? fit : null;
 }
 
 let frame = 0;
@@ -127,11 +168,22 @@ watch(
   { deep: true },
 );
 
+watch(
+  () => props.compactWidth,
+  () => {
+    updateCompact();
+    scheduleRecalc();
+  },
+);
+
 let observer: ResizeObserver | null = null;
 onMounted(() => {
+  updateCompact();
   recalc();
+  // Іконки змінюють ширину тригерів — після першого перемикання рядок перераховується
+  if (isCompact.value) scheduleRecalc();
   if (typeof ResizeObserver !== 'undefined' && rootRef.value) {
-    observer = new ResizeObserver(scheduleRecalc);
+    observer = new ResizeObserver(onResize);
     observer.observe(rootRef.value);
   }
 });
@@ -181,7 +233,12 @@ defineExpose({ recalc, openCurtain: () => (curtainOpen.value = true), closeCurta
           :badge="item.display.badge"
           :width="item.f.width ?? 280"
           :disabled="disabled || item.f.disabled || isHidden(index)"
+          :icon-only="isCompact && !!item.icon"
         >
+          <template v-if="item.icon" #icon>
+            <component :is="item.icon" />
+          </template>
+
           <template #default="{ close }">
             <component
               :is="item.def.component"
@@ -203,10 +260,14 @@ defineExpose({ recalc, openCurtain: () => (curtainOpen.value = true), closeCurta
         data-sky-filters-more
         :disabled="disabled"
         :aria-expanded="curtainOpen"
+        :aria-label="isCompact ? l.allFilters : undefined"
+        :title="isCompact ? l.allFilters : undefined"
         @click="curtainOpen = !curtainOpen"
       >
-        <span>{{ l.allFilters }}</span>
-        <span v-if="activeCount > 0" class="sky-filters__moreActive">{{ l.active }} {{ activeCount }} {{ l.pcs }}</span>
+        <!-- Вузький рядок — лише іконка (і кількість обраних), як календар у фільтрі дат. -->
+        <span v-if="!isCompact">{{ l.allFilters }}</span>
+        <span v-if="activeCount > 0 && isCompact" class="sky-filters__moreActive">{{ activeCount }}</span>
+        <span v-else-if="activeCount > 0" class="sky-filters__moreActive">{{ l.active }} {{ activeCount }} {{ l.pcs }}</span>
         <svg class="sky-filters__moreIcon" width="28" height="18" viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="m17 5a3 3 0 1 1 3 3 3 3 0 0 1 -3-3zm-15 1h12a1 1 0 0 0 0-2h-12a1 1 0 0 0 0 2zm6 3a3 3 0 0 0 -2.82 2h-3.18a1 1 0 0 0 0 2h3.18a3 3 0 1 0 2.82-4zm14 2h-8a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2zm-12 7h-8a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2zm12 0h-3.18a3 3 0 1 0 0 2h3.18a1 1 0 0 0 0-2z"
@@ -227,8 +288,9 @@ defineExpose({ recalc, openCurtain: () => (curtainOpen.value = true), closeCurta
          раптово стрибає в штору. -->
     <div class="sky-filters__measure" aria-hidden="true">
       <span ref="measureMoreRef" class="sky-filters__more">
-        <span>{{ l.allFilters }}</span>
-        <span class="sky-filters__moreActive">{{ l.active }} {{ Math.max(activeCount, 1) }} {{ l.pcs }}</span>
+        <span v-if="!isCompact">{{ l.allFilters }}</span>
+        <span v-if="isCompact" class="sky-filters__moreActive">{{ Math.max(activeCount, 1) }}</span>
+        <span v-else class="sky-filters__moreActive">{{ l.active }} {{ Math.max(activeCount, 1) }} {{ l.pcs }}</span>
         <span class="sky-filters__moreIcon" />
       </span>
       <span ref="measureResetRef" class="sky-filters__reset">{{ l.reset }}</span>
@@ -236,7 +298,7 @@ defineExpose({ recalc, openCurtain: () => (curtainOpen.value = true), closeCurta
 
     <SkyFiltersCurtain
       :open="curtainOpen"
-      :filters="items.map((i) => i.f)"
+      :filters="curtainFilters"
       :values="modelValue"
       :labels="l"
       :disabled="disabled"

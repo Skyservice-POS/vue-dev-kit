@@ -117,6 +117,7 @@ const noWeekends = (date) => [0, 6].includes(new Date(date).getDay())
 | `clearLabel` / `doneLabel` | `String` | `'Очистити'` / `'Готово'` | Тексти футера |
 | `width` | `Number` | `320` | Ширина панелі |
 | `disabled` | `Boolean` | `false` | Вимкнений стан |
+| `iconOnly` | `Boolean` | `false` | Календар замість назви — для вузького екрана. У [`SkyFilters`](/components/sky-filters) вмикається сам (`compactWidth`) |
 
 ## Slots
 
@@ -133,6 +134,8 @@ const noWeekends = (date) => [0, 6].includes(new Date(date).getDay())
 ## Тригер
 
 Назва фільтра; коли період задано — бейдж `01.10.2025 – 15.10.2025` (один день — одна дата).
+З `iconOnly` — календар (іконка з DatePickerRange Dashboard) замість назви, бейдж поруч; відкритий
+фільтр — сіра іконка.
 
 ## CSS-змінні
 

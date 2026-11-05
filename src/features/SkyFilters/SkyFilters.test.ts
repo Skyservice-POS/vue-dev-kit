@@ -45,6 +45,98 @@ afterEach(() => {
 const hiddenTitles = (w: ReturnType<typeof mount>) =>
   w.findAll('.sky-filters__item.is-hidden').map((el) => el.find('.sky-filter-dropdown__title').text());
 
+/** Ширина самого рядка фільтрів (`.sky-filters`) — від неї залежить компактний режим. */
+function stubRootWidth(width: number) {
+  const cw = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (this: HTMLElement) {
+    return this.classList.contains('sky-filters') ? width : 0;
+  });
+  return () => cw.mockRestore();
+}
+
+const withDate: SkyFilterConfig[] = [
+  { key: 'period', title: 'Period', type: 'date' },
+  { key: 'cat', title: 'Cat', options: opts },
+];
+
+describe('SkyFilters compact (icon instead of title)', () => {
+  it('shows the calendar instead of the date title on a narrow row, keeping the picked range', async () => {
+    restore = stubRootWidth(400);
+    const w = mount(SkyFilters, {
+      props: { filters: withDate, modelValue: { period: { start: '2026-11-01', end: '2026-11-05' } } },
+    });
+    await nextTick();
+
+    const [date, cat] = w.findAll('.sky-filter-dropdown__trigger');
+    expect(date.find('.sky-filter-dropdown__icon svg').exists()).toBe(true);
+    expect(date.find('.sky-filter-dropdown__title').exists()).toBe(false);
+    expect(date.find('.sky-filter-dropdown__caret').exists()).toBe(false);
+    expect(date.attributes('aria-label')).toBe('Period');
+    expect(date.find('.sky-filter-dropdown__badge').text()).not.toBe('');
+    // Фільтр без іконки лишається з назвою
+    expect(cat.find('.sky-filter-dropdown__title').text()).toBe('Cat');
+    expect(cat.find('.sky-filter-dropdown__icon').exists()).toBe(false);
+  });
+
+  it('keeps the title when the row is wide enough', async () => {
+    restore = stubRootWidth(450);
+    const w = mount(SkyFilters, { props: { filters: withDate } });
+    await nextTick();
+
+    const date = w.findAll('.sky-filter-dropdown__trigger')[0];
+    expect(date.find('.sky-filter-dropdown__title').text()).toBe('Period');
+    expect(date.find('.sky-filter-dropdown__icon').exists()).toBe(false);
+    expect(date.attributes('aria-label')).toBeUndefined();
+  });
+
+  it('compactWidth 0 and icon: null both keep the title', async () => {
+    restore = stubRootWidth(300);
+    const off = mount(SkyFilters, { props: { filters: withDate, compactWidth: 0 } });
+    const noIcon = mount(SkyFilters, { props: { filters: [{ ...withDate[0], icon: null }] } });
+    await nextTick();
+
+    expect(off.find('.sky-filter-dropdown__icon').exists()).toBe(false);
+    expect(noIcon.find('.sky-filter-dropdown__icon').exists()).toBe(false);
+    expect(noIcon.find('.sky-filter-dropdown__title').text()).toBe('Period');
+  });
+
+  it('switches back to the title when the row grows', async () => {
+    let width = 300;
+    const cw = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(function (this: HTMLElement) {
+      return this.classList.contains('sky-filters') ? width : 0;
+    });
+    restore = () => cw.mockRestore();
+    const w = mount(SkyFilters, { props: { filters: withDate } });
+    await nextTick();
+    expect(w.find('.sky-filter-dropdown__icon').exists()).toBe(true);
+
+    width = 800;
+    (w.vm as any).$.setupState.onResize();
+    await nextTick();
+    expect(w.find('.sky-filter-dropdown__icon').exists()).toBe(false);
+  });
+
+  it('shows "all filters" as an icon (with the picked count) on a narrow row', async () => {
+    restore = stubRootWidth(400);
+    const w = mount(SkyFilters, { props: { filters: withDate, modelValue: { cat: [1] } } });
+    await nextTick();
+    (w.vm as any).$.setupState.hiddenFrom = 0;
+    await nextTick();
+
+    const more = w.find('button[data-sky-filters-more]');
+    expect(more.text()).not.toContain('Усі фільтри');
+    expect(more.attributes('aria-label')).toBe('Усі фільтри');
+    expect(more.find('.sky-filters__moreActive').text()).toBe('1');
+    expect(more.find('svg').exists()).toBe(true);
+  });
+
+  it('does not go compact before layout (width 0)', async () => {
+    restore = stubRootWidth(0);
+    const w = mount(SkyFilters, { props: { filters: withDate } });
+    await nextTick();
+    expect(w.find('.sky-filter-dropdown__icon').exists()).toBe(false);
+  });
+});
+
 describe('SkyFilters', () => {
   it('hides filters that have nothing to pick, unless keepEmpty', async () => {
     const w = mount(SkyFilters, { props: { filters } });
@@ -94,6 +186,62 @@ describe('SkyFilters', () => {
     await w.setProps({ modelValue: { cat: [1] } });
     expect(w.find('button.sky-filters__reset').exists()).toBe(false);
     expect(w.find('[data-sky-filters-more]').text()).toContain('Активно 1 шт.');
+  });
+
+  it('hides even the first filter when it does not fit next to "all filters"', async () => {
+    // Фільтр 100 + кнопка 100 у рядку 150 не влазять — лишається тільки кнопка.
+    restore = stubWidths(150, 100);
+    const w = mount(SkyFilters, { props: { filters } });
+    (w.vm as any).recalc();
+    await nextTick();
+    expect(hiddenTitles(w)).toEqual(['Cat', 'St', 'Sum']);
+    expect(w.find('[data-sky-filters-more]').exists()).toBe(true);
+  });
+
+  it('keeps the date filter in the row and out of the curtain', async () => {
+    // Дата 100 + кнопка 100 у рядку 220: решта (по 100) не влазить — ховаються лише вони.
+    restore = stubWidths(220, 100);
+    const withPeriod: SkyFilterConfig[] = [
+      { key: 'cat', title: 'Cat', options: opts },
+      { key: 'period', title: 'Period', type: 'date' },
+      { key: 'st', title: 'St', type: 'radio', options: opts },
+    ];
+    const w = mount(SkyFilters, { props: { filters: withPeriod } });
+    (w.vm as any).recalc();
+    await nextTick();
+
+    expect(hiddenTitles(w)).toEqual(['Cat', 'St']);
+    const visible = w.findAll('.sky-filters__item:not(.is-hidden) .sky-filter-dropdown__title');
+    expect(visible.map((el) => el.text())).toEqual(['Period']);
+    expect(w.findComponent(SkyFiltersCurtain).props('filters').map((f: SkyFilterConfig) => f.key)).toEqual([
+      'cat',
+      'st',
+    ]);
+  });
+
+  it('pinned: false lets a date filter hide like the rest; pinned: true pins any filter', async () => {
+    restore = stubWidths(150, 100);
+    const w = mount(SkyFilters, {
+      props: {
+        filters: [
+          { key: 'period', title: 'Period', type: 'date', pinned: false },
+          { key: 'cat', title: 'Cat', options: opts, pinned: true },
+        ],
+      },
+    });
+    (w.vm as any).recalc();
+    await nextTick();
+    expect(hiddenTitles(w)).toEqual(['Period']);
+    expect(w.findComponent(SkyFiltersCurtain).props('filters').map((f: SkyFilterConfig) => f.key)).toEqual(['period']);
+  });
+
+  it('no overflow button when only pinned filters are left over', async () => {
+    restore = stubWidths(50, 100);
+    const w = mount(SkyFilters, { props: { filters: [{ key: 'period', title: 'Period', type: 'date' }] } });
+    (w.vm as any).recalc();
+    await nextTick();
+    expect(hiddenTitles(w)).toEqual([]);
+    expect(w.find('[data-sky-filters-more]').exists()).toBe(false);
   });
 
   it('reserves room for the reset button once something is picked', async () => {

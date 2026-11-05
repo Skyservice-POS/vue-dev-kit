@@ -41,12 +41,14 @@ import { SkyFilterDropdown } from '@skyservice-developers/vue-dev-kit'
 | `align` | `'start' \| 'end'` | `'start'` | До якого краю тригера притискається панель, поки вміщається |
 | `width` | `Number` | `280` | Ширина панелі в px; більшу за екран не візьме |
 | `disabled` | `Boolean` | `false` | Вимкнений стан; відкрита панель закривається |
+| `iconOnly` | `Boolean` | `false` | Слот `icon` замість назви (без стрілки), `badge` лишається поруч, `title` — в `aria-label`. Без слоту `icon` нічого не змінює |
 
 ## Slots
 
 | Slot | Props | Опис |
 |------|-------|------|
 | `default` | `{ close }` | Вміст панелі. `close()` — закрити ззовні (напр. після вибору) |
+| `icon` | `{ isOpen }` | Іконка для `iconOnly`. Колір — `currentColor`; відкритий стан — `--sky-filter-icon-open-color` |
 
 ## Events
 
@@ -73,6 +75,7 @@ import { SkyFilterDropdown } from '@skyservice-developers/vue-dev-kit'
 | `--sky-filter-trigger-font-weight` | `500` | Насиченість тексту чіпа |
 | `--sky-filter-trigger-muted-color` | `#b4b4b4` | Колір відкритого / вимкненого чіпа |
 | `--sky-filter-badge-color` | `gray` | Колір бейджа |
+| `--sky-filter-icon-open-color` | `#b4b4b4` | Колір іконки (`iconOnly`), поки панель відкрита |
 | `--sky-filter-panel-bg` | `#fff` | Фон панелі |
 | `--sky-filter-panel-radius` | `5px` | Радіус панелі |
 | `--sky-filter-panel-padding` | `10px 15px` | Падінги панелі |

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, nextTick, onBeforeUnmount, useSlots } from 'vue';
 
 /**
  * Trigger + popover shell shared by the filter chips (SkyCheckboxFilter,
@@ -32,6 +32,11 @@ const props = withDefaults(
      * інакше перекривали б її — інлайн виграє в обох.
      */
     panelVars?: Record<string, string>;
+    /**
+     * Замість назви — іконка зі слоту `icon` (на вузькому екрані). Бейдж лишається поруч,
+     * назва йде в `aria-label`. Без слоту `icon` нічого не змінює.
+     */
+    iconOnly?: boolean;
   }>(),
   {
     summary: '',
@@ -42,6 +47,7 @@ const props = withDefaults(
     triggerClass: '',
     panelClass: '',
     panelVars: () => ({}),
+    iconOnly: false,
   },
 );
 
@@ -61,6 +67,8 @@ const isOpen = ref(false);
 const panelStyle = ref<Record<string, string>>({});
 
 const label = computed(() => props.summary || props.title);
+const slots = useSlots();
+const showIcon = computed(() => props.iconOnly && !!slots.icon);
 const hasBadge = computed(() => !props.disabled && props.badge !== '' && props.badge != null);
 
 /**
@@ -167,15 +175,20 @@ defineExpose({ open, close, toggle, isOpen });
       :disabled="disabled"
       aria-haspopup="dialog"
       :aria-expanded="isOpen"
+      :aria-label="showIcon ? title : undefined"
+      :title="showIcon ? title : undefined"
       @mousedown.prevent
       @click="toggle"
     >
       <slot name="trigger" :is-open="isOpen">
-        <span class="sky-filter-dropdown__title">{{ label }}</span>
+        <span v-if="showIcon" class="sky-filter-dropdown__icon">
+          <slot name="icon" :is-open="isOpen" />
+        </span>
+        <span v-else class="sky-filter-dropdown__title">{{ label }}</span>
         <span v-if="hasBadge" class="sky-filter-dropdown__badge">{{ badge }}</span>
       </slot>
       <svg
-        v-if="!$slots.trigger"
+        v-if="!$slots.trigger && !showIcon"
         class="sky-filter-dropdown__caret"
         width="18"
         height="18"
@@ -242,6 +255,18 @@ defineExpose({ open, close, toggle, isOpen });
   font-weight: var(--sky-filter-trigger-font-weight, 500);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sky-filter-dropdown__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  transition: color 0.2s ease-in-out;
+}
+
+/* Відкритий — сіра іконка, як calendarGrey.svg у DatePickerRange Dashboard. */
+.sky-filter-dropdown__trigger.is-open .sky-filter-dropdown__icon {
+  color: var(--sky-filter-icon-open-color, #b4b4b4);
 }
 
 .sky-filter-dropdown__badge {

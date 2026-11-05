@@ -175,3 +175,22 @@ describe('date presets', () => {
     expect(t.display({ start: '2025-10-01', end: '2025-10-03' }, f)).toMatchObject({ count: 1, badge: '01.10.2025 – 03.10.2025' });
   });
 });
+
+describe('SkyDateFilter iconOnly', () => {
+  it('shows the calendar instead of the title, keeps the picked range next to it', () => {
+    const w = mount(SkyDateFilter, {
+      props: { title: 'Період', iconOnly: true, modelValue: { start: '2025-10-01', end: '2025-10-03' } },
+    });
+    const trigger = w.find('.sky-filter-dropdown__trigger');
+    expect(trigger.find('.sky-filter-dropdown__icon svg').exists()).toBe(true);
+    expect(trigger.find('.sky-filter-dropdown__title').exists()).toBe(false);
+    expect(trigger.attributes('aria-label')).toBe('Період');
+    expect(trigger.find('.sky-filter-dropdown__badge').text()).toBe('01.10.2025 – 03.10.2025');
+  });
+
+  it('shows the title by default', () => {
+    const w = mount(SkyDateFilter, { props: { title: 'Період' } });
+    expect(w.find('.sky-filter-dropdown__title').text()).toBe('Період');
+    expect(w.find('.sky-filter-dropdown__icon').exists()).toBe(false);
+  });
+});
