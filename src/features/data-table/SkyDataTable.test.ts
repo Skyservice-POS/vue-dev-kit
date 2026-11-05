@@ -261,11 +261,56 @@ describe('SkyDataTable — fitRows', () => {
     expect(wrapper.emitted('fit-rows')).toEqual([[10]]);
   });
 
-  it('with pagination, sizes the page to fit and hides the size selector', async () => {
+  it('with pagination, sizes the page to fit; the only size option is the fitted one', async () => {
     restore = stubHeights({ value: 410 });
     const wrapper = await mountTable({ data: makeData(60), pageSize: 25, fitRows: true });
-    expect(pager(wrapper).props()).toMatchObject({ pageSize: 10, pageSizeOptions: [] });
+    expect(pager(wrapper).props()).toMatchObject({ pageSize: 10, pageSizeOptions: [10] });
     expect(bodyRows(wrapper)).toHaveLength(10);
+  });
+
+  it('"all" survives the resize it causes and keeps a way back to pages', async () => {
+    const body = { value: 410 };
+    restore = stubHeights(body);
+    const wrapper = await mountTable({
+      data: makeData(47),
+      pageSize: 25,
+      fitRows: true,
+      pageAllLabel: (n: number) => `Усі ${n}`,
+    });
+    pager(wrapper).vm.$emit('update:pageSize', 47);
+    await wrapper.vm.$nextTick();
+    expect(bodyRows(wrapper)).toHaveLength(47);
+
+    // Пагінатор із однією сторінкою міг сховатись — тіло виросло, ResizeObserver перерахував
+    body.value = 451; // 11 рядків
+    recalc(wrapper);
+    await wrapper.vm.$nextTick();
+    expect(bodyRows(wrapper)).toHaveLength(47);
+    expect(pager(wrapper).props()).toMatchObject({ pageSize: 47, pageSizeOptions: [11] });
+
+    // Назад — «скільки влазить», і висота знову керує сторінкою
+    pager(wrapper).vm.$emit('update:pageSize', 11);
+    await wrapper.vm.$nextTick();
+    expect(bodyRows(wrapper)).toHaveLength(11);
+    body.value = 205;
+    recalc(wrapper);
+    await wrapper.vm.$nextTick();
+    expect(bodyRows(wrapper)).toHaveLength(5);
+  });
+
+  it('"all" stays all when more data arrives', async () => {
+    restore = stubHeights({ value: 410 });
+    const wrapper = await mountTable({
+      data: makeData(30),
+      pageSize: 25,
+      fitRows: true,
+      pageAllLabel: (n: number) => `Усі ${n}`,
+    });
+    pager(wrapper).vm.$emit('update:pageSize', 30);
+    await wrapper.vm.$nextTick();
+    await wrapper.setProps({ data: makeData(50) });
+    await wrapper.vm.$nextTick();
+    expect(bodyRows(wrapper)).toHaveLength(50);
   });
 
   it('keeps the same first row when the body is resized', async () => {

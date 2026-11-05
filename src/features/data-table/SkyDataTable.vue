@@ -74,7 +74,8 @@ const props = withDefaults(
      * Рахувати, скільки рядків вміщається в тіло, і віддавати це подією
      * `fit-rows` — під неї зручно вішати запит на бек з таким `limit`.
      * З пагінацією (`pageSize > 0`) таблиця ще й сама ставить такий розмір
-     * сторінки, а селектор кількості ховає.
+     * сторінки; у селекторі — лише це число й «Усі N» (з `pageAllLabel`).
+     * Обране «Усі» висота не перебиває.
      *
      * Працює лише з обмеженою висотою таблиці (батько з `height` або
      * `flex` + `min-height: 0`): інакше тіло росте разом з рядками, і міряти
@@ -179,6 +180,8 @@ function goToPage(page: number): void {
 // Нова кількість — завжди з першої сторінки: інакше поточна може опинитись за
 // межами нового числа сторінок. SkyPagination свідомо цього не робить сам.
 function changePageSize(size: number): void {
+  // Під fitRows вибір — або «скільки влазить», або «Усі». «Усі» висота більше не перебиває.
+  if (props.fitRows) fitShowAll.value = size > fittedRows.value;
   table.setPageSize(size);
   table.setPageIndex(0);
   emit('update:pageSize', size);
@@ -226,6 +229,11 @@ if (props.virtual && props.pageSize > 0) {
 // ── fitRows ────────────────────────────────────────────────────────────────
 const tableRootRef = ref<{ $el: HTMLElement } | null>(null);
 const fittedRows = ref(0);
+/**
+ * Користувач обрав «Усі». Без цього прапорця перший же ресайз (а він стається одразу:
+ * сторінка одна — пагінатор міг сховатись, тіло виросло) повертав розмір «скільки влазить».
+ */
+const fitShowAll = ref(false);
 
 const fitOptions = computed<SkyDataTableFitOptions>(() =>
   typeof props.fitRows === 'object' && props.fitRows !== null ? props.fitRows : {},
@@ -253,7 +261,7 @@ function recalcFit(): void {
   if (count === fittedRows.value) return;
   fittedRows.value = count;
 
-  if (props.pageSize > 0) {
+  if (props.pageSize > 0 && !fitShowAll.value) {
     // Лишаємось біля того самого першого рядка, а не стрибаємо на першу сторінку
     // на кожен ресайз вікна.
     const firstRow = (pagination.value?.pageIndex ?? 0) * currentPageSize.value;
@@ -300,6 +308,7 @@ watch(
     else {
       stopFit();
       fittedRows.value = 0;
+      fitShowAll.value = false;
     }
   },
 );
@@ -309,7 +318,10 @@ watch(
 watch(
   () => props.data,
   () => {
-    if (props.fitRows) void nextTick(recalcFit);
+    if (!props.fitRows) return;
+    // «Усі» лишається «всіма» й коли записів побільшало
+    if (fitShowAll.value && props.pageSize > 0) table.setPageSize(Math.max(1, table.getRowCount()));
+    void nextTick(recalcFit);
   },
 );
 
@@ -319,6 +331,11 @@ if (props.fitRows && props.virtual) {
       'тримає в DOM лише те, що видно. Лишіть щось одне.',
   );
 }
+
+// Під fitRows у селекторі — «скільки влазить» і (з `pageAllLabel`) «Усі N». Число «влазить»
+// тримаємо в списку й тоді, коли обрано «Усі»: інакше сторінка одна, селектор зникає разом
+// із пагінатором — і назад до сторінок не повернутись.
+const fitSizeOptions = computed(() => (fittedRows.value > 0 ? [fittedRows.value] : []));
 
 defineExpose({ table, recalcFit, fittedRows });
 </script>
@@ -402,7 +419,7 @@ defineExpose({ table, recalcFit, fittedRows });
           :total="table.getRowCount()"
           :page="currentPage"
           :page-size="currentPageSize"
-          :page-size-options="fitRows ? [] : pageSizeOptions"
+          :page-size-options="fitRows ? fitSizeOptions : pageSizeOptions"
           :all-label="pageAllLabel"
           @update:page="goToPage"
           @update:page-size="changePageSize"

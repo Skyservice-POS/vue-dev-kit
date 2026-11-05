@@ -4,6 +4,7 @@ import RadioPanel from '@/shared/ui/SkyFilterDropdown/panels/RadioPanel.vue';
 import RangePanel from '@/shared/ui/SkyFilterDropdown/panels/RangePanel.vue';
 import SearchPanel from '@/shared/ui/SkyFilterDropdown/panels/SearchPanel.vue';
 import DatePanel from '@/shared/ui/SkyFilterDropdown/panels/DatePanel.vue';
+import CalendarIcon from '@/shared/ui/SkyFilterDropdown/CalendarIcon.vue';
 import type { DateCheckContext } from '@/shared/ui/SkyFilterDropdown/panels/DatePanel.vue';
 import { formatDateRange, type DatePreset, type DateRange } from '@/shared/lib/date/dateRange';
 import type { RadioWithInput } from '@/shared/ui/SkyFilterDropdown/panels/RadioPanel.vue';
@@ -85,6 +86,16 @@ export interface SkyFilterConfig {
   fetch?: SearchFetch;
   /** Ширина панелі дропдауна, px. */
   width?: number;
+  /**
+   * Іконка замість назви на вузькому рядку (див. SkyFilters `compactWidth`).
+   * У `date` за замовчуванням — календар; `null` — завжди назва.
+   */
+  icon?: Component | null;
+  /**
+   * Завжди в рядку: не ховається в «Усі фільтри» й не потрапляє в штору.
+   * У `date` — `true` за замовчуванням.
+   */
+  pinned?: boolean;
   /** У шторі секція згорнута, доки в ній нічого не обрано. */
   collapsed?: boolean;
   /** Показувати фільтр, навіть коли опцій нема. */
@@ -109,6 +120,10 @@ export interface FilterTypeDef {
   props?: (filter: SkyFilterConfig, labels: SkyFiltersLabels) => Record<string, unknown>;
   /** false — фільтр нема з чого обирати, рядок його ховає. */
   hasItems?: (filter: SkyFilterConfig) => boolean;
+  /** Іконка замість назви на вузькому рядку; фільтр може перекрити своїм `icon`. */
+  icon?: Component;
+  /** Завжди в рядку, без штори; фільтр може перекрити своїм `pinned`. */
+  pinned?: boolean;
 }
 
 /** Довга назва в тригері розпирала б рядок — після 20 символів обрізаємо. */
@@ -190,6 +205,10 @@ const registry: Record<string, FilterTypeDef> = {
 
   date: {
     component: markRaw(DatePanel),
+    // Як у DatePickerRange Dashboard: на вузькому — календар замість «Період»
+    icon: markRaw(CalendarIcon),
+    // Періоду в шторі нема: він завжди в рядку
+    pinned: true,
     emptyValue: () => ({ start: null, end: null }),
     display: (v) => {
       const r = (v ?? {}) as Partial<DateRange>;

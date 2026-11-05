@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import SkyFilterDropdown from '@/shared/ui/SkyFilterDropdown/SkyFilterDropdown.vue';
+import CalendarIcon from '@/shared/ui/SkyFilterDropdown/CalendarIcon.vue';
 import DatePanel, { type DateCheckContext } from '@/shared/ui/SkyFilterDropdown/panels/DatePanel.vue';
 import { defaultDatePresets, formatDateRange, type DatePreset, type DateRange } from '@/shared/lib/date/dateRange';
 
@@ -28,6 +29,8 @@ const props = withDefaults(
     doneLabel?: string;
     width?: number;
     disabled?: boolean;
+    /** Календар замість назви (на вузькому екрані); обраний період лишається поруч. */
+    iconOnly?: boolean;
   }>(),
   {
     modelValue: () => ({ start: null, end: null }),
@@ -44,6 +47,7 @@ const props = withDefaults(
     doneLabel: 'Готово',
     width: 320,
     disabled: false,
+    iconOnly: false,
   },
 );
 
@@ -76,7 +80,18 @@ function clearAndClose(close: () => void): void {
 </script>
 
 <template>
-  <SkyFilterDropdown class="sky-date-filter" :title="title" :badge="badge" :width="width" :disabled="disabled">
+  <SkyFilterDropdown
+    class="sky-date-filter"
+    :title="title"
+    :badge="badge"
+    :width="width"
+    :disabled="disabled"
+    :icon-only="iconOnly"
+  >
+    <template #icon>
+      <CalendarIcon />
+    </template>
+
     <template #default="{ close }">
       <DatePanel
         ref="panelRef"

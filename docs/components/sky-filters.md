@@ -2,6 +2,11 @@
 
 Рядок фільтрів з одним `v-model` на всі. Фільтри, що не влазять по ширині, ховаються в кнопку **«Усі фільтри»**, а вона відкриває штору (`SkyFiltersCurtain`) зі всіма фільтрами — як `HeaderFilters` в адмінці. Коли влазить усе й щось обрано, у рядку з'являється «Скинути фільтри».
 
+Фільтри ховаються з кінця, порядок не змінюється. Закріплені (`pinned`; `date` — завжди) лишаються
+в рядку й у штору не йдуть. Якщо поруч із ними й «Усі фільтри» не влазить жоден інший — у рядку
+лишаються тільки закріплені й кнопка. На вузькому рядку (`compactWidth`) кнопка — лише іконка
+з кількістю обраних, а `date` — календар замість назви.
+
 Вбудовані типи: `checkbox`, `radio` (з опційним числовим інпутом), `range`, `search` (серверний пошук), `date` (період). Кожен є й окремим фільтр-чіпом зі своєю сторінкою: [`SkyCheckboxFilter`](/components/sky-checkbox-filter), [`SkyRadioFilter`](/components/sky-radio-filter), [`SkyRangeFilter`](/components/sky-range-filter), [`SkySearchFilter`](/components/sky-search-filter), [`SkyDateFilter`](/components/sky-date-filter). Свої типи додаються компонентом прямо в конфігу або через `registerFilterType`.
 
 ## Демо
@@ -47,6 +52,7 @@ const filters = [
 | `labels` | `Partial<SkyFiltersLabels>` | укр. | Тексти: `allFilters`, `active`, `pcs`, `reset`, `ok`, `done`, `clear`, `selectAll`, `search`, `empty`, `loading`, `loadMore` |
 | `curtainAnchor` | `string \| HTMLElement` | — | Елемент/селектор, до кута якого прилипає штора (напр. `'#content'` поруч із меню). Без нього — лівий верхній кут вікна |
 | `curtainWidth` | `Number` | `320` | Ширина штори, px |
+| `compactWidth` | `Number` | `450` | Рядок вужчий за це (px) — іконки замість назв: «Усі фільтри» — лише іконка з кількістю обраних; фільтри з іконкою (`date` — календар, як DatePickerRange у Dashboard) — іконка, обраний період поруч. Назви — в `aria-label`. `0` — завжди назви |
 
 ## SkyFilterConfig
 
@@ -65,6 +71,8 @@ const filters = [
 | `maxDays` / `disabledDate` / `presets` | date | Як у [`SkyDateFilter`](/components/sky-date-filter) |
 | `fetch` | search | `({ page, search }) => Promise<{ items, hasMore }>` |
 | `width` | усі | Ширина панелі дропдауна, px (280) |
+| `icon` | усі | Іконка замість назви на вузькому рядку (`compactWidth`). У `date` — календар за замовчуванням; `null` — завжди назва |
+| `pinned` | усі | Завжди в рядку: не ховається в «Усі фільтри» й не потрапляє в штору. У `date` — `true` за замовчуванням |
 | `collapsed` | усі | У шторі секція згорнута, доки в ній нічого не обрано |
 | `keepEmpty` | checkbox, radio | Показувати без опцій |
 | `disabled` | усі | Вимкнути один фільтр |
