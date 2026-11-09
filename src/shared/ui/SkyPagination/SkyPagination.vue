@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import SkyFilterDropdown from '@/shared/ui/SkyFilterDropdown/SkyFilterDropdown.vue';
 
 /**
@@ -79,21 +79,101 @@ const sizeOptions = computed(() => {
 const sizeLabel = (n: number): string =>
   hasAll.value && n === props.total ? props.allLabel!(props.total) : String(n);
 
-/** Номери сторінок із «…»: перша, остання, поточна з сусідами. */
-const pages = computed<(number | '…')[]>(() => {
-  const last = pageCount.value;
-  const span = props.siblings;
-  if (last <= 5 + span * 2) return Array.from({ length: last }, (_, i) => i + 1);
+/**
+ * Скільки пунктів (номерів разом із «…») влазить у ширину. Підбирає `fit()` за
+ * реальною розміткою; поки виміряти нема як (немає `ResizeObserver`, елемент
+ * схований, happy-dom) — 7, тобто «1 … 9 10 11 … 47», як було до підгону.
+ */
+const FALLBACK_SLOTS = 7;
+const slots = ref(FALLBACK_SLOTS);
 
-  const from = Math.max(2, props.page - span);
-  const to = Math.min(last - 1, props.page + span);
-  const out: (number | '…')[] = [1];
-  if (from > 2) out.push('…');
-  for (let p = from; p <= to; p++) out.push(p);
-  if (to < last - 1) out.push('…');
-  out.push(last);
-  return out;
+/**
+ * Номери сторінок із «…» під бюджет `max` пунктів. Обов'язкові — перша, поточна
+ * з `siblings` сусідами й остання; решту місця добираємо найменшими номерами
+ * підряд. Так виходить «1 2 3 4 5 … 47», поки поточна серед перших, і
+ * «1 2 … 9 10 11 … 47», коли вона далі. «…» замість однієї сторінки не ставимо —
+ * пункт той самий, тож краще показати номер.
+ */
+function layout(page: number, last: number, span: number, max: number): (number | '…')[] {
+  if (last <= max) return Array.from({ length: last }, (_, i) => i + 1);
+
+  const build = (set: Set<number>): (number | '…')[] => {
+    const sorted = [...set].sort((a, b) => a - b);
+    const out: (number | '…')[] = [];
+    sorted.forEach((p, i) => {
+      const prev = sorted[i - 1];
+      if (prev !== undefined && p - prev === 2) out.push(prev + 1);
+      else if (prev !== undefined && p - prev > 2) out.push('…');
+      out.push(p);
+    });
+    return out;
+  };
+
+  const set = new Set([1, last]);
+  for (let p = Math.max(1, page - span); p <= Math.min(last, page + span); p++) set.add(p);
+  let best = build(set);
+  for (let p = 2; p < last; p++) {
+    if (set.has(p)) continue;
+    set.add(p);
+    const next = build(set);
+    if (next.length > max) break;
+    best = next;
+  }
+  return best;
+}
+
+const pages = computed(() => layout(props.page, pageCount.value, props.siblings, slots.value));
+
+/** Найменший осмислений бюджет: перша, поточна з сусідами, остання і дві «…». */
+const minSlots = computed(() => layout(props.page, pageCount.value, props.siblings, 0).length);
+
+const root = ref<HTMLElement | null>(null);
+let fitRun = 0;
+
+const overflows = (el: HTMLElement): boolean => el.scrollWidth > el.clientWidth + 1;
+
+/**
+ * Двійковий пошук найбільшого бюджету без переповнення. Кожна спроба — ререндер
+ * через `nextTick`; усе це мікрозадачі, тож браузер не встигає намалювати
+ * проміжні варіанти. Нижче `minSlots` не опускаємось — там уже скрол.
+ */
+async function fit(): Promise<void> {
+  const el = root.value;
+  if (!el || el.clientWidth === 0) return;
+  const run = ++fitRun;
+  // Пункт не вужчий за ~20px, тож більше за ширину/20 перевіряти марно.
+  let lo = minSlots.value;
+  let hi = Math.max(lo, Math.min(pageCount.value, Math.floor(el.clientWidth / 20)));
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    slots.value = mid;
+    await nextTick();
+    if (run !== fitRun || !root.value) return;
+    if (overflows(root.value)) hi = mid - 1;
+    else lo = mid;
+  }
+  slots.value = lo;
+}
+
+// Ширина кореня від вмісту не залежить (flex: 1, min-width: 0), тож зміна
+// бюджету спостерігача не смикає — лише справжня зміна місця. Корінь під
+// `v-if`, тож стежимо за самим ref, а не чіпляємось раз у onMounted.
+let observer: ResizeObserver | null = null;
+onMounted(() => {
+  if (typeof ResizeObserver === 'undefined') return;
+  observer = new ResizeObserver(() => void fit());
+  watch(
+    root,
+    (el, old) => {
+      if (old) observer?.unobserve(old);
+      if (el) observer?.observe(el);
+    },
+    { immediate: true },
+  );
 });
+onBeforeUnmount(() => observer?.disconnect());
+
+watch(() => [props.page, pageCount.value, props.siblings], () => void fit(), { flush: 'post' });
 
 const visible = computed(() => pageCount.value > 1 || sizeOptions.value.length > 1);
 
@@ -109,7 +189,7 @@ function pick(size: number, close: () => void): void {
 </script>
 
 <template>
-  <div v-if="visible" class="sky-pagination">
+  <div v-if="visible" ref="root" class="sky-pagination">
     <SkyFilterDropdown
       v-if="sizeOptions.length > 1"
       class="sky-pagination__size"
@@ -160,12 +240,21 @@ function pick(size: number, close: () => void): void {
 .sky-pagination {
   display: flex;
   align-items: center;
-  flex: 0 1 auto;
+  /* Займає все вільне місце, а не ширину вмісту: від цієї ширини рахується,
+     скільки номерів влазить. Тож вона мусить не залежати від самих номерів. */
+  flex: 1 1 0%;
+  min-width: 0;
   max-width: 100%;
   height: var(--sky-pagination-height, 48px);
   overflow: auto;
   font-size: var(--sky-pagination-font-size, 12pt);
   line-height: var(--sky-pagination-line-height, 15px);
+}
+
+/* Не стискатись, а переповнювати: інакше флекс з'їдає падінги номерів, і
+   переповнення, за яким `fit()` міряє, настає надто пізно. */
+.sky-pagination > * {
+  flex-shrink: 0;
 }
 
 /* Рамка — на обгортці, а кнопка всередині світло-сіра: так само, як
